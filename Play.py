@@ -741,10 +741,10 @@ def round_end (board, end_counter, units_stats, peaks, elements, color_team, shi
         print (units_stats[team]['hub']['regeneration'])
         print (units_stats['common']['hub']['max_energy_point'])
         if units_stats[team]['hub']['energy_point'] + units_stats[team]['hub']['regeneration'] < units_stats['common']['hub']['max_energy_point']:
-            change_value(team, 'hub', ships, peaks, units_stats[team]['hub']['regeneration'], 'energy_point')
+            change_value('hub', ships, peaks, units_stats[team]['hub']['regeneration'], 'energy_point',units_stats,team)
 
     #display board every round end
-    board_display(board, elements, color_team, ships, peaks, units_stats, elements)
+    board_display(board, color_team, ships, peaks, units_stats, elements)
 
     #display stats every round end
     display_stats (elements, color_team, ships, units_stats, peaks)

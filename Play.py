@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from colored import*
-"bcdkjjckdnjkdcnblkc,kd,mlc,"
+
 def play (map_title, team_1, team_2):
     """ Start the game and do the folowing function
     Parameter

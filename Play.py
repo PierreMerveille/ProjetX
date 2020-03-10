@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#------------------------
 from colored import*
 def play (map_title, team_1, team_2):
     """ Start the game and do the folowing function

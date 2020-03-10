@@ -132,8 +132,7 @@ def set_games (team_1, team_2, map_title) :
     display_stats(elements,color_team,ships,units_stats,peaks)
 
     return board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks
-
-    
+   
 def end_game ( color_team, units_stats, end_counter ): 
 
     """ Verify if game is finished 
@@ -604,8 +603,7 @@ def change_value ( entity_name, ships, peaks, new_value, caracteristic, units_st
                 else :
                     peaks[entity_name]['storage'] += new_value
                 return peaks
-        
-        
+               
 def transfer (transfer_list, ships, team, units_stats, peaks, board) :
 
     """ Fill a tanker's energy storage into a cruiser or into the hub 

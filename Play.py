@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from colored import*
-
 def play (map_title, team_1, team_2):
     """ Start the game and do the folowing function
     Parameter
@@ -24,21 +23,24 @@ def play (map_title, team_1, team_2):
     end_counter = 0
     
     while end_game(color_team, units_stats, end_counter) == False:
+       
+       
         for team in color_team:
-            order = input("Let's get your order")
+            
+            order = input("Let's get %s's orders: "%team)
             upgrade_list , create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board)
             ships,board,units_stats = create_units(create_list, ships, team, board, units_stats)
            
             units_stats = upgrade(team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list)
             
-            units_stats, ships, end_counter = attack(attack_list, board, units_stats, ships, team, end_counter)
+            end_counter = attack(attack_list, board, units_stats, ships, team, end_counter)
             
             board, ships = move(move_list, ships, team, board, units_stats, peaks)
             
             ships, units_stats , peaks = transfer(transfer_list, ships, team, units_stats, peaks, board)
             
-            round_end(board, end_counter, units_stats, peaks, elements, color_team, ships)
-    
+            units_stats = round_end(board, end_counter, units_stats, peaks, elements, color_team, ships)
+            
 def set_games (team_1, team_2, map_title) :
     """
     Create all the environnement of the game. Takes the data contained in the file and initializes the data structure (variable)
@@ -133,7 +135,8 @@ def set_games (team_1, team_2, map_title) :
     display_stats(elements,color_team,ships,units_stats,peaks)
 
     return board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks
-   
+
+    
 def end_game ( color_team, units_stats, end_counter ): 
 
     """ Verify if game is finished 
@@ -173,7 +176,7 @@ def end_game ( color_team, units_stats, end_counter ):
             end = True
     return end
 
-def separate_instruction (order, ships, units_stats,board):
+def separate_instruction (order, ships, units_stats,board,team):
     """ 
     Separate the different instrcution in the order and separate the first part of the instruction from the second ( on the left of the ':' and then on the right ) and set it in a list with all the other instructions
     
@@ -239,18 +242,16 @@ def separate_instruction (order, ships, units_stats,board):
             upgrade_list.append(order[1])
         
         # check if order[0] is a ship    
-        elif order[0] in ships :
+        elif order[0] in ships and ships[order[0]]['team'] == team :
            
             
             # check if there is only one '-'in order[1]
-            value = False
+            occurence = 0
             for element in order[1] : 
-                if element == '-'and value== False :
-                    value = True
-                elif element == '-' :
-                    value= 'bad'
+                if element == '-':
+                    occurence += 1
             # if there is only one '-', cut the coorinates in 2 round the '-'      
-            if value == True:              
+            if occurence == 1:              
                 coordinates = order[1][1:].split('-')
                 # if it's an attack-instruction ==> handle with the attack_value (ex: *10-12=23)
                 if order[1][0] == '*':
@@ -272,7 +273,6 @@ def separate_instruction (order, ships, units_stats,board):
                 # verify if the coordinates are in the board
                 if coordinates[0] in x_list and coordinates[1] in y_list :
                     correct = True
-            print (correct)
             #add to the move_list if it's a correct move 
             if order[1][0] == '@' and correct :
                 move_list.append([order[0], order[1][1:]])
@@ -280,17 +280,19 @@ def separate_instruction (order, ships, units_stats,board):
             elif order[1][0] == '*'and correct:
                 attack_list .append([order[0], order[1][1:]])
             # add to the transfer_list if it's a good transfer
-            elif (order[1][0] == '<' or order[1][0] == '>') and (correct or order[1][1:]== 'hub') :
-                transfer_list.append( [order[0], order[1]])
+            elif (order[1][0] == '<' or order[1][0] == '>') and (order[1][1:] in ships or order[1][1:]== 'hub') :
+                if ships[order[1][1:]]['type']== 'cruiser' or order [1][1:] == 'hub' :
+                    transfer_list.append( [order[0], order[1]])
+                    
+                
         # add to the transfer_list if it's a good transfer from hub
         elif order[0] == 'hub' and order [1][1:] in ships:
             transfer_list.append([order[0][0], order[1]])
         # add to the create_list if it's a creation
         elif order[1]== 'tanker'or order[1]== 'cruiser':
             create_list.append([order[0], order[1]])
-    print (create_list)
-    print (attack_list)    
     return upgrade_list , create_list, move_list, attack_list, transfer_list
+
     
 def create_units (create_list, ships, team, board, units_stats) :
     
@@ -319,16 +321,20 @@ def create_units (create_list, ships, team, board, units_stats) :
     specification : Johan Rochet (v.1 20/02/20) 
      
     """
+   
     for instruction in create_list :
         coordinates = units_stats[team]['hub']['coordinates']
+        
         # if you want to create a tanker
         if instruction [1] == 'tanker' and units_stats[team]['hub']['energy_point'] >= units_stats['common']['tanker']['creation_cost'] :
-
+            
             energy_point = units_stats[team]['tanker']['storage_capacity'] 
             # add the tanker in the dico ships       
             ships[instruction[0]]= {'coordinates': coordinates , 'HP': 50, 'energy_point' : energy_point, 'type' : 'tanker', 'team' : team}
             # add the tanker in the list_entity of the board
-            board[coordinates]['list_entity'].append (instruction[0])
+            
+            board[coordinates]['list_entity'].append(instruction[0])
+            
             # sub the energy_point from the hub
             units_stats[team]['hub']['energy_point'] -= units_stats['common']['tanker']['creation_cost']
 
@@ -424,7 +430,7 @@ def attack (attack_list, board, units_stats, ships, team, end_counter):
     
     Parameters
     ----------
-    instruction : order from the attack_list (list)
+    attack_list : order from the attack_list (list)
     board : dictionary where each coordinates gives a list with the character to display and a list of entities on this position (dict)
     units_stats : dictionnary containing the stats of each unit (dict)
     ships : information of each ship (dict)
@@ -433,9 +439,6 @@ def attack (attack_list, board, units_stats, ships, team, end_counter):
     
     Returns
     -------
-    board : the same dictionnary but without the ship hit by the attack if the ship is destroyed (dict)
-    ships : the same dictionnary but with less health for the ennemy ship that got attacked (ships)
-    units_stats : the same dictionnary but with less health for the hub if he is attacked (board)
     end_counter : number of rounds without attacks (float) (+ O,5 by round)
     
     Notes
@@ -449,59 +452,76 @@ def attack (attack_list, board, units_stats, ships, team, end_counter):
     #Implementation of the function attack
     #Initialise the coordinate and the attack point
     #attack_point = coord_attack[1]
-    for instruction in attack_list :
-
-        coord_attack=instruction[1].split('=')
-        coordinates= coord_attack[0].split ('-')
-        #coordinates = tuple (x,y)
-        coordinates = (int(coordinates[0]),int(coordinates[1]))
-        #verify in another function if we have the range
-        hithin_range = range_verification (units_stats, instruction[0], ships, coordinates, team)
-        #create a list for delete cruiser
-        cruiser_dead=[]
-        #create a variable verify if something is hit
-        hit=0
-        
-        #attacke if hithin_range is True
-        if hithin_range :
-            #verify the coordinates of all the ship
-            for ship in ships :
-                if ships[ship]['coordinates']==coordinates:
-                    #change the value of the point of structure of the ship in the coordinate
-                    ships = change_value(ship, units_stats, ships, peaks, int(coord_attack[1])*-1, 'HP', ennemy_team)
+    if len(attack_list)==0:
+        end_counter+=0.5
+    else :
+        for instruction in attack_list :
+            #initialize a valeur with the name of the ship
+            ship=instruction[0]
+            coord_attack=instruction[1].split('=')
+            #coord_attack[1]= attack_point
+            coordinates= coord_attack[0].split ('-')
+            #coordinates = tuple (x,y)
+            coordinates = (int(coordinates[0]),int(coordinates[1]))
+            #verify in another function if we have the range
+            hithin_range = range_verification (units_stats, instruction[0], ships, coordinates, team)
+            #create a list for delete cruiser
+            cruiser_dead=[]
+            position=[]
+            #create a variable verify if something is hit
+            hit=0
+            #attacke if hithin_range is True
+            print(coord_attack)
+            if hithin_range and ships[ship]['energy_point']>=coord_attack[1]:
+                #verify the coordinates of all the ship
+                for ship in ships :
+                    if ships[ship]['coordinates']==coordinates:
+                        #change the value of the point of structure of the ship in the coordinate
+                        ships = change_value(ship, units_stats, ships, peaks, int(coord_attack[1])*-1, 'HP', ennemy_team)
+                        hit+=1
+                        end_counter=0
+                        #reduce the energy of the ship
+                        ships = change_value(ship, ships, peaks, int(coord_attack[1])*-1, 'energy_point', team)
+                        if ships[ship]['HP']<=0:
+                            #stock a dead cruiser
+                            cruiser_dead.append(ship)
+                            coord=ships[ship]['coordinates']
+                            position.append(coord)
+                            #delete the ship for the dictionnary board
+                            board[(coordinates[0],coordinates[1])]['list_entity'].remove(ship)
+                for ship in cruiser_dead:
+                    del ships[ship]
+                    for coordinate in position :
+                        for index in range (len(board[coordinate]['list_entity'])):
+                            if ship==board[coordinate]['list_entity'][index]:
+                                del board[coordinate]['list_entity'][index]
+                #verify if the ennemy hub is in the coordinates
+                if units_stats[ennemy_team]['hub']['coordinates']==coordinates :
+                    #change the value of the point of structure of the ennemy's hub in the coordinate
+                    untis_stats=change_value('hub',units_stats, ships, peaks, int(coord_attack[1])*-1, 'HP', ennemy_team)
                     hit+=1
-                    if ships[ship]['HP']<=0:
-                        #stock a dead cruiser
-                        cruiser_dead.append(ship)
-                        #delete the ship for the dictionnary board
-                        board[(coordinates[0],coordinates[1])]['list_entity'].remove(ship)
-            for ship in cruiser_dead:
-                del ships[ship]
-            #verify if the ennemy hub is in the coordinates
-            if units_stats[ennemy_team]['hub']['coordinates']==coordinates :
-                #change the value of the point of structure of the ennemy's hub in the coordinate
-                untis_stats=change_value('hub',units_stats, ships, peaks, int(coord_attack[1])*-1, 'HP', ennemy_team)
-                hit+=1
-                
-            if units_stats[team]['hub']['coordinates']==coordinates :
-                #change the value of the point of structure of the hub in the coordinate
-                untis_stats=change_value('hub',units_stats, ships, peaks, int(coord_attack[1])*-1, 'HP', team)
-                hit+=1
-                #if units_stats[team]['hub']['HP']<=0:
-            if hit==0 : 
-                #if nothing is hit than increment the end_counter
-                end_counter+=1
-        else :
-            end_counter+=1
-    return units_stats, ships, end_counter
+                    end_counter=0
+                    
+                if units_stats[team]['hub']['coordinates']==coordinates :
+                    #change the value of the point of structure of the hub in the coordinate
+                    untis_stats=change_value('hub',units_stats, ships, peaks, int(coord_attack[1])*-1, 'HP', team)
+                    hit+=1
+                    end_counter=0
+                    #if units_stats[team]['hub']['HP']<=0:
+                if hit==0 : 
+                    #if nothing is hit than increment the end_counter
+                    end_counter += 0.5
+            else :
+                end_counter += 0.5
+    return end_counter
     
-def move (instruction, ships, team, board, units_stats, peaks) :
+def move (move_list, ships, team, board, units_stats, peaks) :
     
     """ Move a ship on the board
     
     Parameters
     ----------
-    instruction : order from the move_list (list)
+    move_list : order from the move_list (list)
     ships : information of each ship (dict)
     team : number of the team which is playing (int)
     board : dictionary where each coordinates gives a list of entities on this position (dict)
@@ -522,27 +542,36 @@ def move (instruction, ships, team, board, units_stats, peaks) :
     specification : Pierre Merveille (v.1 20/02/20)
     
     """  
-    for nbr_instruction in instruction:
-        part_of_instruction = nbr_instruction.split(':')
-        if part_of_instruction[0] in ships:
-            order = part_of_instruction[1].strip('@')
-            new_coord = order.split('-')
-            old_coord = ships[part_of_instruction[0]]['coordinates']
-            if ships[part_of_instruction[0]]['type'] == 'tanker':
-                change_value(part_of_instruction[0], ships, peaks, new_coord, 'coordinates', units_stats)
-                board[new_coord]['list_entity'] += part_of_instruction[0]
-                board[old_coord]['list_entity'] -= part_of_instruction[0]
+    for instruction in move_list:
+            new_coord = instruction[1].split('-')
+            new_coord = (int(new_coord[0]), int(new_coord[1]))
+            old_coord = ships[instruction[0]]['coordinates']
+            #if ship type is tanker
+            if ships[instruction[0]]['type'] == 'tanker':
+                #change coordinates of moved tanker
+                change_value(instruction[0], ships, peaks, new_coord, 'coordinates', units_stats, team)
+                #add to list_entity the new elements for board
+                board[new_coord]['list_entity'].append(instruction[0])
+                index = board[old_coord]['list_entity'].index(instruction[0])
+                del board[old_coord]['list_entity'][index]
 
             else:
-                if ships[part_of_instruction[0]]['energy_point'] < (((new_coord[0] - old_coord[0])**2 + (new_coord[1] - old_coord[1]))**0,5) * units_stats[team]['cruiser']['move'] :
-                    print('Not enough energy_point in' + part_of_instruction[0])
+                print(new_coord[0])
+                print(new_coord[1])
+                print(old_coord[0])
+                print(old_coord[1])
+                                                                 
+                if ships[instruction[0]]['energy_point'] < (((new_coord[0] - old_coord[0])**2 + (new_coord[1] - old_coord[1]))**0.5) * units_stats[team]['cruiser']['move'] :
+                    print('Not enough energy_point in' + instruction[0])
                 else:
-                    change_value(part_of_instruction[0], ships, peaks, (((new_coord[0] - old_coord[0])**2 + (new_coord[1] - old_coord[1]))**0,5) * units_stats[team]['cruiser']['move'], 'energy_point', units_stats)
-                    change_value(part_of_instruction[0], ships, peaks, new_coord, 'coordinates', units_stats)
-                    board[new_coord]['list_entity'] += part_of_instruction[0]
-                    board[old_coord]['list_entity'] -= part_of_instruction[0]
+                    change_value(instruction[0], ships, peaks, (((new_coord[0] - old_coord[0])**2 + (new_coord[1] - old_coord[1]))**0.5) * units_stats[team]['cruiser']['move'], 'energy_point', units_stats,team)
+                    change_value(instruction[0], ships, peaks, new_coord, 'coordinates', units_stats, team)
+                    board[new_coord]['list_entity'].append(instruction[0])
+                    
+                    index = board[old_coord]['list_entity'].index(instruction[0])
+                    del board[old_coord]['list_entity'][index]
 
-            print(part_of_instruction[0] + 'doesn t exist')
+            print(instruction[0] + 'doesn t exist')
             
     return board, ships
             
@@ -575,10 +604,11 @@ def change_value ( entity_name, ships, peaks, new_value, caracteristic, units_st
     -------
     specification : Johan Rochet (v.1 22/02/20)
     
-    """
+    """   
     
     #implementation of the function change value
     #change value for the hub
+
     if entity_name == 'hub' :
         #change the value in function of the caracteristic and return the dictionnary
         units_stats[team]['hub'][caracteristic] += new_value
@@ -604,7 +634,8 @@ def change_value ( entity_name, ships, peaks, new_value, caracteristic, units_st
                 else :
                     peaks[entity_name]['storage'] += new_value
                 return peaks
-               
+        
+        
 def transfer (transfer_list, ships, team, units_stats, peaks, board) :
 
     """ Fill a tanker's energy storage into a cruiser or into the hub 
@@ -642,12 +673,12 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
                 # in_dico = storage of the tanker 
                 in_dico = ships[instruction[0]]['energy_point']
                 # max_storage  = max stroage of a tanker 
-                max_storage = units_stats[team]['tanker']['energy_point']
+                max_storage = units_stats[team]['tanker']['storage_capacity']
             # set all to 0 if it isn't a tanker 
             else :
                 max_storage = 0
                 in_dico = 0
-                                
+                       
             # split and store the coordinates if it's a peak 
             if not instruction [1][1:] == 'hub' :
                 
@@ -662,6 +693,7 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
 
                 for peak in peaks : 
                     if peaks[peak]['coordinates'] == instruction[1] :
+                        
                         #transfer energy 
                         if max_storage > in_dico and range_verification(units_stats, instruction[0], ships,instruction[1],team ):
                             while in_dico < max_storage and peaks[peak]['storage'] >0 :
@@ -673,7 +705,7 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
                 out_dico =units_stats[team]['hub']['energy_point']
                 #transfer energy
                 if max_storage > in_dico and units_stats[team]['hub']['energy_point'] >0 and range_verification(units_stats, instruction[0], ships,units_stats[team]['hub']['coordinates'],team ):
-            
+                   
                     while in_dico < max_storage and units_stats[team]['hub']['energy_point'] >0 :
                     
                         in_dico += 1
@@ -685,26 +717,25 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
         
         #give energy  to a ship or the hub    
         elif instruction [1][0] == '>' :
+            
             if ships[instruction[0]]['type'] == 'tanker' :
                 out_dico = ships[instruction[0]]['energy_point']
+              
                 
-                if instruction[1][1:] in ships : 
-                    if ships[instruction[1][1:]]['type']== 'cruiser' and range_verification(units_stats, instruction[0], ships,ships[instruction[1][1:]]['coordinates'], team) :
-
-                        while ships[instruction[1][1:]]['energy_point'] < units_stats['common']['cruiser'] ['max_energy'] and out_dico > 0:
-                            ships[instruction[1][1:]]['energy_point']
-                            ships[instruction[1][1:]]['energy_point'] += 1 
-                            out_dico -= 1
-                        ships[instruction[0]]['energy_point'] = out_dico
+                if ships[instruction[1][1:]]['type']== 'cruiser' and range_verification(units_stats, instruction[0], ships,ships[instruction[1][1:]]['coordinates'], team) :
+                    
+                    while ships[instruction[1][1:]]['energy_point'] < units_stats['common']['cruiser'] ['max_energy'] and out_dico > 0:
+                        ships[instruction[1][1:]]['energy_point']
+                        ships[instruction[1][1:]]['energy_point'] += 1 
+                        out_dico -= 1
+                    
+                    ships[instruction[0]]['energy_point'] = out_dico
                 #give energy to a hub    
                 elif  instruction[1][1:] == 'hub' and range_verification(units_stats, instruction[0], ships,units_stats[team][instruction[1][1:]]['coordinates'], team) :
-                    print (5)
-                    units_stats[team][instruction[1][1:]]['energy_point'] += out_dico
-                    ships[instruction[0]]['eneegy_point'] = 0
-
-           
-    return ships, units_stats , peaks
-        
+                    
+                    while units_stats[team][instruction[1][1:]]['energy_point'] < units_stats['common']['hub']['max_energy_point'] and ships[instruction[0]]['energy_point'] > 0 :
+                        ships[instruction[0]]['energy_point'] -=1 
+                        units_stats[team][instruction[1][1:]]['energy_point'] += 1
 def round_end (board, end_counter, units_stats, peaks, elements, color_team, ships):
 
     """ Print new board and stats and make "end of round changes" and do the regeneration of the hub energy
@@ -720,7 +751,7 @@ def round_end (board, end_counter, units_stats, peaks, elements, color_team, shi
 
     Return :
     --------
-    unit_stats : every end of round changes energy amount stored in hub (dict)
+    units_stats : every end of round changes energy amount stored in hub (dict)
     
     Notes : 
     -------
@@ -734,19 +765,15 @@ def round_end (board, end_counter, units_stats, peaks, elements, color_team, shi
     """    
     #add energy to hub every round end
     for team in color_team:
-        print (team)
-        print (units_stats)
-        print (units_stats[team]['hub']['energy_point'])
-        print (units_stats[team]['hub']['regeneration'])
-        print (units_stats['common']['hub']['max_energy_point'])
         if units_stats[team]['hub']['energy_point'] + units_stats[team]['hub']['regeneration'] < units_stats['common']['hub']['max_energy_point']:
-            change_value('hub', ships, peaks, units_stats[team]['hub']['regeneration'], 'energy_point',units_stats,team)
-
+            change_value('hub', ships, peaks, units_stats[team]['hub']['regeneration'], 'energy_point', units_stats, team)
+           
     #display board every round end
     board_display(board, color_team, ships, peaks, units_stats, elements)
 
     #display stats every round end
     display_stats (elements, color_team, ships, units_stats, peaks)
+    return units_stats
     
 def select_value_to_print (board, coordinates, units_stats, ships, peaks, color_team, elements):
     """
@@ -1131,7 +1158,7 @@ def display_stats (elements, color_team, ships, units_stats, peaks):
 
     print(fg(255))   
     
-def range_verification (units_stats, ship_name, ships, coordinates):
+def range_verification (units_stats, ship_name, ships, coordinates, team):
 
     """  Verify if the ship can attend the box 
 

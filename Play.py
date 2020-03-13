@@ -28,7 +28,7 @@ def play (map_title, team_1, team_2):
         for team in color_team:
             
             order = input("Let's get %s's orders: "%team)
-            upgrade_list , create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board,team)
+            upgrade_list , create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board, team)
             ships,board,units_stats = create_units(create_list, ships, team, board, units_stats)
            
             units_stats = upgrade(team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list)

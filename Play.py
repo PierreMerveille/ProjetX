@@ -218,7 +218,7 @@ def separate_instruction (order, ships, units_stats,board,team):
             y_list.append (str(key[1]))
     # cut the different instrcutions
     order_list = order. split (' ')
-    instructions_list = [] 
+    instructions_list = []
     # cut the instruction in two part around the ':' if there is only one ':'
     for instruction in order_list :
         #check if there is only one ':'
@@ -293,7 +293,6 @@ def separate_instruction (order, ships, units_stats,board,team):
             create_list.append([order[0], order[1]])
     return upgrade_list , create_list, move_list, attack_list, transfer_list
 
-    
 def create_units (create_list, ships, team, board, units_stats) :
     
     """ Creates new units in the team either a tanker or a cruiser and place it on the board
@@ -516,7 +515,6 @@ def attack (attack_list, board, units_stats, ships, team, end_counter):
     return end_counter
     
 def move (move_list, ships, team, board, units_stats, peaks) :
-    
     """ Move a ship on the board
     
     Parameters
@@ -1180,10 +1178,14 @@ def range_verification (units_stats, ship_name, ships, coordinates, team):
     Versions
     --------
     specification : Johan Rochet (v.1 24/02/20)
+    implementation : Anthony Pierard (v.1 02/03/20)
     """
-    if abs(coordinates[0]-ships[ship_name]['coordinates'][0])+abs(coordinates[1]-ships[ship_name]['coordinates'][1]) <= units_stats[team]['cruiser']['range'] :
+    # Calculate if the max between the difference in x or the difference in y is longer than the range of the cruiser
+    if max(abs(int(coordinates[0])-ships[ship_name]['coordinates'][0]),abs(int(coordinates[1])-ships[ship_name]['coordinates'][1])) <= units_stats[team]['cruiser']['range'] :
+        #he can hit this coordinate
         return True
     else :
+        #he can't hit this coordinate
         return False
 
 play('fichier', 'teamdegroslulu', 'fifi')

@@ -29,10 +29,14 @@ def play (map_title, team_1, team_2):
             
             order = input("Let's get %s's orders: "%team)
 <<<<<<< HEAD
+<<<<<<< HEAD
             upgrade_list , create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board, team)
 =======
             upgrade_list , create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board,team)
 >>>>>>> 6d7eec9a7dbd212209d2d72651498dc36e17c818
+=======
+            upgrade_list , create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board, team)
+>>>>>>> 41765b8e9d01d80cd462955d3ea9581d50066568
             ships,board,units_stats = create_units(create_list, ships, team, board, units_stats)
            
             units_stats = upgrade(team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list)

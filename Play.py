@@ -28,7 +28,11 @@ def play (map_title, team_1, team_2):
         for team in color_team:
             
             order = input("Let's get %s's orders: "%team)
+<<<<<<< HEAD
             upgrade_list , create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board, team)
+=======
+            upgrade_list , create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board,team)
+>>>>>>> 6d7eec9a7dbd212209d2d72651498dc36e17c818
             ships,board,units_stats = create_units(create_list, ships, team, board, units_stats)
            
             units_stats = upgrade(team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list)
@@ -736,6 +740,7 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
                     while units_stats[team][instruction[1][1:]]['energy_point'] < units_stats['common']['hub']['max_energy_point'] and ships[instruction[0]]['energy_point'] > 0 :
                         ships[instruction[0]]['energy_point'] -=1 
                         units_stats[team][instruction[1][1:]]['energy_point'] += 1
+    return ships, units_stats , peaks
 def round_end (board, end_counter, units_stats, peaks, elements, color_team, ships):
 
     """ Print new board and stats and make "end of round changes" and do the regeneration of the hub energy

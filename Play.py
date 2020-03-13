@@ -33,13 +33,9 @@ def play (map_title, team_1, team_2):
 
             order = input("Let's get %s's orders: "%team)
 
-            upgrade_list , create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board, team)
+            upgrade_list, create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board, team, peaks)
 
-            upgrade_list , create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board,team)
-
-            upgrade_list , create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board, team)
-
-            ships,board,units_stats = create_units(create_list, ships, team, board, units_stats)
+            ships, board, units_stats = create_units(create_list, ships, team, board, units_stats)
            
             units_stats = upgrade(team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list)
             
@@ -47,7 +43,7 @@ def play (map_title, team_1, team_2):
             
             board, ships = move(move_list, ships, team, board, units_stats, peaks)
             
-            ships, units_stats , peaks = transfer(transfer_list, ships, team, units_stats, peaks, board)
+            ships, units_stats, peaks = transfer(transfer_list, ships, team, units_stats, peaks, board)
             
             units_stats = round_end(board, end_counter, units_stats, peaks, elements, color_team, ships)
 def set_games (team_1, team_2, map_title) :
@@ -98,7 +94,7 @@ def set_games (team_1, team_2, map_title) :
 
     units_stats  = {team_1 : { 'cruiser' : {'range' : 1 , 'move' : 10}, 'tanker': {'storage_capacity' : 600}, 'hub' :  {'coordinates' : 123, 'HP': 123, 'energy_point' :123, 'regeneration':123}},
                 team_2 : { 'cruiser' : {'range' : 1 , 'move' : 10}, 'tanker': {'storage_capacity' : 600}, 'hub' :  {'coordinates' : 123, 'HP': 123, 'energy_point' :123, 'regeneration':123, }},
-                'common' : {'cruiser' : {'max_energy' : 400, 'cost_attack' : 10, 'creation_cost' : 100, 'attack' : 1}, 'tanker' : {'creation_cost' : 50, 'move': 0}, 'hub': {'max_energy_point' : 0}}}
+                'common' : {'cruiser' : {'max_energy' : 400, 'cost_attack' : 10, 'creation_cost' : 750, 'attack' : 1}, 'tanker' : {'creation_cost' : 1000, 'move': 0}, 'hub': {'max_energy_point' : 0}}}
 
 
     for ligne in range (3, 5):
@@ -185,7 +181,7 @@ def end_game ( color_team, units_stats, end_counter ):
             end = True
     return end
 
-def separate_instruction (order, ships, units_stats,board,team):
+def separate_instruction (order, ships, units_stats,board,team,peaks):
     """ 
     Separate the different instrcution in the order and separate the first part of the instruction from the second ( on the left of the ':' and then on the right ) and set it in a list with all the other instructions
     
@@ -216,6 +212,7 @@ def separate_instruction (order, ships, units_stats,board,team):
     x_list =[]
     y_list =[]
     instructions_list= []
+    
 
     # list the coordinates of the board to check after if the instrcutions are correct
     for key in board :
@@ -252,6 +249,7 @@ def separate_instruction (order, ships, units_stats,board,team):
         
         # check if order[0] is a ship    
         elif order[0] in ships and ships[order[0]]['team'] == team :
+            
            
             
             # check if there is only one '-'in order[1]
@@ -289,16 +287,22 @@ def separate_instruction (order, ships, units_stats,board,team):
             elif order[1][0] == '*'and correct:
                 attack_list .append([order[0], order[1][1:]])
             # add to the transfer_list if it's a good transfer
-            elif (order[1][0] == '<' or order[1][0] == '>') and (order[1][1:] in ships or order[1][1:]== 'hub') :
-                if ships[order[1][1:]]['type']== 'cruiser' or order [1][1:] == 'hub' :
-                    transfer_list.append( [order[0], order[1]])
-                    
-                
+            elif order[1][0] == '<' :
+                if order[1][1:] == 'hub' or correct :
+                    if correct :
+                            
+                        peak_list =[]
+                        for peak in peaks :
+                            peak_list. append (peaks[peak]['coordinates'])
+                if (coordinates[0],coordinates[1]) in peak_list or order[1][1:] =='hub':
+                    transfer_list.append(order[0],order[1])
+               
         # add to the transfer_list if it's a good transfer from hub
-        elif order[0] == 'hub' and order [1][1:] in ships:
+        elif order[0] == 'hub' and order [1][1:] in ships :
             transfer_list.append([order[0][0], order[1]])
+            print (7)
         # add to the create_list if it's a creation
-        elif order[1]== 'tanker'or order[1]== 'cruiser':
+        elif (order[1]== 'tanker'or order[1]== 'cruiser') and order[0] not in ships :
             create_list.append([order[0], order[1]])
     return upgrade_list , create_list, move_list, attack_list, transfer_list
 
@@ -579,7 +583,7 @@ def move (move_list, ships, team, board, units_stats, peaks) :
                 if ships[instruction[0]]['energy_point'] < max(abs(new_coord[0] - old_coord[0]), abs(new_coord[1] - old_coord[1])) * units_stats[team]['cruiser']['move'] :
                     print('Not enough energy_point in' + instruction[0])
                 else:
-                    change_value(instruction[0], ships, peaks, (ships[instruction[0]]['energy_point'] - (max(abs(new_coord[0] - old_coord[0]), abs(new_coord[1] - old_coord[1])) * units_stats[team]['cruiser']['move'])), 'energy_point', units_stats,team)
+                    change_value(instruction[0], ships, peaks, ( - (max(abs(new_coord[0] - old_coord[0]), abs(new_coord[1] - old_coord[1])) * units_stats[team]['cruiser']['move'])), 'energy_point', units_stats,team)
                     change_value(instruction[0], ships, peaks, new_coord, 'coordinates', units_stats, team)
                     board[new_coord]['list_entity'].append(instruction[0])
                     index = board[old_coord]['list_entity'].index(instruction[0])

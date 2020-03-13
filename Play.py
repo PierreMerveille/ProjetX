@@ -28,7 +28,13 @@ def play (map_title, team_1, team_2):
         for team in color_team:
             
             order = input("Let's get %s's orders: "%team)
+
             upgrade_list , create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board, team)
+
+            upgrade_list , create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board,team)
+
+            upgrade_list , create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board, team)
+
             ships,board,units_stats = create_units(create_list, ships, team, board, units_stats)
            
             units_stats = upgrade(team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list)
@@ -293,6 +299,7 @@ def separate_instruction (order, ships, units_stats,board,team):
             create_list.append([order[0], order[1]])
     return upgrade_list , create_list, move_list, attack_list, transfer_list
 
+    
 def create_units (create_list, ships, team, board, units_stats) :
     
     """ Creates new units in the team either a tanker or a cruiser and place it on the board
@@ -518,6 +525,7 @@ def attack (attack_list, board, units_stats, ships, team, peaks, end_counter):
     return end_counter
     
 def move (move_list, ships, team, board, units_stats, peaks) :
+    
     """ Move a ship on the board
     
     Parameters
@@ -562,10 +570,10 @@ def move (move_list, ships, team, board, units_stats, peaks) :
                 print(old_coord[0])
                 print(old_coord[1])
                                                                  
-                if ships[instruction[0]]['energy_point'] < (((new_coord[0] - old_coord[0])**2 + (new_coord[1] - old_coord[1]))**0.5) * units_stats[team]['cruiser']['move'] :
+                if ships[instruction[0]]['energy_point'] < max(abs(new_coord[0] - old_coord[0]), abs(new_coord[1] - old_coord[1])) * units_stats[team]['cruiser']['move'] :
                     print('Not enough energy_point in' + instruction[0])
                 else:
-                    change_value(instruction[0], ships, peaks, (((new_coord[0] - old_coord[0])**2 + (new_coord[1] - old_coord[1]))**0.5) * units_stats[team]['cruiser']['move'], 'energy_point', units_stats,team)
+                    change_value(instruction[0], ships, peaks, (ships[instruction[0]]['energy_point'] - (max(abs(new_coord[0] - old_coord[0]), abs(new_coord[1] - old_coord[1])) * units_stats[team]['cruiser']['move'])), 'energy_point', units_stats,team)
                     change_value(instruction[0], ships, peaks, new_coord, 'coordinates', units_stats, team)
                     board[new_coord]['list_entity'].append(instruction[0])
                     
@@ -1182,14 +1190,10 @@ def range_verification (units_stats, ship_name, ships, coordinates, team):
     Versions
     --------
     specification : Johan Rochet (v.1 24/02/20)
-    implementation : Anthony Pierard (v.1 02/03/20)
     """
-    # Calculate if the max between the difference in x or the difference in y is longer than the range of the cruiser
-    if max(abs(int(coordinates[0])-ships[ship_name]['coordinates'][0]),abs(int(coordinates[1])-ships[ship_name]['coordinates'][1])) <= units_stats[team]['cruiser']['range'] :
-        #he can hit this coordinate
+    if abs(coordinates[0]-ships[ship_name]['coordinates'][0])+abs(coordinates[1]-ships[ship_name]['coordinates'][1]) <= units_stats[team]['cruiser']['range'] :
         return True
     else :
-        #he can't hit this coordinate
         return False
 
 play('fichier', 'teamdegroslulu', 'fifi')

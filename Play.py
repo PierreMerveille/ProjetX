@@ -83,9 +83,9 @@ def set_games (team_1, team_2, map_title) :
     for x in range (1, long + 2):
         for y in range ( 1, larg + 2):
             if x==1 and y==1:
-                board = {(x, y) : {'list_entity' : ['   ']}}
+                board = {(x,y) : {'list_entity' : ['   ']}}
             else:
-                board[(x, y)] = {'list_entity': ['   ']}
+                board[(x,y)] = {'list_entity': ['   ']}
 
 
 
@@ -1200,4 +1200,4 @@ def range_verification (units_stats, ship_name, ships, coordinates, team):
     else :
         return False
 
-play('fichier', 'teamdegroslulu', 'fifi')
+play('fichier', 'teamdegroslulu', 'fifi')   

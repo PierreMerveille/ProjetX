@@ -423,7 +423,7 @@ def upgrade (team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list):
                         units_stats[team]['hub']['energy_points'] -= 400
     return units_stats
                         
-def attack (attack_list, board, units_stats, ships, team, end_counter):
+def attack (attack_list, board, units_stats, ships, team, peaks, end_counter):
     
     """Execute an attack on a chosen box
     
@@ -434,6 +434,7 @@ def attack (attack_list, board, units_stats, ships, team, end_counter):
     units_stats : dictionnary containing the stats of each unit (dict)
     ships : information of each ship (dict)
     team : number of the team which is playing (int)
+    peaks : the dictionnary with all the peaks (dict)
     end_counter : number of rounds without attacks (float) (+ O,5 by round)
     
     Returns
@@ -447,6 +448,8 @@ def attack (attack_list, board, units_stats, ships, team, end_counter):
     Versions
     --------
     specification : Anthony Pierard (v.1 20/02/20)
+                    Anthony Pierard (v.2 13/03/20)
+    implementation : Anthony Pierard (v.1 03/02/20)
     """                       
     #Implementation of the function attack
     #Initialise the coordinate and the attack point
@@ -471,7 +474,7 @@ def attack (attack_list, board, units_stats, ships, team, end_counter):
             hit=0
             #attacke if hithin_range is True
             print(coord_attack)
-            if hithin_range and ships[ship]['energy_point']>=coord_attack[1]:
+            if hithin_range and ships[ship]['energy_point']>=int(coord_attack[1]):
                 #verify the coordinates of all the ship
                 for ship in ships :
                     if ships[ship]['coordinates']==coordinates:

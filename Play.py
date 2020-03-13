@@ -249,6 +249,7 @@ def separate_instruction (order, ships, units_stats,board,team):
         
         # check if order[0] is a ship    
         elif order[0] in ships and ships[order[0]]['team'] == team :
+            
            
             
             # check if there is only one '-'in order[1]
@@ -292,10 +293,11 @@ def separate_instruction (order, ships, units_stats,board,team):
                     
                 
         # add to the transfer_list if it's a good transfer from hub
-        elif order[0] == 'hub' and order [1][1:] in ships:
+        elif order[0] == 'hub' and order [1][1:] in ships :
             transfer_list.append([order[0][0], order[1]])
+            print (7)
         # add to the create_list if it's a creation
-        elif order[1]== 'tanker'or order[1]== 'cruiser':
+        elif (order[1]== 'tanker'or order[1]== 'cruiser') and order[0] not in ships :
             create_list.append([order[0], order[1]])
     return upgrade_list , create_list, move_list, attack_list, transfer_list
 

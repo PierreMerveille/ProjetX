@@ -21,12 +21,16 @@ def play (map_title, team_1, team_2):
     
     board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks = set_games(team_1, team_2, map_title)
     end_counter = 0
-    
+
     while end_game(color_team, units_stats, end_counter) == False:
        
        
         for team in color_team:
-            
+            if team==team_1:
+                ennemy_team=team_2
+            else :
+                ennemy_team = team_1
+
             order = input("Let's get %s's orders: "%team)
 
             upgrade_list , create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board, team)
@@ -39,14 +43,13 @@ def play (map_title, team_1, team_2):
            
             units_stats = upgrade(team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list)
             
-            end_counter = attack(attack_list, board, units_stats, ships, team, peaks, end_counter)
+            end_counter = attack(attack_list, board, units_stats, ships, team, ennemy_team, peaks, end_counter)
             
             board, ships = move(move_list, ships, team, board, units_stats, peaks)
             
             ships, units_stats , peaks = transfer(transfer_list, ships, team, units_stats, peaks, board)
             
             units_stats = round_end(board, end_counter, units_stats, peaks, elements, color_team, ships)
-            
 def set_games (team_1, team_2, map_title) :
     """
     Create all the environnement of the game. Takes the data contained in the file and initializes the data structure (variable)
@@ -430,7 +433,7 @@ def upgrade (team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list):
                         units_stats[team]['hub']['energy_points'] -= 400
     return units_stats
                         
-def attack (attack_list, board, units_stats, ships, team, peaks, end_counter):
+def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, end_counter):
     
     """Execute an attack on a chosen box
     
@@ -487,11 +490,11 @@ def attack (attack_list, board, units_stats, ships, team, peaks, end_counter):
                 for ship in ships :
                     if ships[ship]['coordinates']==coordinates:
                         #change the value of the point of structure of the ship in the coordinate
-                        ships = change_value(ship, units_stats, ships, peaks, int(coord_attack[1])*-1, 'HP', ennemy_team)
+                        ships = change_value(ship, ships, peaks, int(coord_attack[1])*-1, 'HP', units_stats, ennemy_team)
                         hit+=1
                         end_counter=0
                         #reduce the energy of the ship
-                        ships = change_value(ship, ships, peaks, int(coord_attack[1])*-1, 'energy_point', team)
+                        ships = change_value(ship, ships, peaks, int(coord_attack[1])*-1, 'energy_point', units_stats, team)
                         if ships[ship]['HP']<=0:
                             #stock a dead cruiser
                             cruiser_dead.append(ship)
@@ -508,14 +511,14 @@ def attack (attack_list, board, units_stats, ships, team, peaks, end_counter):
                 #verify if the ennemy hub is in the coordinates
                 if units_stats[ennemy_team]['hub']['coordinates']==coordinates :
                     #change the value of the point of structure of the ennemy's hub in the coordinate
-                    untis_stats=change_value('hub',units_stats, ships, peaks, int(coord_attack[1])*-1, 'HP', ennemy_team)
+                    untis_stats=change_value('hub', ships, peaks, int(coord_attack[1])*-1, 'HP', units_stats, ennemy_team)
                     hit+=1
                     end_counter=0
                     return end_counter
                   
                 if units_stats[team]['hub']['coordinates']==coordinates :
                     #change the value of the point of structure of the hub in the coordinate
-                    untis_stats=change_value('hub',units_stats, ships, peaks, int(coord_attack[1])*-1, 'HP', team)
+                    untis_stats=change_value('hub', ships, peaks, int(coord_attack[1])*-1, 'HP', units_stats, team)
                     hit+=1
                     end_counter=0
                     return end_counter

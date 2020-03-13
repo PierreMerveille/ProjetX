@@ -580,7 +580,7 @@ def move (move_list, ships, team, board, units_stats, peaks) :
                 if ships[instruction[0]]['energy_point'] < max(abs(new_coord[0] - old_coord[0]), abs(new_coord[1] - old_coord[1])) * units_stats[team]['cruiser']['move'] :
                     print('Not enough energy_point in' + instruction[0])
                 else:
-                    change_value(instruction[0], ships, peaks, (ships[instruction[0]]['energy_point'] - (max(abs(new_coord[0] - old_coord[0]), abs(new_coord[1] - old_coord[1])) * units_stats[team]['cruiser']['move'])), 'energy_point', units_stats,team)
+                    change_value(instruction[0], ships, peaks, (ships[instruction[0]]['energy_point'] - abs(max(abs(new_coord[0] - old_coord[0]), abs(new_coord[1] - old_coord[1])) * units_stats[team]['cruiser']['move'])), 'energy_point', units_stats,team)
                     change_value(instruction[0], ships, peaks, new_coord, 'coordinates', units_stats, team)
                     board[new_coord]['list_entity'].append(instruction[0])
                     

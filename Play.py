@@ -39,7 +39,7 @@ def play (map_title, team_1, team_2):
            
             units_stats = upgrade(team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list)
             
-            end_counter = attack(attack_list, board, units_stats, ships, team, end_counter)
+            end_counter = attack(attack_list, board, units_stats, ships, team, peaks, end_counter)
             
             board, ships = move(move_list, ships, team, board, units_stats, peaks)
             

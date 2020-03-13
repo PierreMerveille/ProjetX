@@ -430,7 +430,7 @@ def upgrade (team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list):
                         units_stats[team]['hub']['energy_points'] -= 400
     return units_stats
                         
-def attack (attack_list, board, units_stats, ships, team, end_counter):
+def attack (attack_list, board, units_stats, ships, team, peaks, end_counter):
     
     """Execute an attack on a chosen box
     
@@ -441,6 +441,7 @@ def attack (attack_list, board, units_stats, ships, team, end_counter):
     units_stats : dictionnary containing the stats of each unit (dict)
     ships : information of each ship (dict)
     team : number of the team which is playing (int)
+    peaks : the dictionnary with all the peaks (dict)
     end_counter : number of rounds without attacks (float) (+ O,5 by round)
     
     Returns
@@ -454,12 +455,15 @@ def attack (attack_list, board, units_stats, ships, team, end_counter):
     Versions
     --------
     specification : Anthony Pierard (v.1 20/02/20)
+                    Anthony Pierard (v.2 13/03/20)
+    implementation : Anthony Pierard (v.1 03/02/20)
     """                       
     #Implementation of the function attack
     #Initialise the coordinate and the attack point
     #attack_point = coord_attack[1]
     if len(attack_list)==0:
         end_counter+=0.5
+        return end_counter
     else :
         for instruction in attack_list :
             #initialize a valeur with the name of the ship
@@ -478,7 +482,7 @@ def attack (attack_list, board, units_stats, ships, team, end_counter):
             hit=0
             #attacke if hithin_range is True
             print(coord_attack)
-            if hithin_range and ships[ship]['energy_point']>=coord_attack[1]:
+            if hithin_range and ships[ship]['energy_point']>=int(coord_attack[1]):
                 #verify the coordinates of all the ship
                 for ship in ships :
                     if ships[ship]['coordinates']==coordinates:
@@ -507,18 +511,24 @@ def attack (attack_list, board, units_stats, ships, team, end_counter):
                     untis_stats=change_value('hub',units_stats, ships, peaks, int(coord_attack[1])*-1, 'HP', ennemy_team)
                     hit+=1
                     end_counter=0
-                    
+                    return end_counter
+                  
                 if units_stats[team]['hub']['coordinates']==coordinates :
                     #change the value of the point of structure of the hub in the coordinate
                     untis_stats=change_value('hub',units_stats, ships, peaks, int(coord_attack[1])*-1, 'HP', team)
                     hit+=1
                     end_counter=0
+                    return end_counter
+                else : 
+                    return end_counter
                     #if units_stats[team]['hub']['HP']<=0:
                 if hit==0 : 
                     #if nothing is hit than increment the end_counter
                     end_counter += 0.5
+                    return end_counter
             else :
                 end_counter += 0.5
+                return end_counter
     return end_counter
     
 def move (move_list, ships, team, board, units_stats, peaks) :

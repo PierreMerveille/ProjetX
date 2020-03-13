@@ -91,7 +91,7 @@ def set_games (team_1, team_2, map_title) :
 
     units_stats  = {team_1 : { 'cruiser' : {'range' : 1 , 'move' : 10}, 'tanker': {'storage_capacity' : 600}, 'hub' :  {'coordinates' : 123, 'HP': 123, 'energy_point' :123, 'regeneration':123}},
                 team_2 : { 'cruiser' : {'range' : 1 , 'move' : 10}, 'tanker': {'storage_capacity' : 600}, 'hub' :  {'coordinates' : 123, 'HP': 123, 'energy_point' :123, 'regeneration':123, }},
-                'common' : {'cruiser' : {'max_energy' : 400, 'cost_attack' : 10, 'creation_cost' : 100, 'attack' : 1}, 'tanker' : {'creation_cost' : 50, 'move': 0}, 'hub': {'max_energy_point' : 0}}}
+                'common' : {'cruiser' : {'max_energy' : 400, 'cost_attack' : 10, 'creation_cost' : 750, 'attack' : 1}, 'tanker' : {'creation_cost' : 1000, 'move': 0}, 'hub': {'max_energy_point' : 0}}}
 
 
     for ligne in range (3, 5):

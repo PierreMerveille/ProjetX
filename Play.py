@@ -463,6 +463,7 @@ def attack (attack_list, board, units_stats, ships, team, peaks, end_counter):
     #attack_point = coord_attack[1]
     if len(attack_list)==0:
         end_counter+=0.5
+        return end_counter
     else :
         for instruction in attack_list :
             #initialize a valeur with the name of the ship
@@ -510,18 +511,24 @@ def attack (attack_list, board, units_stats, ships, team, peaks, end_counter):
                     untis_stats=change_value('hub',units_stats, ships, peaks, int(coord_attack[1])*-1, 'HP', ennemy_team)
                     hit+=1
                     end_counter=0
-                    
+                    return end_counter
+                  
                 if units_stats[team]['hub']['coordinates']==coordinates :
                     #change the value of the point of structure of the hub in the coordinate
                     untis_stats=change_value('hub',units_stats, ships, peaks, int(coord_attack[1])*-1, 'HP', team)
                     hit+=1
                     end_counter=0
+                    return end_counter
+                else : 
+                    return end_counter
                     #if units_stats[team]['hub']['HP']<=0:
                 if hit==0 : 
                     #if nothing is hit than increment the end_counter
                     end_counter += 0.5
+                    return end_counter
             else :
                 end_counter += 0.5
+                return end_counter
     return end_counter
     
 def move (move_list, ships, team, board, units_stats, peaks) :

@@ -218,7 +218,7 @@ def separate_instruction (order, ships, units_stats,board,team):
             y_list.append (str(key[1]))
     # cut the different instrcutions
     order_list = order. split (' ')
-    instructions_list = []
+    instructions_list = [] 
     # cut the instruction in two part around the ':' if there is only one ':'
     for instruction in order_list :
         #check if there is only one ':'

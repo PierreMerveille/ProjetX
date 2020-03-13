@@ -29,11 +29,7 @@ def play (map_title, team_1, team_2):
             
             order = input("Let's get %s's orders: "%team)
 
-            upgrade_list , create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board, team)
-
-            upgrade_list , create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board,team)
-
-            upgrade_list , create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board, team)
+            upgrade_list , create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board, team,peaks)
 
             ships,board,units_stats = create_units(create_list, ships, team, board, units_stats)
            
@@ -182,7 +178,7 @@ def end_game ( color_team, units_stats, end_counter ):
             end = True
     return end
 
-def separate_instruction (order, ships, units_stats,board,team):
+def separate_instruction (order, ships, units_stats,board,team,peaks):
     """ 
     Separate the different instrcution in the order and separate the first part of the instruction from the second ( on the left of the ':' and then on the right ) and set it in a list with all the other instructions
     
@@ -213,6 +209,7 @@ def separate_instruction (order, ships, units_stats,board,team):
     x_list =[]
     y_list =[]
     instructions_list= []
+    
 
     # list the coordinates of the board to check after if the instrcutions are correct
     for key in board :
@@ -287,11 +284,16 @@ def separate_instruction (order, ships, units_stats,board,team):
             elif order[1][0] == '*'and correct:
                 attack_list .append([order[0], order[1][1:]])
             # add to the transfer_list if it's a good transfer
-            elif (order[1][0] == '<' or order[1][0] == '>') and (order[1][1:] in ships or order[1][1:]== 'hub') :
-                if ships[order[1][1:]]['type']== 'cruiser' or order [1][1:] == 'hub' :
-                    transfer_list.append( [order[0], order[1]])
-                    
-                
+            elif order[1][0] == '<' :
+                if order[1][1:] == 'hub' or correct :
+                    if correct :
+                            
+                        peak_list =[]
+                        for peak in peaks :
+                            peak_list. append (peaks[peak]['coordinates'])
+                if (coordinates[0],coordinates[1]) in peak_list or order[1][1:] =='hub':
+                    transfer_list.append(order[0],order[1])
+               
         # add to the transfer_list if it's a good transfer from hub
         elif order[0] == 'hub' and order [1][1:] in ships :
             transfer_list.append([order[0][0], order[1]])

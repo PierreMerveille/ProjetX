@@ -29,9 +29,9 @@ def play (map_title, team_1, team_2):
             
             order = input("Let's get %s's orders: "%team)
 
-            upgrade_list , create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board, team,peaks)
+            upgrade_list, create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board, team, peaks)
 
-            ships,board,units_stats = create_units(create_list, ships, team, board, units_stats)
+            ships, board, units_stats = create_units(create_list, ships, team, board, units_stats)
            
             units_stats = upgrade(team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list)
             
@@ -39,7 +39,7 @@ def play (map_title, team_1, team_2):
             
             board, ships = move(move_list, ships, team, board, units_stats, peaks)
             
-            ships, units_stats , peaks = transfer(transfer_list, ships, team, units_stats, peaks, board)
+            ships, units_stats, peaks = transfer(transfer_list, ships, team, units_stats, peaks, board)
             
             units_stats = round_end(board, end_counter, units_stats, peaks, elements, color_team, ships)
             

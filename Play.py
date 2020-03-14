@@ -16,27 +16,28 @@ def play (map_title, team_1, team_2):
     --------
     specification : Pierre Merveille (v.1 24/02/20)
     """
-     
-    
-    
+         
     board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks = set_games(team_1, team_2, map_title)
     end_counter = 0
 
     while end_game(color_team, units_stats, end_counter) == False:
-       
-       
+        order_list={}
+        for team in color_team :
+            order = input("Let's get %s's orders: "%team)
+            order_list[team]= order
+
         for team in color_team:
             if team==team_1:
                 ennemy_team=team_2
             else :
                 ennemy_team = team_1
 
-            order = input("Let's get %s's orders: "%team)
-
+            order = order_list[team]
+            
             upgrade_list, create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board, team, peaks)
-
+            
             ships, board, units_stats = create_units(create_list, ships, team, board, units_stats)
-           
+            
             units_stats = upgrade(team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list)
             
             end_counter = attack(attack_list, board, units_stats, ships, team, ennemy_team, peaks, end_counter)
@@ -45,7 +46,7 @@ def play (map_title, team_1, team_2):
             
             ships, units_stats, peaks = transfer(transfer_list, ships, team, units_stats, peaks, board)
             
-            units_stats = round_end(board, end_counter, units_stats, peaks, elements, color_team, ships)
+        units_stats = round_end(board, end_counter, units_stats, peaks, elements, color_team, ships)
 def set_games (team_1, team_2, map_title) :
     """
     Create all the environnement of the game. Takes the data contained in the file and initializes the data structure (variable)

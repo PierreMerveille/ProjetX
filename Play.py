@@ -84,8 +84,8 @@ def set_games (team_1, team_2, map_title) :
     larg = int(board_dimension[1])
 
 
-    for x in range (1, long + 2):
-        for y in range ( 1, larg + 2):
+    for x in range (1, long + 1):
+        for y in range ( 1, larg + 1):
             if x==1 and y==1:
                 board = {(x,y) : {'list_entity' : ['   ']}}
             else:
@@ -221,8 +221,9 @@ def separate_instruction (order, ships, units_stats,board,team,peaks):
         if not str(key[0]) in x_list :
             x_list.append(str(key[0]))
         # add the y-coordinates in y_list 
-        if not key[1] in x_list :
+        if not str(key[1]) in y_list :
             y_list.append (str(key[1]))
+       
     # cut the different instrcutions
     order_list = order. split (' ')
     instructions_list = []
@@ -909,18 +910,18 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements) :
         if coordinates[0] > long :
             long = coordinates[0]
     # creation of the board
-    for i in range (1, larg+2):
+    for i in range (larg+2):
         #jump for each row
         bord += bg(0) + '\n'
         
-        if i == 1 or i == larg +1 :
+        if i == 0 or i == larg +1 :
             #first and last row
-            for j in range (1, long+1):
+            for j in range (long+2):
                 #begin
-                if j == 1 :
-                    bord += bg('6')+'   ' + str(j)+'  '
+                if j == 0 :
+                    bord += bg('6')+'   ' 
                 #end
-                elif j == long :
+                elif j == long+1 :
                     bord+= bg('6') +'   '
                 #column < 10        
                 elif j<10:
@@ -932,11 +933,11 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements) :
         else : 
             
             #intermediate rows
-            for j in range (1, long+2):
+            for j in range (long+2):
                 #begin and end
-                if j==1 or j==long+1:
-                    bord += bg('6') + str(i-1) 
-                    if i<11 : 
+                if j==0 or j==long+1:
+                    bord += bg('6') + str(i) 
+                    if i<10 : 
                         #begin
                         bord+= '  '
                     else:
@@ -949,7 +950,7 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements) :
                     else : 
                         color = bg('115')
                     # add the character and the front color of the character and reset color to white after
-                    bord += color + select_value_to_print(board, (j-1,i-1),units_stats,ships,peaks, color_team,elements)  + attr(0) + fg('255')
+                    bord += color + select_value_to_print(board, (j,i),units_stats,ships,peaks, color_team,elements)  + attr(0) + fg('255')
     bord += bg('0')       
     print(bord) 
         

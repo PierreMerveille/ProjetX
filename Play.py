@@ -682,6 +682,8 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
     Versions
     --------
     specification : Pierre Merveille (v.2 24/02/20)
+    implementation: Johan Rochet (v.1 30/02/20)
+                    Johan ROchet (v.2 15/03/20)
     """    
     # draw energy
     for instruction in transfer_list :
@@ -739,19 +741,18 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
             if ships[instruction[0]]['type'] == 'tanker' :
                 out_dico = ships[instruction[0]]['energy_point']
               
-                
+                #give energy to a cruiser
                 if ships[instruction[1][1:]]['type']== 'cruiser' and range_verification(units_stats, instruction[0], ships,ships[instruction[1][1:]]['coordinates'], team) :
                     
-                    while ships[instruction[1][1:]]['energy_point'] < units_stats['common']['cruiser'] ['max_energy'] and out_dico > 0:
-                        ships[instruction[1][1:]]['energy_point']
+                    while ships[instruction[1][1:]]['energy_point'] < units_stats['common']['cruiser'] ['max_energy'] and ships[instruction[0]]['energy_point'] > 0:
+                        
                         ships[instruction[1][1:]]['energy_point'] += 1 
-                        out_dico -= 1
-                    
-                    ships[instruction[0]]['energy_point'] = out_dico
+                        ships[instruction[0]]['energy_point'] -= 1
                 #give energy to a hub    
                 elif  instruction[1][1:] == 'hub' and range_verification(units_stats, instruction[0], ships,units_stats[team][instruction[1][1:]]['coordinates'], team) :
                     
                     while units_stats[team][instruction[1][1:]]['energy_point'] < units_stats['common']['hub']['max_energy_point'] and ships[instruction[0]]['energy_point'] > 0 :
+
                         ships[instruction[0]]['energy_point'] -=1 
                         units_stats[team][instruction[1][1:]]['energy_point'] += 1
     return ships, units_stats , peaks
@@ -786,7 +787,7 @@ def round_end (board, end_counter, units_stats, peaks, elements, color_team, shi
     for team in color_team:
         if units_stats[team]['hub']['energy_point'] + units_stats[team]['hub']['regeneration'] < units_stats['common']['hub']['max_energy_point']:
             change_value('hub', ships, peaks, units_stats[team]['hub']['regeneration'], 'energy_point', units_stats, team)
-           
+        
     #display board every round end
     board_display(board, color_team, ships, peaks, units_stats, elements)
 
@@ -816,6 +817,7 @@ def select_value_to_print (board, coordinates, units_stats, ships, peaks, color_
     --------
     specification : Johan Rochet (v1. 28/02/20)
     implementation : Johan Rochet (v1. 28/02/20)
+                     Johan Rochet (v2. 15/03/20)
     """
     
     if board[coordinates]['list_entity'] == ['   '] :
@@ -828,54 +830,36 @@ def select_value_to_print (board, coordinates, units_stats, ships, peaks, color_
         value_to_print = [4]
         # select the units to display and the color of it. Order = hub-cruiser-tanker-peak
         for entity in board[coordinates]['list_entity']: 
-           
-            
+                       
             # first verifiy if the entity is a hub        
             if entity in units_stats : 
-                team = color_team[entity]
-                # set O and the color of the hub in value_to_print
-                value_to_print = [0, team]
+                # set O, the color of the hub and the type of the entity in value_to_print 
+                value_to_print = [0,color_team[entity], 'hub']
                 
             # then check if it's a ship  
-            if entity in ships: 
+            elif entity in ships: 
                 #check if it's a cruiser
                 if ships[entity]['type'] == 'cruiser':
                     # verify that ther is no hub already placed
                     if value_to_print[0] >0 :
-                        team = ships[entity]['team']
-                        color = color_team[team]
-                        # set 1 and the color of the cruiser in value_to_print
-                        value_to_print = [1,color]
+                        # set 1, the color of the cruiser and the type of the entity in value_to_print
+                        value_to_print = [1,color_team[ships[entity]['team']],'cruiser']
                 #check if it's a tanker        
                 else : 
                     # verify that ther is no hub or cruiser  already placed
                     if value_to_print[0] >1 :
-                        team = ships[entity]['team']
-                        color = color_team[team]
-                        # set 2 and the color of the tanker in value_to_print
-                        value_to_print = [2,color]
+                        # set 2, the color of the tanker and the type of the entity in value_to_print
+                        value_to_print = [2,color_team[ships[entity]['team']],'tanker']
             # finally check if it' a peak 
             elif entity in peaks : 
                 # verify that ther is no hub, cruiser or tanker already placed
                 if value_to_print[0] > 2 :
                     # set 2 and the color 'yellow' in value_to_print
-                    value_to_print = [3, fg(10)+ attr(1)]
-        # CHange the number in value_to_print by the type of entity it represents
-        if value_to_print[0] == 0 :
-            value_to_print[0] = 'hub'
-        elif value_to_print[0] == 1 :
-            value_to_print[0] = 'cruiser'
-        elif value_to_print[0] == 2 :
-            value_to_print[0] = 'tanker'
-        elif value_to_print[0] == 3 :
-            value_to_print[0] = 'peak' 
+                    value_to_print = [3, fg(10)+ attr(1), 'peak']
         # center the character in the box
-        value_to_print[0] = ' '+ elements[value_to_print[0]] + ' '
-        value_to_print = value_to_print[1] + value_to_print[0]
-        
-        
-    
-    
+        value_to_print[2] = ' '+ elements[value_to_print[2]] + ' '
+        value_to_print = value_to_print[1] + value_to_print[2]
+   
     return value_to_print
     
 def board_display ( board, color_team, ships, peaks, units_stats, elements) :

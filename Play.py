@@ -169,7 +169,7 @@ def end_game ( color_team, units_stats, end_counter ):
     """  
     #at beginning end is false
     end = False
-    #verify while end is false, quit while if end is true
+    
 
     #if end_counter >= 40 end is True
     if end_counter >= 40:

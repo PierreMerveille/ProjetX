@@ -36,7 +36,7 @@ def play (map_title, team_1, team_2):
             
             upgrade_list, create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board, team, peaks)
             
-            ships, board, units_stats = create_units(create_list, ships, team, board, units_stats)
+            ships, board, units_stats = create_units(create_list, ships, team, board, units_stats,peaks)
             
             units_stats = upgrade(team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list)
             
@@ -93,9 +93,9 @@ def set_games (team_1, team_2, map_title) :
 
 
 
-    units_stats  = {team_1 : { 'cruiser' : {'range' : 1 , 'move' : 10}, 'tanker': {'storage_capacity' : 600}, 'hub' :  {'coordinates' : 123, 'HP': 123, 'energy_point' :123, 'regeneration':123}},
-                team_2 : { 'cruiser' : {'range' : 1 , 'move' : 10}, 'tanker': {'storage_capacity' : 600}, 'hub' :  {'coordinates' : 123, 'HP': 123, 'energy_point' :123, 'regeneration':123, }},
-                'common' : {'cruiser' : {'max_energy' : 400, 'cost_attack' : 10, 'creation_cost' : 750, 'attack' : 1}, 'tanker' : {'creation_cost' : 1000, 'move': 0}, 'hub': {'max_energy_point' : 0}}}
+    units_stats  = {team_1 : { 'cruiser' : {'range' : 1 , 'move' : 10}, 'tanker': {'max_energy' : 600}, 'hub' :  {'coordinates' : 123, 'HP': 123, 'energy_point' :123, 'regeneration':123}},
+                team_2 : { 'cruiser' : {'range' : 1 , 'move' : 10}, 'tanker': {'max_energy' : 600}, 'hub' :  {'coordinates' : 123, 'HP': 123, 'energy_point' :123, 'regeneration':123, }},
+                'common' : {'cruiser' : {'max_energy' : 400, 'cost_attack' : 10, 'creation_cost' : 750, 'attack' : 1, 'max_HP': 100}, 'tanker' : {'creation_cost' : 1000, 'move': 0, 'max_HP': 50}, 'hub': {'max_energy_point' : 0}}}
 
 
     for ligne in range (3, 5):
@@ -309,7 +309,7 @@ def separate_instruction (order, ships, units_stats,board,team,peaks):
     return upgrade_list , create_list, move_list, attack_list, transfer_list
 
     
-def create_units (create_list, ships, team, board, units_stats) :
+def create_units (create_list, ships, team, board, units_stats, peaks) :
     
     """ Creates new units in the team either a tanker or a cruiser and place it on the board
     
@@ -340,29 +340,19 @@ def create_units (create_list, ships, team, board, units_stats) :
     for instruction in create_list :
         coordinates = units_stats[team]['hub']['coordinates']
         
-        # if you want to create a tanker
-        if instruction [1] == 'tanker' and units_stats[team]['hub']['energy_point'] >= units_stats['common']['tanker']['creation_cost'] :
-            
-            energy_point = units_stats[team]['tanker']['storage_capacity'] 
-            # add the tanker in the dico ships       
-            ships[instruction[0]]= {'coordinates': coordinates , 'HP': 50, 'energy_point' : energy_point, 'type' : 'tanker', 'team' : team}
-            # add the tanker in the list_entity of the board
-            
-            board[coordinates]['list_entity'].append(instruction[0])
-            
-            # sub the energy_point from the hub
-            units_stats[team]['hub']['energy_point'] -= units_stats['common']['tanker']['creation_cost']
+        if (instruction[1]== 'tanker' or instruction[1] == 'cruiser') and  units_stats[team]['hub']['energy_point'] >= units_stats['common'][instruction[1]]['creation_cost'] :
+            if instruction[1]== 'tanker' :
+                energy_point = units_stats[team][instruction[1]]['max_energy'] 
+            else : 
+                energy_point = units_stats['common'][instruction[1]]['max_energy']
 
-        elif  instruction [1] == 'cruiser' and units_stats[team]['hub']['energy_point'] >= units_stats['common']['cruiser']['creation_cost'] : 
-            energy_point = units_stats['common']['cruiser']['max_energy'] 
-            # add the cruiser in the dico ships 
-            ships[instruction[0]]= {'coordinates': coordinates , 'HP': 100, 'energy_point' : 400, 'type' : 'cruiser', 'team' : team}
-            # add the cruiser in the list_entity of the board
-            board[coordinates]['list_entity'].append (instruction[0])
-            # sub the energy_point from the hub
-            units_stats[team]['hub']['energy_point'] -= units_stats['common']['cruiser']['creation_cost']
-    
+            max_HP = units_stats['common'][instruction[1]]['max_HP'] 
+            ships[instruction[0]]= {'coordinates': coordinates , 'HP': max_HP, 'energy_point' : energy_point, 'type' : instruction[1], 'team' : team}
+            board[coordinates]['list_entity'].append(instruction[0])
+            change_value('hub',ships, peaks,-units_stats['common'][instruction[1]]['creation_cost'],'energy_point',units_stats,team)
     return ships,board,units_stats
+        
+    
     
 def upgrade (team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list):
    
@@ -387,7 +377,7 @@ def upgrade (team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list):
   
     range : modify cruiser range by adding max_range_upgrade to the range in units_stats associated to the team asking the upgrade  
     move : modify cruiser move by max_travel_upgrade to the move in units_stats associated to the team asking the upgrade
-    storage : modify tanker storage_capacity by adding max_capacity_upgrade to the storage_capacity in units_stats associated to the team asking the upgrade
+    storage : modify tanker max_energy by adding max_capacity_upgrade to the max_energy in units_stats associated to the team asking the upgrade
     regeneration : modify hub regeneration per round by adding max_regen_upgrade to the regen in units_stats associated to the team asking the upgrade
        
     
@@ -693,7 +683,7 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
                 # in_dico = storage of the tanker 
                 in_dico = ships[instruction[0]]['energy_point']
                 # max_storage  = max stroage of a tanker 
-                max_storage = units_stats[team]['tanker']['storage_capacity']
+                max_storage = units_stats[team]['tanker']['max_energy']
             # set all to 0 if it isn't a tanker 
             else :
                 max_storage = 0
@@ -821,8 +811,7 @@ def select_value_to_print (board, coordinates, units_stats, ships, peaks, color_
     """
     
     if board[coordinates]['list_entity'] == ['   '] :
-        
-        
+                
         value_to_print = ('   ')
         
     else : 
@@ -1035,7 +1024,7 @@ def display_stats (elements, color_team, ships, units_stats, peaks):
                     for team_stat in team_stats:
                     
                         value = str(team_stats[team_stat])
-                        if team_stat == 'storage_capacity':
+                        if team_stat == 'max_energy':
                             stat_team = color_team[team_name] + '💼  ' 
                         tanker_stats_1 = stat_team +': ' + value + '   '         
                     
@@ -1109,7 +1098,7 @@ def display_stats (elements, color_team, ships, units_stats, peaks):
         cruiser_stats = units_stats[team_name]['cruiser']
         
         #for each key change icon and associate it to value
-        value = str(tanker_stats['storage_capacity'])
+        value = str(tanker_stats['max_energy'])
         tanker_team_stats = ' | \U0001F50B :' + value
 
         value = str(cruiser_stats['range'])

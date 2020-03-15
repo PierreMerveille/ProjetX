@@ -333,7 +333,9 @@ def create_units (create_list, ships, team, board, units_stats, peaks) :
     
     Versions
     --------
-    specification : Johan Rochet (v.1 20/02/20) 
+    specification : Johan Rochet (v.1 20/02/20)
+    implementation : Johan Rochet (v.1 01/03/20) 
+                     Johan Rochet (V.2 15/03/20)
      
     """
    
@@ -672,7 +674,7 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
     Versions
     --------
     specification : Pierre Merveille (v.2 24/02/20)
-    implementation: Johan Rochet (v.1 30/02/20)
+    implementation: Johan Rochet (v.1 01/03/20)
                     Johan ROchet (v.2 15/03/20)
     """    
     # draw energy

@@ -266,15 +266,13 @@ def separate_instruction (order, ships, units_stats,board,team,peaks):
                 if order[1][0] == '*':
                     value= False
                     # check if there is only one '=' in coordinates[1]
+                    occurence= 0
                     for element in coordinates[1] :
 
-                        if element == '='and value== False :
-                            value = True
-
-                        elif element == '=' :
-                            value= 'bad'
+                        if element == '=':
+                            occurence += 1
                     # if there is only one '=', cut the coorinates[1] in 2 round the '=' 
-                    if value == True : 
+                    if occurence ==1 : 
                         coordinate_y = coordinates[1].split('=')
                         #set the y-coordinate of the attack in coordinate[1]
                         coordinates[1] = coordinate_y[0]
@@ -292,20 +290,22 @@ def separate_instruction (order, ships, units_stats,board,team,peaks):
             elif order[1][0] == '<' :
                 if order[1][1:] == 'hub' or correct :
                     if correct :
-                            
+                        
                         peak_list =[]
                         for peak in peaks :
                             peak_list. append (peaks[peak]['coordinates'])
-                if (coordinates[0],coordinates[1]) in peak_list or order[1][1:] =='hub':
-                    transfer_list.append(order[0],order[1])
-               
-        # add to the transfer_list if it's a good transfer from hub
-        elif order[0] == 'hub' and order [1][1:] in ships :
-            transfer_list.append([order[0][0], order[1]])
-            print (7)
+                if (int(coordinates[0]),int(coordinates[1])) in peak_list or order[1][1:] =='hub':
+                    transfer_list.append([order[0],order[1]])
+                    print (5)
+
+            elif order[1][0] == '>' :
+                if order[1][1:] == 'hub' or order[1][1:] in ships:
+                    transfer_list.append([order[0],order[1]])
+
         # add to the create_list if it's a creation
         elif (order[1]== 'tanker'or order[1]== 'cruiser') and order[0] not in ships :
             create_list.append([order[0], order[1]])
+
     return upgrade_list , create_list, move_list, attack_list, transfer_list
 
     
@@ -691,18 +691,15 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
                 max_storage = 0
                 in_dico = 0
                        
-            # split and store the coordinates if it's a peak 
+            #if the tanker draw energy in a peak 
+            
             if not instruction [1][1:] == 'hub' :
-                
+                # split and store the coordinates if it's a peak 
                 instruction[1] = instruction[1][1:].split ('-')
                 instruction[1][0] = int(instruction[1][0])
                 instruction[1][1] = int(instruction[1][1])
                 instruction[1] = tuple (instruction[1])
-                
-                
-            #if the tanker draw energy in a peak 
-            if instruction[1] in board :
-
+                           
                 for peak in peaks : 
                     if peaks[peak]['coordinates'] == instruction[1] :
                         

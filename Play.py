@@ -481,7 +481,7 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
             position=[]
             #create a variable verify if something is hit
             hit=0
-            #attacke if hithin_range is True
+            #attack if hithin_range is True
             print(coord_attack)
             if hithin_range and ships[instruction[0]]['energy_point']>=int(coord_attack[1]):
                 #verify the coordinates of all the ship
@@ -496,11 +496,6 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                         if ships[ship]['HP']<=0:
                             #stock a dead cruiser
                             cruiser_dead.append(ship)
-                            
-                for ship in cruiser_dead:
-                    index = board[ships[ship]['coordinates']]['list_entity'].index(ship)
-                    del (board[ships[ship]['coordinates']]['list_entity'][index])
-                    del ships[ship]
                
                 #verify if the ennemy hub is in the coordinates
                 if units_stats[ennemy_team]['hub']['coordinates']==coordinates :
@@ -508,22 +503,27 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                     untis_stats=change_value('hub', ships, peaks, int(coord_attack[1])*-1, 'HP', units_stats, ennemy_team)
                     hit+=1
                     end_counter=0
-                    return end_counter
+                   
                   
-                if units_stats[team]['hub']['coordinates']==coordinates :
+                elif units_stats[team]['hub']['coordinates']==coordinates :
                     #change the value of the point of structure of the hub in the coordinate
                     units_stats=change_value('hub', ships, peaks, int(coord_attack[1])*-1, 'HP', units_stats, team)
                     hit+=1
                     end_counter=0
                                                 
                     #if units_stats[team]['hub']['HP']<=0:
-                if hit==0 : 
+                elif hit==0 : 
                     #if nothing is hit than increment the end_counter
                     end_counter += 0.5
+                   
                     
             else :
                 end_counter += 0.5
-                
+            #delete the ships which are destroyed
+            for ship in cruiser_dead:
+                    index = board[ships[ship]['coordinates']]['list_entity'].index(ship)
+                    del (board[ships[ship]['coordinates']]['list_entity'][index])
+                    del ships[ship]   
     return end_counter
     
 def move (move_list, ships, team, board, units_stats, peaks) :

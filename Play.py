@@ -567,7 +567,7 @@ def move (move_list, ships, team, board, units_stats, peaks) :
                 del board[old_coord]['list_entity'][index]
 
             else:
-
+                
                 if ships[instruction[0]]['energy_point'] < max(abs(new_coord[0] - old_coord[0]), abs(new_coord[1] - old_coord[1])) * units_stats[team]['cruiser']['move'] :
                     print('Not enough energy_point in' + instruction[0])
                 else:
@@ -1167,7 +1167,8 @@ def range_verification (units_stats, ship_name, ships, coordinates, team):
     --------
     specification : Johan Rochet (v.1 24/02/20)
     """
-    if abs(coordinates[0]-ships[ship_name]['coordinates'][0])+abs(coordinates[1]-ships[ship_name]['coordinates'][1]) <= units_stats[team]['cruiser']['range'] :
+    if max (abs(coordinates[0]-ships[ship_name]['coordinates'][0]), abs(coordinates[1]-ships[ship_name]['coordinates'][1])) <= units_stats[team]['cruiser']['range'] :
+        
         return True
     else :
         return False

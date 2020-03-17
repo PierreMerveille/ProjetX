@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 from colored import*
 def play (map_title, team_1, team_2):
     """ Start the game and do the folowing function
@@ -464,11 +465,10 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
     #attack_point = coord_attack[1]
     if len(attack_list)==0:
         end_counter+=0.5
-        return end_counter
+        
     else :
         for instruction in attack_list :
-            #initialize a valeur with the name of the ship
-            ship=instruction[0]
+            
             coord_attack=instruction[1].split('=')
             #coord_attack[1]= attack_point
             coordinates= coord_attack[0].split ('-')
@@ -483,7 +483,7 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
             hit=0
             #attacke if hithin_range is True
             print(coord_attack)
-            if hithin_range and ships[ship]['energy_point']>=int(coord_attack[1]):
+            if hithin_range and ships[instruction[0]]['energy_point']>=int(coord_attack[1]):
                 #verify the coordinates of all the ship
                 for ship in ships :
                     if ships[ship]['coordinates']==coordinates:
@@ -492,20 +492,16 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                         hit+=1
                         end_counter=0
                         #reduce the energy of the ship
-                        ships = change_value(ship, ships, peaks, int(coord_attack[1])*-1, 'energy_point', units_stats, team)
+                        ships = change_value(instruction[0], ships, peaks, int(coord_attack[1])*-1, 'energy_point', units_stats, team)
                         if ships[ship]['HP']<=0:
                             #stock a dead cruiser
                             cruiser_dead.append(ship)
-                            coord=ships[ship]['coordinates']
-                            position.append(coord)
-                            #delete the ship for the dictionnary board
-                            board[(coordinates[0],coordinates[1])]['list_entity'].remove(ship)
+                            
                 for ship in cruiser_dead:
+                    index = board[ships[ship]['coordinates']]['list_entity'].index(ship)
+                    del (board[ships[ship]['coordinates']]['list_entity'][index])
                     del ships[ship]
-                    for coordinate in position :
-                        for index in range (len(board[coordinate]['list_entity'])):
-                            if ship==board[coordinate]['list_entity'][index]:
-                                del board[coordinate]['list_entity'][index]
+               
                 #verify if the ennemy hub is in the coordinates
                 if units_stats[ennemy_team]['hub']['coordinates']==coordinates :
                     #change the value of the point of structure of the ennemy's hub in the coordinate
@@ -516,20 +512,18 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                   
                 if units_stats[team]['hub']['coordinates']==coordinates :
                     #change the value of the point of structure of the hub in the coordinate
-                    untis_stats=change_value('hub', ships, peaks, int(coord_attack[1])*-1, 'HP', units_stats, team)
+                    units_stats=change_value('hub', ships, peaks, int(coord_attack[1])*-1, 'HP', units_stats, team)
                     hit+=1
                     end_counter=0
-                    return end_counter
-                else : 
-                    return end_counter
+                                                
                     #if units_stats[team]['hub']['HP']<=0:
                 if hit==0 : 
                     #if nothing is hit than increment the end_counter
                     end_counter += 0.5
-                    return end_counter
+                    
             else :
                 end_counter += 0.5
-                return end_counter
+                
     return end_counter
     
 def move (move_list, ships, team, board, units_stats, peaks) :
@@ -648,9 +642,10 @@ def change_value ( entity_name, ships, peaks, new_value, caracteristic, units_st
         
 def transfer (transfer_list, ships, team, units_stats, peaks, board) :
 
-    """ Fill a tanker's energy storage into a cruiser or into the hub 
-        OR
-        Fill the storage of a tanker with the energy of a peak or a hub
+    """ 
+    Fill a tanker's energy storage into a cruiser or into the hub 
+    OR
+    Fill the storage of a tanker with the energy of a peak or a hub
 
     Parameters
     ----------

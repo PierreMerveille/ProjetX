@@ -34,25 +34,27 @@ def create_order(long, larg) :
            
             if occurence == 0 :
 
-                instruction_list.append(instruction + '_'+ str(create_unit[instruction]) + ':' + instruction)
+                instruction_list.append(instruction + '_'+ str(team) +'_' + str(create_unit[instruction]) + ':' + instruction)
                 
             else:
                 number_tanker = (occurence+create_unit[instruction])
-                instruction_list.append( instruction + '_'+ str(str(number_tanker)) + ':' + instruction)
+                instruction_list.append( instruction + '_'+ str(team) +'_' + str(str(number_tanker)) + ':' + instruction)
                 
             create_unit[instruction]+= 1
                         
         #transfer energy
-        elif order == 'transfer' :
+        if order == 'transfer' :
             order_type = choice(['draw','give'])
-            
-            if order_type == 'draw' :
-                tanker_list = []
-                for ship in ships :
+            tanker_list = []
+            for ship in ships :
                     
                     if ships[ship]['type'] == 'tanker' and ships[ship]['team'] == team :
                         
                         tanker_list.append(ship)
+
+            if order_type == 'draw' :
+                
+                
                 if tanker_list != []:
 
                     tanker = choice(tanker_list)
@@ -62,12 +64,27 @@ def create_order(long, larg) :
                         for peak in peaks :
                             coordinates.append (peaks[peak]['coordinates'])
                         coordinates= choice (coordinates)
+                        instruction_list.append(tanker + ':<' +str(coordinates[0]) + '-'+ str(coordinates[1]))
                     else : 
-                        coordinates = units_stats [team]['hub']['coordinates']
+                        instruction_list.append(tanker + ':<hub')
                     
-                    instruction_list.append(tanker + ':<' +str(coordinates[0]) + '-'+ str(coordinates[1]))
+                    
             #elif order_type = give (à faire)
-        
+            if order_type == 'give':
+                if tanker_list !=  [] : 
+                    tanker = choice(tanker_list)
+                    coordinates = []
+                    Input = choice(['hub','ship'])
+                    if Input == 'hub' :
+                         instruction_list.append(tanker + ':>hub')
+                    else : 
+                        cruiser_list = []
+                        for ship in ships :
+                            if ships[ship]['type'] == 'cruiser' and ships[ship]['team'] == team :
+                                cruiser_list.append(ships[ship]['coordinates'])
+                        coordinates = choice(cruiser_list)
+                    
+                        instruction_list.append(tanker + ':>' +str(coordinates[0]) + '-'+ str(coordinates[1]))
 
         elif order == 'attack' :
             cruiser_list=[]

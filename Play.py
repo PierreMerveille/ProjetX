@@ -32,7 +32,7 @@ def play (map_title, teams):
 
             if teams[team]['player'] == 'local_player' :
            
-                order = input("Let's get %s's orders: "%team)
+                order = input("Let's get %s's orders: "% teams[team]['team'])
                 order_list[teams[team]['team']]= order
             else :
                 order = create_order (long,larg,teams[team]['team'],ships, units_stats,peaks)

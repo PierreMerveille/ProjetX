@@ -4,7 +4,7 @@ from colored import*
 from random import *
 
 
-
+  
 
 def play (map_title, teams):
     """ Start the game and do the folowing function

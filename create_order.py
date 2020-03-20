@@ -12,7 +12,7 @@ def create_order() :
     create_unit = {'tanker' : 0, 'cruiser' : 0}
     
     while nb_order != 0 :
-        order = choice(['move', 'create','transfer','attack'])
+        order = choice(['move', 'create','transfer','attack', 'upgrade'])
         order_list.append(order)
         nb_order -= 1
 
@@ -43,7 +43,7 @@ def create_order() :
             create_unit[instruction]+= 1
                         
         #transfer energy
-        if order == 'transfer' :
+        elif order == 'transfer' :
             order_type = choice(['draw','give'])
             
             if order_type == 'draw' :
@@ -68,9 +68,8 @@ def create_order() :
                     instruction_list.append(tanker + ':<' +str(coordinates[0]) + '-'+ str(coordinates[1]))
             #elif order_type = give (à faire)
         
-        long=10
-        larg=10
-        if order == 'attack' :
+
+        elif order == 'attack' :
             cruiser_list=[]
             for ship in ships :
                 if ships[ship]['type'] == 'cruiser' and ships[ship]['team'] == team : 
@@ -84,7 +83,16 @@ def create_order() :
 
                 instruction_list.append(str(cruiser) + ':' + str(x) + '-' + str(y) + '=' + str(damage))
                     
+        elif order == 'move' :
+            for ship in ships :
+
+                if ships[ship]['type'] == 'tanker' and ships[ship]['team'] == team : 
+                    ship_list.append(ship)
             
+            ship_in_movement= choice(ship_list)
+            raw = randint(0,nbr_row)
+            column = randint(0,nbr_column)
+            instruction_list.append( ship_in_movement + ':@' + str(raw + '-' + column))
     print (instruction_list)
 
                

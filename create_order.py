@@ -21,9 +21,11 @@ def create_order() :
     
     for order in order_list :
 
+        #create a ship
         if order == 'create' :
             instruction = choice(['tanker','cruiser'])
             
+            #verify if a ship is already done or not
             occurence = 0 
             for  ship in ships:
                                 
@@ -40,6 +42,7 @@ def create_order() :
                 
             create_unit[instruction]+= 1
                         
+        #transfer energy
         if order == 'transfer' :
             order_type = choice(['draw','give'])
             

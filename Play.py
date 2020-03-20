@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from colored import*
-def play (map_title, team_1, team_2):
+from random import *
+
+
+
+
+def play (map_title, teams):
     """ Start the game and do the folowing function
     Parameter
     ----------
@@ -18,15 +23,20 @@ def play (map_title, team_1, team_2):
     specification : Pierre Merveille (v.1 24/02/20)
     """
          
-    board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks = set_games(team_1, team_2, map_title)
+    board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks,long,larg = set_games(teams['first_team']['team'],teams['second_team']['team'], map_title)
     end_counter = 0
 
     while end_game(color_team, units_stats, end_counter) == False:
         order_list={}
-        for team in color_team :
-            order = input("Let's get %s's orders: "%team)
-            order_list[team]= order
+        for team in teams :
 
+            if teams[team]['player'] == 'local_player' :
+           
+                order = input("Let's get %s's orders: "%team)
+                order_list[teams[team]['team']]= order
+            else :
+                order = create_order (long,larg,teams[team]['team'],ships, units_stats,peaks)
+                order_list[teams[team]['team']] = order
         for team in color_team:
             if team==team_1:
                 ennemy_team=team_2
@@ -48,6 +58,7 @@ def play (map_title, team_1, team_2):
             ships, units_stats, peaks = transfer(transfer_list, ships, team, units_stats, peaks, board)
             
         units_stats = round_end(board, end_counter, units_stats, peaks, elements, color_team, ships)
+    print ('FINISH')
 def set_games (team_1, team_2, map_title) :
     """
     Create all the environnement of the game. Takes the data contained in the file and initializes the data structure (variable)
@@ -141,7 +152,7 @@ def set_games (team_1, team_2, map_title) :
     board_display(board, color_team, ships, peaks, units_stats, elements)
     display_stats(elements,color_team,ships,units_stats,peaks)
 
-    return board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks
+    return board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks, long,larg
 
     
 def end_game ( color_team, units_stats, end_counter ): 
@@ -170,12 +181,9 @@ def end_game ( color_team, units_stats, end_counter ):
     """  
     #at beginning end is false
     end = False
-    
-
     #if end_counter >= 40 end is True
     if end_counter >= 40:
         end = True
-
     #for each team in color_team
     for team in color_team:
         #if structure points of hub <= 0 end is True
@@ -295,10 +303,11 @@ def separate_instruction (order, ships, units_stats,board,team,peaks):
                         peak_list =[]
                         for peak in peaks :
                             peak_list. append (peaks[peak]['coordinates'])
-                if (int(coordinates[0]),int(coordinates[1])) in peak_list or order[1][1:] =='hub':
-                    transfer_list.append([order[0],order[1]])
-                    print (5)
-
+                        if (int(coordinates[0]),int(coordinates[1])) in peak_list :
+                            transfer_list.append([order[0],order[1]])
+                    else : 
+                        transfer_list.append([order[0],order[1]])
+                                       
             elif order[1][0] == '>' :
                 if order[1][1:] == 'hub' or order[1][1:] in ships:
                     transfer_list.append([order[0],order[1]])
@@ -396,21 +405,20 @@ def upgrade (team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list):
 
             #if team has enough energy do requested upgrades, else print('caps(%s): you don't have enough energy stored in your hub')%team
             if upgrade == 'regeneration':
-                regen_cost = cost_upgrade['cost_regen_upgrade'] 
-
+                
                 if units_stats[team]['hub']['regeneration'] < max_upgrade['max_regen_upgrade']:
                 
-                    if regen_cost <= units_stats[team]['hub']['energy_point']:
+                    if cost_upgrade['cost_regen_upgrade']  <= units_stats[team]['hub']['energy_point']:
                         units_stats[team]['hub']['regeneration'] += 5
                         units_stats[team]['hub']['energy_point'] -= 700
 
             elif upgrade == 'storage':
-                storage_cost = cost_upgrade['cost_capacity_upgrade']
+                storage_cost = cost_upgrade['cost_upgrade_capacity']
                 
-                if units_stats[team]['tanker']['storage'] < max_upgrade['max_capacity_upgrade']:
+                if units_stats[team]['tanker']['max_energy'] < max_upgrade['max_capacity_upgrade']:
                     
                     if storage_cost <= units_stats[team]['hub']['energy_point']:
-                        units_stats[team]['tanker']['storage'] += 100
+                        units_stats[team]['tanker']['max_energy'] += 100
                         units_stats[team]['hub']['energy_point'] -= 600           
             
             elif upgrade == 'move':
@@ -607,7 +615,7 @@ def change_value ( entity_name, ships, peaks, new_value, caracteristic, units_st
     Version 
     -------
     specification : Johan Rochet (v.1 22/02/20)
-    implementation : Anthony Pierard (v.1 03/03/20)
+    
     """   
     
     #implementation of the function change value
@@ -726,19 +734,21 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
                 out_dico = ships[instruction[0]]['energy_point']
               
                 #give energy to a cruiser
-                if ships[instruction[1][1:]]['type']== 'cruiser' and range_verification(units_stats, instruction[0], ships,ships[instruction[1][1:]]['coordinates'], team) :
+                if ships[instruction[1][1:]]['type']== 'cruiser' : 
+                    if range_verification(units_stats, instruction[0], ships,ships[instruction[1][1:]]['coordinates'], team) :
                     
-                    while ships[instruction[1][1:]]['energy_point'] < units_stats['common']['cruiser'] ['max_energy'] and ships[instruction[0]]['energy_point'] > 0:
-                        
-                        ships[instruction[1][1:]]['energy_point'] += 1 
-                        ships[instruction[0]]['energy_point'] -= 1
-                #give energy to a hub    
-                elif  instruction[1][1:] == 'hub' and range_verification(units_stats, instruction[0], ships,units_stats[team][instruction[1][1:]]['coordinates'], team) :
+                        while ships[instruction[1][1:]]['energy_point'] < units_stats['common']['cruiser'] ['max_energy'] and ships[instruction[0]]['energy_point'] > 0:
+                            
+                            ships[instruction[1][1:]]['energy_point'] += 1 
+                            ships[instruction[0]]['energy_point'] -= 1
+                    #give energy to a hub    
+                elif  instruction[1][1:] == 'hub' :
+                    if range_verification(units_stats, instruction[0], ships,units_stats[team][instruction[1][1:]]['coordinates'], team) :
                     
-                    while units_stats[team][instruction[1][1:]]['energy_point'] < units_stats['common']['hub']['max_energy_point'] and ships[instruction[0]]['energy_point'] > 0 :
+                        while units_stats[team][instruction[1][1:]]['energy_point'] < units_stats['common']['hub']['max_energy_point'] and ships[instruction[0]]['energy_point'] > 0 :
 
-                        ships[instruction[0]]['energy_point'] -=1 
-                        units_stats[team][instruction[1][1:]]['energy_point'] += 1
+                            ships[instruction[0]]['energy_point'] -=1 
+                            units_stats[team][instruction[1][1:]]['energy_point'] += 1
     return ships, units_stats , peaks
 def round_end (board, end_counter, units_stats, peaks, elements, color_team, ships):
 
@@ -1173,4 +1183,117 @@ def range_verification (units_stats, ship_name, ships, coordinates, team):
     else :
         return False
 
-play('fichier', 'teamdegroslulu', 'fifi')   
+def create_order(long, larg,  team, ships, units_stats,peaks) :
+
+    nb_order = randint(1,30)
+    order_list = []
+    instruction_list =[]
+    create_unit = {'tanker' : 0, 'cruiser' : 0}
+    cruiser_list=[]
+    tanker_list = []
+    peak_coordinates =[]
+
+    for ship in ships :
+
+        if ships[ship]['type'] == 'cruiser' and ships[ship]['team'] == team : 
+            cruiser_list.append(ship)
+        
+    for ship in ships :
+
+        if ships[ship]['type'] == 'tanker' and ships[ship]['team'] == team : 
+            tanker_list.append(ship)
+        
+    for peak in peaks :
+        peak_coordinates.append (peaks[peak]['coordinates'])
+    
+    ship_list = tanker_list+ cruiser_list
+    
+    while nb_order != 0 :
+        order = choice(['move', 'create','transfer','attack', 'upgrade'])
+        order_list.append(order)
+        nb_order -= 1
+   
+    for order in order_list :
+        #create a ship
+        if order == 'create' :
+            instruction = choice(['tanker','cruiser'])
+            if instruction == 'tanker' :
+                type_list = tanker_list 
+            else :
+                type_list = cruiser_list
+            #verify if a ship is already done or not                
+            if len(type_list) == 0 :
+
+                instruction_list.append(instruction + '_'+ str(team) +'_' + str(create_unit[instruction]) + ':' + instruction)
+                
+            else:
+                number_tanker = (len(type_list) +create_unit[instruction])
+                instruction_list.append( instruction + '_'+ str(team) +'_' + str(str(number_tanker)) + ':' + instruction)
+                
+            create_unit[instruction]+= 1
+                        
+        #transfer energy 
+        elif order == 'transfer' and tanker_list != [] and peak_coordinates != []:
+            order_type = choice(['draw','give'])
+            
+            if order_type == 'draw' :
+                                
+                    tanker = choice(tanker_list)
+                    coordinates = []
+                    output = choice(['hub','peak'])
+                    if output == 'peak' :
+                        coordinates= choice (peak_coordinates)
+                        instruction_list.append(tanker + ':<' +str(coordinates[0]) + '-'+ str(coordinates[1]))
+                    else : 
+                        instruction_list.append(tanker + ':<hub')    
+                    
+            #elif order_type = give (à faire)
+            if order_type == 'give':
+               
+                tanker = choice(tanker_list)
+                coordinates = []
+                Input = choice(['hub','ship'])
+                if Input == 'hub' :
+                        instruction_list.append(tanker + ':>hub')
+                else : 
+                    if cruiser_list !=[] :
+                        cruiser = choice(cruiser_list)
+                        coordinates = ships[cruiser]['coordinates']         
+                
+                        instruction_list.append(tanker + ':>' + str(coordinates[0]) + '-'+ str(coordinates[1]))
+
+        elif order == 'attack' and cruiser_list != [] :
+              
+            cruiser = choice(cruiser_list)
+            x=randint(1,long)
+            y=randint(1,larg)
+            damage=randint(0 ,ships[cruiser]['energy_point'])
+
+            instruction_list.append(str(cruiser) + ':' + str(x) + '-' + str(y) + '=' + str(damage))
+                    
+        elif order == 'move' and ship_list != [] :
+                        
+            ship_in_movement= choice(ship_list)
+            line = randint(0,long)
+            column = randint(0,larg)
+            instruction_list.append(ship_in_movement + ':@' + str(line) + '-' + str(column))
+
+        elif order == 'upgrade' :
+            order_type = choice(['regeneration', 'storage', 'move', 'range'])
+            instruction_list.append('upgrade:' + order_type)
+
+    instruction_str = ''
+    for element in instruction_list :
+        instruction_str += element +' '
+    
+    return instruction_str
+
+
+team_1 = str(input('What\'s the team name ? '))
+player_1 = str(input('Kind of player (AI or local_player) ? '))
+team_2 = input ('What\'s the second_team name ? ')
+player_2 = str(input('Kind of player (AI or local_player ? '))
+
+if (player_1 == 'AI' or player_1 == 'local_player') and (player_2 == 'AI' or player_2 == 'local_player') :
+    teams= {'first_team' : {'team': team_1,'player' : player_1}, 'second_team' : {'team' : team_2, 'player' : player_2}}
+    play('fichier',teams)

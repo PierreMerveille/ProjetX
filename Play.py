@@ -732,9 +732,16 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
             
             if ships[instruction[0]]['type'] == 'tanker' :
                 out_dico = ships[instruction[0]]['energy_point']
-              
+                
+                if  instruction[1][1:] == 'hub' :
+                    if range_verification(units_stats, instruction[0], ships,units_stats[team][instruction[1][1:]]['coordinates'], team) :
+                    
+                        while units_stats[team][instruction[1][1:]]['energy_point'] < units_stats['common']['hub']['max_energy_point'] and ships[instruction[0]]['energy_point'] > 0 :
+
+                            ships[instruction[0]]['energy_point'] -=1 
+                            units_stats[team][instruction[1][1:]]['energy_point'] += 1
                 #give energy to a cruiser
-                if ships[instruction[1][1:]]['type']== 'cruiser' : 
+                elif ships[instruction[1][1:]]['type']== 'cruiser' : 
                     if range_verification(units_stats, instruction[0], ships,ships[instruction[1][1:]]['coordinates'], team) :
                     
                         while ships[instruction[1][1:]]['energy_point'] < units_stats['common']['cruiser'] ['max_energy'] and ships[instruction[0]]['energy_point'] > 0:
@@ -742,13 +749,7 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
                             ships[instruction[1][1:]]['energy_point'] += 1 
                             ships[instruction[0]]['energy_point'] -= 1
                     #give energy to a hub    
-                elif  instruction[1][1:] == 'hub' :
-                    if range_verification(units_stats, instruction[0], ships,units_stats[team][instruction[1][1:]]['coordinates'], team) :
-                    
-                        while units_stats[team][instruction[1][1:]]['energy_point'] < units_stats['common']['hub']['max_energy_point'] and ships[instruction[0]]['energy_point'] > 0 :
-
-                            ships[instruction[0]]['energy_point'] -=1 
-                            units_stats[team][instruction[1][1:]]['energy_point'] += 1
+                
     return ships, units_stats , peaks
 def round_end (board, end_counter, units_stats, peaks, elements, color_team, ships):
 

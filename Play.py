@@ -251,70 +251,71 @@ def separate_instruction (order, ships, units_stats,board,team,peaks):
        
     
     # determine the nature of the instruction and set it in a list if it's correct
-    for order in instructions_list: 
-        # check if it's an upgrade-instruction
-        correct = False
-        if order[0] == 'upgrade' :
-           if order[1] == 'regeneration' or order[1] == 'range' or order[1] == 'move' or order[1] == 'storage':
-            upgrade_list.append(order[1])
-        
-        # check if order[0] is a ship    
-        elif order[0] in ships and ships[order[0]]['team'] == team :
-            
+    for order in instructions_list:
+        if order[1] != '' :  
            
+        # check if it's an upgrade-instruction
+            correct = False
+            if order[0] == 'upgrade' :
+                if order[1] == 'regeneration' or order[1] == 'range' or order[1] == 'move' or order[1] == 'storage':
+                    upgrade_list.append(order[1])
             
-            # check if there is only one '-'in order[1]
-            occurence = 0
-            for element in order[1] : 
-                if element == '-':
-                    occurence += 1
-            # if there is only one '-', cut the coorinates in 2 round the '-'      
-            if occurence == 1:              
-                coordinates = order[1][1:].split('-')
-                # if it's an attack-instruction ==> handle with the attack_value (ex: *10-12=23)
-                if order[1][0] == '*':
-                    value= False
-                    # check if there is only one '=' in coordinates[1]
-                    occurence= 0
-                    for element in coordinates[1] :
+            # check if order[0] is a ship    
+            elif order[0] in ships and ships[order[0]]['team'] == team :            
+            
+                
+                # check if there is only one '-'in order[1]
+                occurence = 0
+                for element in order[1] : 
+                    if element == '-':
+                        occurence += 1
+                # if there is only one '-', cut the coorinates in 2 round the '-'      
+                if occurence == 1:              
+                    coordinates = order[1][1:].split('-')
+                    # if it's an attack-instruction ==> handle with the attack_value (ex: *10-12=23)
+                    if order[1][0] == '*':
+                        value= False
+                        # check if there is only one '=' in coordinates[1]
+                        occurence= 0
+                        for element in coordinates[1] :
 
-                        if element == '=':
-                            occurence += 1
-                    # if there is only one '=', cut the coorinates[1] in 2 round the '=' 
-                    if occurence ==1 : 
-                        coordinate_y = coordinates[1].split('=')
-                        #set the y-coordinate of the attack in coordinate[1]
-                        coordinates[1] = coordinate_y[0]
-                    
-                # verify if the coordinates are in the board
-                if coordinates[0] in x_list and coordinates[1] in y_list :
-                    correct = True
-            #add to the move_list if it's a correct move 
-            if order[1][0] == '@' and correct :
-                move_list.append([order[0], order[1][1:]])
-            # add to the attack_list if it's a correct attack
-            elif order[1][0] == '*'and correct:
-                attack_list .append([order[0], order[1][1:]])
-            # add to the transfer_list if it's a good transfer
-            elif order[1][0] == '<' :
-                if order[1][1:] == 'hub' or correct :
-                    if correct :
+                            if element == '=':
+                                occurence += 1
+                        # if there is only one '=', cut the coorinates[1] in 2 round the '=' 
+                        if occurence ==1 : 
+                            coordinate_y = coordinates[1].split('=')
+                            #set the y-coordinate of the attack in coordinate[1]
+                            coordinates[1] = coordinate_y[0]
                         
-                        peak_list =[]
-                        for peak in peaks :
-                            peak_list. append (peaks[peak]['coordinates'])
-                        if (int(coordinates[0]),int(coordinates[1])) in peak_list :
+                    # verify if the coordinates are in the board
+                    if coordinates[0] in x_list and coordinates[1] in y_list :
+                        correct = True
+                #add to the move_list if it's a correct move 
+                if order[1][0] == '@' and correct :
+                    move_list.append([order[0], order[1][1:]])
+                # add to the attack_list if it's a correct attack
+                elif order[1][0] == '*'and correct:
+                    attack_list .append([order[0], order[1][1:]])
+                # add to the transfer_list if it's a good transfer
+                elif order[1][0] == '<' :
+                    if order[1][1:] == 'hub' or correct :
+                        if correct :
+                            
+                            peak_list =[]
+                            for peak in peaks :
+                                peak_list. append (peaks[peak]['coordinates'])
+                            if (int(coordinates[0]),int(coordinates[1])) in peak_list :
+                                transfer_list.append([order[0],order[1]])
+                        else : 
                             transfer_list.append([order[0],order[1]])
-                    else : 
+                                        
+                elif order[1][0] == '>' :
+                    if order[1][1:] == 'hub' or order[1][1:] in ships:
                         transfer_list.append([order[0],order[1]])
-                                       
-            elif order[1][0] == '>' :
-                if order[1][1:] == 'hub' or order[1][1:] in ships:
-                    transfer_list.append([order[0],order[1]])
 
-        # add to the create_list if it's a creation
-        elif (order[1]== 'tanker'or order[1]== 'cruiser') and order[0] not in ships :
-            create_list.append([order[0], order[1]])
+            # add to the create_list if it's a creation
+            elif (order[1]== 'tanker'or order[1]== 'cruiser') and order[0] not in ships :
+                create_list.append([order[0], order[1]])
 
     return upgrade_list , create_list, move_list, attack_list, transfer_list
 

@@ -134,9 +134,9 @@ def set_games (team_1, team_2, map_title) :
         name_entity = 'peak' + str(index-5)
         
         if index == 6:
-            peaks = {name_entity : {'coordinates' : (int(info_peak[0]), int(info_peak[1])), 'storage' : info_peak[2]}}
+            peaks = {name_entity : {'coordinates' : (int(info_peak[0]), int(info_peak[1])), 'storage' : int(info_peak[2])}}
         else:
-            peaks[name_entity]= {'coordinates' : (int(info_peak[0]), int(info_peak[1])), 'storage' : info_peak[2]}
+            peaks[name_entity]= {'coordinates' : (int(info_peak[0]), int(info_peak[1])), 'storage' : int(info_peak[2])}
             
         board[(int(info_peak[0]), int(info_peak[1]))]['list_entity'] = [name_entity]
 
@@ -708,6 +708,9 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
                         
                         #transfer energy 
                         if max_storage > in_dico and range_verification(units_stats, instruction[0], ships,instruction[1],team ):
+                            print (in_dico)
+                            print (max_storage)
+                            print (type(peaks[peak]['storage']))
                             while in_dico < max_storage and peaks[peak]['storage'] >0 :
                     
                                 in_dico += 1

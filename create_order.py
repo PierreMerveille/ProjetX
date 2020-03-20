@@ -104,7 +104,10 @@ def create_order(long, larg,  team, ships, units_stats,peaks) :
             order_type = choice(['regeneration', 'storage', 'move', 'range'])
             instruction_list.append('upgrade:' + order_type)
 
-    print (instruction_list)
+    instruction_str = ''
+    for element in instruction_list :
+        instruction_str += element +' '
+    print (instruction_str)
 
                
 

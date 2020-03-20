@@ -5,7 +5,7 @@ peaks = {'peak1': {'coordinates': (10, 10), 'storage': 400}, 'peak2': {'coordina
 units_stats = {1: {'cruiser': {'range': 1, 'move': 10}, 'tanker': {'storage_capacity': 600}, 'hub': {'coordinates': (15, 3), 'HP': 1500, 'energy_point': 1500, 'regeneration': 25}}, 'fifi': {'cruiser': {'range': 1, 'move': 10}, 'tanker': {'storage_capacity': 600}, 'hub': {'coordinates': (1, 9), 'HP': 1500, 'energy_point': 1500, 'regeneration': 25}}, 'common': {'cruiser': {'max_energy': 400, 'cost_attack': 10, 'creation_cost': 100, 'attack': 1}, 'tanker': {'creation_cost': 50, 'move': 0}, 'hub': {'max_energy_point': 1500}}}
 team = 1
 
-def create_order() :
+def create_order(long, larg) :
     nb_order = randint(1,30)
     order_list = []
     instruction_list =[]
@@ -84,18 +84,24 @@ def create_order() :
                 instruction_list.append(str(cruiser) + ':' + str(x) + '-' + str(y) + '=' + str(damage))
                     
         elif order == 'move' :
+            ship_list = []
             for ship in ships :
 
                 if ships[ship]['type'] == 'tanker' and ships[ship]['team'] == team : 
                     ship_list.append(ship)
             
             ship_in_movement= choice(ship_list)
-            raw = randint(0,nbr_row)
-            column = randint(0,nbr_column)
-            instruction_list.append( ship_in_movement + ':@' + str(raw + '-' + column))
+            line = randint(0,long)
+            column = randint(0,larg)
+            instruction_list.append(ship_in_movement + ':@' + str(line) + '-' + str(column))
+
+        elif order == 'upgrade' :
+            order_type = choice(['regeneration', 'storage', 'move', 'range'])
+            instruction_list.append('upgrade:' + order_type)
+
     print (instruction_list)
 
                
 
 
-create_order()
+create_order(15, 10)

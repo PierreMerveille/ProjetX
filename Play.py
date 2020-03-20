@@ -607,7 +607,7 @@ def change_value ( entity_name, ships, peaks, new_value, caracteristic, units_st
     Version 
     -------
     specification : Johan Rochet (v.1 22/02/20)
-    
+    implementation : Anthony Pierard (v.1 03/03/20)
     """   
     
     #implementation of the function change value

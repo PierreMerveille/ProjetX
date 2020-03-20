@@ -12,7 +12,7 @@ def create_order() :
     create_unit = {'tanker' : 0, 'cruiser' : 0}
     
     while nb_order != 0 :
-        order = choice(['move', 'create','transfer'])
+        order = choice(['move', 'create','transfer','attack'])
         order_list.append(order)
         nb_order -= 1
 
@@ -67,7 +67,22 @@ def create_order() :
                     
                     instruction_list.append(tanker + ':<' +str(coordinates[0]) + '-'+ str(coordinates[1]))
             #elif order_type = give (à faire)
+        
+        long=10
+        larg=10
+        if order == 'attack' :
+            cruiser_list=[]
+            for ship in ships :
+                if ships[ship]['type'] == 'cruiser' and ships[ship]['team'] == team : 
+                    cruiser_list.append(ship)
+            
+            if cruiser_list!=[]:
+                cruiser = choice(cruiser_list)
+                x=randint(1,long)
+                y=randint(1,larg)
+                damage=randint(1,ships[ship]['energy_point'])
 
+                instruction_list.append(str(cruiser) + ':' + str(x) + '-' + str(y) + '=' + str(damage))
                     
             
     print (instruction_list)

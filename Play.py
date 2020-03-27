@@ -25,8 +25,8 @@ def play (map_title, teams):
          
     board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks,long,larg = set_games(teams['first_team']['team'],teams['second_team']['team'], map_title)
     end_counter = 0
-
-    while end_game(color_team, units_stats, end_counter) == False:
+    end = False
+    while end == False:
         order_list={}
         for team in teams :
 
@@ -58,7 +58,12 @@ def play (map_title, teams):
             ships, units_stats, peaks = transfer(transfer_list, ships, team, units_stats, peaks, board)
             
         units_stats = round_end(board, end_counter, units_stats, peaks, elements, color_team, ships)
-    print ('FINISH')
+
+        end,winner = end_game(color_team,units_stats,end_counter,team,ennemy_team)
+    if winner :
+        print ('%s is the winner ' % winner)
+    else : 
+        print ('no winner')
 def set_games (team_1, team_2, map_title) :
     """
     Create all the environnement of the game. Takes the data contained in the file and initializes the data structure (variable)
@@ -155,7 +160,7 @@ def set_games (team_1, team_2, map_title) :
     return board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks, long,larg
 
     
-def end_game ( color_team, units_stats, end_counter ): 
+def end_game ( color_team, units_stats, end_counter,team,ennemy_team ): 
 
     """ Verify if game is finished 
     
@@ -181,15 +186,24 @@ def end_game ( color_team, units_stats, end_counter ):
     """  
     #at beginning end is false
     end = False
+    winner = False
     #if end_counter >= 40 end is True
     if end_counter >= 40:
+        end = True    
+        if units_stats[team]['hub']['HP'] < units_stats[ennemy_team]['hub']['HP'] :
+            winner = ennemy_team 
+        elif  units_stats[team]['hub']['HP'] > units_stats[ennemy_team]['hub']['HP'] :
+            winner = team 
+        else: 
+            winner = False
+    elif int(units_stats[team]['hub']['HP']) <= 0: 
         end = True
+        winner = team 
+    elif int(units_stats[ennemy_team]['hub']['HP']) <= 0:
+        end = True
+        winner = ennemy_team
     #for each team in color_team
-    for team in color_team:
-        #if structure points of hub <= 0 end is True
-        if int(units_stats[team]['hub']['HP']) <= 0:
-            end = True
-    return end
+    return end,winner
 
 def separate_instruction (order, ships, units_stats,board,team,peaks):
     """ 

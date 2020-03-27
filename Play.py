@@ -7,7 +7,11 @@ import time
 import sys
 
 
+
 def play (map_title, team_1, team_1_type, team_2, team_2_type):
+
+
+
     """ Start the game and do the folowing function
     Parameter
     ----------
@@ -29,6 +33,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     end = False
     while end == False:
         order_list={}
+        
         for team in teams :
 
             if teams[team]['player'] == 'local_player' :
@@ -38,6 +43,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             else :
                 order = create_order (long,larg,teams[team]['team'],ships, units_stats,peaks)
                 order_list[teams[team]['team']] = order
+        
         for team in color_team:
             if team==team_1:
                 ennemy_team=team_2
@@ -61,10 +67,12 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
         units_stats = round_end(board, end_counter, units_stats, peaks, elements, color_team, ships)
 
         end,winner = end_game(color_team,units_stats,end_counter,team,ennemy_team)
+    
     if winner :
-        print ('%s is the winner ' % winner)
+        print ('%s is the winner.' % winner)
     else : 
-        print ('no winner')
+        print ('The game ends in a draw.')
+
 def set_games (team_1, team_2, map_title) :
     """
     Create all the environnement of the game. Takes the data contained in the file and initializes the data structure (variable)

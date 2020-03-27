@@ -4,11 +4,10 @@ from colored import*
 from random import *
 import socket
 import time
+import sys
 
 
-
-
-def play (map_title, teams):
+def play (map_title, team_1, team_1_type, team_2, team_2_type):
     """ Start the game and do the folowing function
     Parameter
     ----------
@@ -24,8 +23,8 @@ def play (map_title, teams):
     --------
     specification : Pierre Merveille (v.1 24/02/20)
     """
-         
-    board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks,long,larg = set_games(teams['first_team']['team'],teams['second_team']['team'], map_title)
+    teams= {'first_team' : {'team': team_1,'player' :team_1_type}, 'second_team' : {'team' : team_2, 'player' : team_2_type}}     
+    board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks,long,larg = set_games(team_1, team_2, map_title)
     end_counter = 0
     end = False
     while end == False:
@@ -160,7 +159,6 @@ def set_games (team_1, team_2, map_title) :
     display_stats(elements,color_team,ships,units_stats,peaks)
 
     return board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks, long,larg
-
     
 def end_game ( color_team, units_stats, end_counter,team,ennemy_team ): 
 
@@ -334,7 +332,6 @@ def separate_instruction (order, ships, units_stats,board,team,peaks):
                 create_list.append([order[0], order[1]])
 
     return upgrade_list , create_list, move_list, attack_list, transfer_list
-
     
 def create_units (create_list, ships, team, board, units_stats, peaks) :
     
@@ -380,8 +377,6 @@ def create_units (create_list, ships, team, board, units_stats, peaks) :
             board[coordinates]['list_entity'].append(instruction[0])
             change_value('hub',ships, peaks,-units_stats['common'][instruction[1]]['creation_cost'],'energy_point',units_stats,team)
     return ships,board,units_stats
-        
-    
     
 def upgrade (team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list):
    
@@ -663,8 +658,7 @@ def change_value ( entity_name, ships, peaks, new_value, caracteristic, units_st
                 else :
                     peaks[entity_name]['storage'] += new_value
                 return peaks
-        
-        
+      
 def transfer (transfer_list, ships, team, units_stats, peaks, board) :
 
     """ 
@@ -1335,7 +1329,6 @@ def get_IP():
     
     return socket.gethostbyname(socket.gethostname())
 
-
 def connect_to_player(player_id, remote_IP='127.0.0.1', verbose=False):
     """Initialise communication with remote player.
     
@@ -1427,7 +1420,6 @@ def connect_to_player(player_id, remote_IP='127.0.0.1', verbose=False):
     # return sockets for further use     
     return (socket_in, socket_out)
 
-
 def disconnect_from_player(connection):
     """End communication with remote player.
     
@@ -1448,7 +1440,6 @@ def disconnect_from_player(connection):
     # close sockets
     socket_in.close()
     socket_out.close()
-    
     
 def notify_remote_orders(connection, orders):
     """Notifies orders of the local player to a remote player.
@@ -1477,7 +1468,6 @@ def notify_remote_orders(connection, orders):
         socket_out.sendall(orders.encode())
     except:
         raise IOError('remote player cannot be reached')
-
 
 def get_remote_orders(connection):
     """Returns orders from a remote player.
@@ -1512,11 +1502,4 @@ def get_remote_orders(connection):
         
     return orders
 
-team_1 = str(input('What\'s the team name ? '))
-player_1 = str(input('Kind of player (AI or local_player) ? '))
-team_2 = input ('What\'s the second_team name ? ')
-player_2 = str(input('Kind of player (AI or local_player ? '))
-
-if (player_1 == 'AI' or player_1 == 'local_player') and (player_2 == 'AI' or player_2 == 'local_player') :
-    teams= {'first_team' : {'team': team_1,'player' : player_1}, 'second_team' : {'team' : team_2, 'player' : player_2}}
-    play('fichier',teams)
+play('fichier', sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4])

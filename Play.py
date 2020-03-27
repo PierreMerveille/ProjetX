@@ -5,7 +5,15 @@ from random import *
 import socket
 import time
 
-  
+
+team_1 = str(input('What\'s the team name ? '))
+player_1 = str(input('Kind of player (AI or local_player) ? '))
+team_2 = input ('What\'s the second_team name ? ')
+player_2 = str(input('Kind of player (AI or local_player ? '))
+
+if (player_1 == 'AI' or player_1 == 'local_player') and (player_2 == 'AI' or player_2 == 'local_player') :
+    teams= {'first_team' : {'team': team_1,'player' : player_1}, 'second_team' : {'team' : team_2, 'player' : player_2}}
+    play('fichier',teams)
 
 def play (map_title, teams):
     """ Start the game and do the folowing function

@@ -7,7 +7,6 @@ import time
 import sys
 
 
-
 def play (map_title, team_1, team_1_type, team_2, team_2_type):
 
 
@@ -512,6 +511,8 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
             #attack if hithin_range is True
             print(coord_attack)
             if hithin_range and ships[instruction[0]]['energy_point']>=int(coord_attack[1]):
+                #reduce the energy of the ship
+                ships = change_value(instruction[0], ships, peaks, int(coord_attack[1])*-1, 'energy_point', units_stats, team)
                 #verify the coordinates of all the ship
                 for ship in ships :
                     if ships[ship]['coordinates']==coordinates:
@@ -519,8 +520,8 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                         ships = change_value(ship, ships, peaks, int(coord_attack[1])*-1, 'HP', units_stats, ennemy_team)
                         hit+=1
                         end_counter=0
-                        #reduce the energy of the ship
-                        ships = change_value(instruction[0], ships, peaks, int(coord_attack[1])*-1, 'energy_point', units_stats, team)
+                        
+                        
                         if ships[ship]['HP']<=0:
                             #stock a dead cruiser
                             cruiser_dead.append(ship)
@@ -1310,9 +1311,6 @@ def create_order(long, larg,  team, ships, units_stats,peaks) :
         instruction_str += element +' '
     
     return instruction_str
-
-
-    
 
 def get_IP():
     """Returns the IP of the computer where get_IP is called.

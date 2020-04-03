@@ -34,9 +34,10 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     if teams['first_team']['player'] == 'remote':
 
         connection = connect_to_player(1, remote_IP='127.0.0.1', verbose=False)
+        link = True
     elif teams['second_team']['player'] == 'remote':
         connection = connect_to_player(2, remote_IP='127.0.0.1', verbose=False)
-
+        link = True
     while end == False:
         order_list={}
         
@@ -85,7 +86,8 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
         print ('%s is the winner.' % winner)
     else : 
         print ('The game ends in a draw.')
-    disconnect_from_player(connection)
+    if link : 
+        disconnect_from_player(connection)
 def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
     """
     Create all the environnement of the game. Takes the data contained in the file and initializes the data structure (variable)

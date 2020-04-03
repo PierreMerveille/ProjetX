@@ -30,19 +30,32 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks,long,larg,teams = set_games(team_1,team_1_type , team_2,team_2_type, map_title)
     end_counter = 0
     end = False
+
+    if teams['first_team']['player'] == 'remote':
+
+        connection = connect_to_player(1, remote_IP='127.0.0.1', verbose=False)
+    elif teams['second_team']['player'] == 'remote':
+        connection = connect_to_player(2, remote_IP='127.0.0.1', verbose=False)
+
     while end == False:
         order_list={}
         
         for team in teams :
 
-            if teams[team]['player'] == 'local_player' :
+            if teams[team]['player'] == 'human' :
            
                 order = input("Let's get %s's orders: "% teams[team]['team'])
                 order_list[teams[team]['team']]= order
-            
-            else :
+                notify_remote_orders(connection, order)
+
+            elif  teams[team]['player'] == 'remote':
+
+                get_remote_orders(connection)
+
+            elif teams[team]['player'] == 'AI':
                 order = create_order (long,larg,teams[team]['team'],ships, units_stats,peaks)
                 order_list[teams[team]['team']] = order
+    
         
         for team in color_team:
             if team==team_1:
@@ -72,7 +85,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
         print ('%s is the winner.' % winner)
     else : 
         print ('The game ends in a draw.')
-
+    disconnect_from_player(connection)
 def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
     """
     Create all the environnement of the game. Takes the data contained in the file and initializes the data structure (variable)

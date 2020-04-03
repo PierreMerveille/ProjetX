@@ -26,8 +26,8 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     --------
     specification : Pierre Merveille (v.1 24/02/20)
     """
-    teams= {'first_team' : {'team': team_1,'player' :team_1_type}, 'second_team' : {'team' : team_2, 'player' : team_2_type}}     
-    board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks,long,larg = set_games(team_1, team_2, map_title)
+        
+    board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks,long,larg,teams = set_games(team_1,team_1_type , team_2,team_2_type, map_title)
     end_counter = 0
     end = False
     while end == False:
@@ -39,6 +39,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
            
                 order = input("Let's get %s's orders: "% teams[team]['team'])
                 order_list[teams[team]['team']]= order
+            
             else :
                 order = create_order (long,larg,teams[team]['team'],ships, units_stats,peaks)
                 order_list[teams[team]['team']] = order
@@ -72,7 +73,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     else : 
         print ('The game ends in a draw.')
 
-def set_games (team_1, team_2, map_title) :
+def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
     """
     Create all the environnement of the game. Takes the data contained in the file and initializes the data structure (variable)
     
@@ -160,12 +161,13 @@ def set_games (team_1, team_2, map_title) :
 
     
     ships ={}
-    
+
+    teams= {'first_team' : {'team': team_1,'player' :team_1_type}, 'second_team' : {'team' : team_2, 'player' : team_2_type}} 
     #ships ={'name' : {'coordinates' : , 'team' : , 'type' : , 'HP' : , 'energy_point': }
     board_display(board, color_team, ships, peaks, units_stats, elements)
     display_stats(elements,color_team,ships,units_stats,peaks)
 
-    return board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks, long,larg
+    return board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks, long,larg,teams
     
 def end_game ( color_team, units_stats, end_counter,team,ennemy_team ): 
 

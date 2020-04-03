@@ -30,7 +30,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks,long,larg,teams = set_games(team_1,team_1_type , team_2,team_2_type, map_title)
     end_counter = 0
     end = False
-
+    link = False
     if teams['first_team']['player'] == 'remote':
 
         connection = connect_to_player(1, remote_IP='127.0.0.1', verbose=False)

@@ -130,7 +130,7 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
     Versions 
     --------
     specification : Pierre Merveille(v.1 23/02/20)
-                    Anthony Pierard(v.2 28/02/20)
+                    Pierre Merveille(v.2 28/02/20)
                     Johan Rochet(v.3 27/03/20)
 
     Implémentation : Merveille Pierre (v.1 10/03/20)
@@ -648,7 +648,7 @@ def move (move_list, ships, team, board, units_stats, peaks) :
     Versions
     --------
     specification : Pierre Merveille (v.1 20/02/20)
-                    Johan Rochet (v.1 27/02/20)
+                    Kevin Schweitzer (v.1 27/02/20)
     implementation : Pierre Merveille (v.1 2/03/20)
     
     """  
@@ -773,7 +773,7 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
     Versions
     --------
     specification : Pierre Merveille (v.1 24/02/20)
-                    Pierre Merveille (v.2 10/03/20)
+                    Kevin Schweitzer (v.2 10/03/20)
     implementation: Johan Rochet (v.1 01/03/20)
                     Johan ROchet (v.2 15/03/20)
     """    
@@ -986,7 +986,7 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements) :
                     Anthony Pierard (v.2 01/03/20)
                     Johan Rochet (v.3 06/04/20)
     implémentation : Anthony Pierard (v.1 01/03/20)
-                    Johan Rochet (v.2 03/03/20)
+                    Anthony Pierard (v.2 03/03/20)
                     
     """
     larg = 0

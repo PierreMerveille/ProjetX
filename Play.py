@@ -35,10 +35,11 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
                      Pierre Merveille (v.2 30/03/20)
     """
         
-    board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks, long, larg, teams = set_games(team_1,team_1_type , team_2,team_2_type, map_title)
+    long, larg = set_games(team_1,team_1_type , team_2,team_2_type, map_title)
     end_counter = 0
     end = False
     link = False
+
     if teams['first_team']['player'] == 'remote':
 
         connection = remote_play.connect_to_player(1, remote_IP='127.0.0.1', verbose=False)
@@ -79,17 +80,17 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             
             upgrade_list, create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board, team, peaks)
             
-            ships, board, units_stats = create_units(create_list, ships, team, board, units_stats,peaks)
+            create_units(create_list, ships, team, board, units_stats,peaks)
             
-            units_stats = upgrade(team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list)
+            upgrade(team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list)
             
             end_counter = attack(attack_list, board, units_stats, ships, team, ennemy_team, peaks, end_counter)
             
-            board, ships = move(move_list, ships, team, board, units_stats, peaks)
+            move(move_list, ships, team, board, units_stats, peaks)
             
-            ships, units_stats, peaks = transfer(transfer_list, ships, team, units_stats, peaks, board)
+            transfer(transfer_list, ships, team, units_stats, peaks, board)
             
-        units_stats = round_end(board, end_counter, units_stats, peaks, elements, color_team, ships)
+        round_end(board, end_counter, units_stats, peaks, elements, color_team, ships)
 
         end,winner = end_game(color_team,units_stats,end_counter,team,ennemy_team)
     
@@ -114,12 +115,8 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
 
     Returns :
     ---------
-    ships : information of each ship (dict)
-    board : dictionary where each coordinates gives a list with the character to display and a list of entities on this position (dict)
-    units_states : states of each unit (dict)
-    max_upgrade : tuple containing the values for each upgrade (tuple)
-    cost_upgrade : tuple containing the price for each upgrade (tuple)
-    peaks : dictionnary with informations about each peak (dict)
+    long : board length (int)
+    larg : board width (int)
     
     Notes : 
     ------
@@ -206,7 +203,7 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
     board_display(board, color_team, ships, peaks, units_stats, elements)
     display_stats(elements,color_team,ships,units_stats,peaks)
 
-    return board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks, long,larg,teams
+    return long, larg
     
 def end_game ( color_team, units_stats, end_counter, team, ennemy_team ): 
 
@@ -223,6 +220,7 @@ def end_game ( color_team, units_stats, end_counter, team, ennemy_team ):
     Return :
     --------
     end : sets the game to finished depending on the structure points or number of pacific rounds (bool)
+    winner : name of the winner if there is one (str)
     
     Notes : 
     -------
@@ -273,7 +271,11 @@ def separate_instruction (order, ships, units_stats,board,team,peaks):
     
     Return
     ------
-    instructions_list : list with all the instrcution separate in two (list) 
+    upgrade_list : list of the upgrade order (list)
+    create_list : list of the create order (list)
+    move_list : list of the move order (list)
+    attack_list : list of the attack order (list)
+    transfer_list : list of the transfer order (list)
     
     Notes 
     -----
@@ -409,12 +411,6 @@ def create_units (create_list, ships, team, board, units_stats, peaks) :
     peaks : the dictionnary with all the peaks (dict)
     
         
-    Returns :
-    --------
-    ships : dictionnary with the new added ship (dict)
-    board : add new ship to the list of entities on this position (dict) 
-    units_stats : dictionnary containing the stats of each unit (dict)
-
     
     Notes : 
     -------
@@ -445,7 +441,6 @@ def create_units (create_list, ships, team, board, units_stats, peaks) :
             board[coordinates]['list_entity'].append(instruction[0])
             change_value('hub',ships, peaks,-units_stats['common'][instruction[1]]['creation_cost'],'energy_point',units_stats,team)
 
-    return ships,board,units_stats
     
 def upgrade (upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade):
    
@@ -461,9 +456,6 @@ def upgrade (upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade):
     max_upgrade : tuple containing the values for each upgrade (dict)
     cost_upgrade : tuple containing the price for each upgrade (tuple)
     
-    Return
-    ------
-    units_stats : update stats in dictionnary (dict)
 
     Notes
     -----
@@ -523,7 +515,6 @@ def upgrade (upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade):
                     if range_cost <= units_stats[team]['hub']['energy_point']:
                         units_stats[team]['cruiser']['range'] += 1
                         units_stats[team]['hub']['energy_point'] -= 400
-    return units_stats
                         
 def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, end_counter):
     
@@ -542,7 +533,7 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
     
     Returns
     -------
-    end_counter : number of rounds without attacks (float) (+ O,5 by round)
+    end_counter : number of rounds without attacks (float) 
     
     Notes
     -----
@@ -636,10 +627,6 @@ def move (move_list, ships, team, board, units_stats, peaks) :
     units_stats : get the travel cost (dict)
     peaks : parameter of change_value (dict)
         
-    Return :
-    --------
-    ships : dictonnary with the new coordinates of the ship (dict)
-    board : update of the board (dict) 
     
     Notes : 
     -------
@@ -675,7 +662,6 @@ def move (move_list, ships, team, board, units_stats, peaks) :
                     index = board[old_coord]['list_entity'].index(instruction[0])
                     del board[old_coord]['list_entity'][index]
             
-    return board, ships
             
 def change_value ( entity_name, ships, peaks, new_value, caracteristic, units_stats, team):
     
@@ -692,13 +678,6 @@ def change_value ( entity_name, ships, peaks, new_value, caracteristic, units_st
     units_stats : dictionnary containing the stats of each unit (dict)
     team : name of the team which is playing (str)
     
-    Return 
-    ------
-    units_stats : dictionnary containing the stats of each unit (dict)
-    or 
-    ships : the dictionnary with the change of value for the caracteristic (dict)
-    or 
-    peaks : the dictionnary with the change of value for the caracteristic (dict)
     
     Notes 
     -----
@@ -720,7 +699,6 @@ def change_value ( entity_name, ships, peaks, new_value, caracteristic, units_st
     if entity_name == 'hub' :
         #change the value in function of the caracteristic and return the dictionnary
         units_stats[team]['hub'][caracteristic] += new_value
-        return units_stats
     else :
         #change the value for the ship 
         for ship in ships :
@@ -731,7 +709,6 @@ def change_value ( entity_name, ships, peaks, new_value, caracteristic, units_st
                     ships[entity_name]['coordinates'] = new_value
                 else :
                     ships[entity_name][caracteristic] += new_value
-                return ships
         #change value for the peak
         for peak in peaks:
             #check all the name of the peak in peaks
@@ -741,7 +718,7 @@ def change_value ( entity_name, ships, peaks, new_value, caracteristic, units_st
                     peaks[entity_name]['coordinates'] = new_value
                 else :
                     peaks[entity_name]['storage'] += new_value
-                return peaks
+
       
 def transfer (transfer_list, ships, team, units_stats, peaks, board) :
 
@@ -759,11 +736,6 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
     peaks : dictionnary with all the peaks (dict)
     board : 
 
-    Return :
-    --------
-    ships : energy changed or/and storage change (dict)
-    units_stats : energy point of the hub and capacity of tanker storage(dict) 
-    peaks : dictionnary with the new or not value of storage of a peak (dict)
 
     Notes : 
     -------
@@ -850,7 +822,6 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
                             ships[instruction[0]]['energy_point'] -= 1
                     #give energy to a hub    
                 
-    return ships, units_stats , peaks
 def round_end (board, end_counter, units_stats, peaks, elements, color_team, ships):
 
     """ Print new board and stats and make "end of round changes" and do the regeneration of the hub energy
@@ -866,9 +837,6 @@ def round_end (board, end_counter, units_stats, peaks, elements, color_team, shi
     color_team : color for each team (dict)
     ships : information of each ship (dict)
 
-    Return :
-    --------
-    units_stats : every end of round changes energy amount stored in hub (dict)
     
     Notes : 
     -------
@@ -892,7 +860,7 @@ def round_end (board, end_counter, units_stats, peaks, elements, color_team, shi
 
     #display stats every round end
     display_stats (elements, color_team, ships, units_stats, peaks)
-    return units_stats
+
     
 def select_value_to_print (board, coordinates, units_stats, ships, peaks, color_team, elements):
     """
@@ -991,7 +959,7 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements) :
     """
     larg = 0
     long = 0
-    bord = fg(255)
+    board_str = fg(255)
     for coordinates in board :
         if coordinates[1] > larg :
             larg = coordinates[1]
@@ -1000,23 +968,23 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements) :
     # creation of the board
     for i in range (larg+2):
         #jump for each row
-        bord += bg(0) + '\n'
+        board_str += bg(0) + '\n'
         
         if i == 0 or i == larg +1 :
             #first and last row
             for j in range (long+2):
                 #begin
                 if j == 0 :
-                    bord += bg('6')+'   ' 
+                    board_str += bg('6')+'   ' 
                 #end
                 elif j == long+1 :
-                    bord+= bg('6') +'   '
+                    board_str+= bg('6') +'   '
                 #column < 10        
                 elif j<10:
-                    bord+= bg(6)+str(j) +'  '
+                    board_str+= bg(6)+str(j) +'  '
                 #column < 100   
                 else :
-                    bord += bg(6) + str(j)+ ' '
+                    board_str += bg(6) + str(j)+ ' '
             
         else : 
             
@@ -1024,13 +992,13 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements) :
             for j in range (long+2):
                 #begin and end
                 if j==0 or j==long+1:
-                    bord += bg('6') + str(i) 
+                    board_str += bg('6') + str(i) 
                     if i<10 : 
                         #begin
-                        bord+= '  '
+                        board_str+= '  '
                     else:
                         #end
-                        bord += ' '+ bg('0')
+                        board_str += ' '+ bg('0')
                 else :
                     #grid
                     if (i+j) % 2 == 0 :
@@ -1038,9 +1006,9 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements) :
                     else : 
                         color = bg('115')
                     # add the character and the front color of the character and reset color to white after
-                    bord += color + select_value_to_print(board, (j,i),units_stats,ships,peaks, color_team,elements)  + attr(0) + fg('255')
-    bord += bg('0')       
-    print(bord) 
+                    board_str += color + select_value_to_print(board, (j,i),units_stats,ships,peaks, color_team,elements)  + attr(0) + fg('255')
+    board_str += bg('0')       
+    print(board_str) 
         
 def display_stats (elements, color_team, ships, units_stats, peaks):
     """
@@ -1313,7 +1281,7 @@ def create_order(long, larg,  team, ships, units_stats,peaks) :
 
     Return : 
     --------
-    AI_order : order from the AI
+    instruction_str : All of the order create by the AI (str)
 
     Notes :
     --------

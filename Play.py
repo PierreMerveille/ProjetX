@@ -645,17 +645,23 @@ def change_value ( entity_name, ships, peaks, new_value, caracteristic, units_st
     
     Return 
     ------
+    units_stats : dictionnary containing the stats of each unit (dict)
+    or 
     ships : the dictionnary with the change of value for the caracteristic (dict)
+    or 
     peaks : the dictionnary with the change of value for the caracteristic (dict)
     
     Notes 
     -----
-    This function change a cracteristic of a ship or a peak
-    This function is insert in the function 
+    This function change a cracteristic of a ship, a peak or a hub and return a different dictionnary depending on the change
     
     Version 
     -------
     specification : Johan Rochet (v.1 22/02/20)
+                    Anthony Pierard (v.2 01/03/20)
+    implémentation : Anthony Pierard (v.1 01/03/20)
+                     Anthony Pierard (v.2 04/03/20)
+
     
     """   
     
@@ -800,12 +806,14 @@ def round_end (board, end_counter, units_stats, peaks, elements, color_team, shi
     
     Parameters  
     ----------
-    ships : information of each ship (dict)
+    
     board : get the structure points of each hub (int)
+    end_counter : number of rounds without attacks (float) (+ O,5 by round)
     unit_stats : stats of all entities (dict)
     peaks : stats of all peaks (dict)
     elements : character for each type of entity (dict)
     color_team : color for each team (dict)
+    ships : information of each ship (dict)
 
     Return :
     --------
@@ -819,6 +827,8 @@ def round_end (board, end_counter, units_stats, peaks, elements, color_team, shi
     Versions
     --------
     specification : Kevin Schweitzer (v.1 24/02/20)
+    
+    implémentation : Kevin Schweitzer (v.1 01/03/20)
     
     """    
     #add energy to hub every round end
@@ -840,13 +850,13 @@ def select_value_to_print (board, coordinates, units_stats, ships, peaks, color_
     Parameters
     ----------
     board : dictionnary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
-    element : dictionnary with the type of entity (cruiser, hub,...) with the charactere of each type (dict)
-    color_team : dictionnary with the number of the team with the color of each team (dict)
-    ships :  dictionnary with the statistics of ech ship (tanker or cruiser)(dict)
-    peaks : dictionnary with all the peaks (dict)
+    coordinates : tuple with the coordinate of the box (tuple)
     units_stats : get the location of each hub (dict)
-    coordinates : tuple with the coordinate of the box
-
+    ships :  dictionnary with the statistics of each ship (tanker or cruiser)(dict)
+    peaks : dictionnary with all the peaks (dict)
+    color_team : dictionnary with the number of the team with the color of each team (dict)
+    elements : dictionnary with the type of entity (cruiser, hub,...) with the charactere of each type (dict)
+    
     Return
     ------
     value_to_print : character to print on a box with its color
@@ -854,6 +864,7 @@ def select_value_to_print (board, coordinates, units_stats, ships, peaks, color_
     Version:
     --------
     specification : Johan Rochet (v1. 28/02/20)
+                    Johan Rochet (v.2 06/04/20)
     implementation : Johan Rochet (v1. 28/02/20)
                      Johan Rochet (v2. 15/03/20)
     """
@@ -906,11 +917,11 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements) :
     Parameters 
     ----------
     board : dictionnary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
-    element : dictionnary with the type of entity (cruiser, hub,...) with the charactere of each type (dict)
     color_team : dictionnary with the number of the team with the color of each team (dict)
     ships :  dictionnary with the statistics of ech ship (tanker or cruiser)(dict)
     peaks : dictionnary with all the peaks (dict)
     units_stats : get the location of each hub (dict)    
+    elements : dictionnary with the type of entity (cruiser, hub,...) with the charactere of each type (dict)
 
     Notes : 
     -------
@@ -921,6 +932,11 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements) :
     Version 
     -------
     specification : Johan Rochet (v.1 22/02/20)
+                    Anthony Pierard (v.2 01/03/20)
+                    Johan Rochet (v.3 06/04/20)
+    implémentation : Anthony Pierard (v.1 01/03/20)
+                    Johan Rochet (v.2 03/03/20)
+                    
     """
     larg = 0
     long = 0
@@ -996,6 +1012,7 @@ def display_stats (elements, color_team, ships, units_stats, peaks):
     -------
     specification : Johan Rochet (v.1 22/02/20)
     implementation : Kevin Schweitzer (v.1 28/02/20)
+                     Kevin Schweitzer et Johan Rochet (v.2 03/03/20)
     
     """
     #color legend for each team
@@ -1208,10 +1225,11 @@ def range_verification (units_stats, ship_name, ships, coordinates, team):
     ship_name : name of the ship (str)
     ships :  dictionnary with the statistics of ech ship (tanker or cruiser)(dict)
     coordinates : coordinates of the box to attend (tuple)
+    team : name fo the team who plays
 
     Return 
     ------
-    hithin_range : true if coordinates are in range and False if not (bool)
+    whithin_range : true if coordinates are in range and False if not (bool)
 
     Notes
     -----
@@ -1220,6 +1238,8 @@ def range_verification (units_stats, ship_name, ships, coordinates, team):
     Versions
     --------
     specification : Johan Rochet (v.1 24/02/20)
+    implémentation : Anthony Pierard (v.1 27/02/20)
+                     Pierre Merveille (v.2 12/03/20)
     """
     if max (abs(coordinates[0]-ships[ship_name]['coordinates'][0]), abs(coordinates[1]-ships[ship_name]['coordinates'][1])) <= units_stats[team]['cruiser']['range'] :
         
@@ -1228,6 +1248,33 @@ def range_verification (units_stats, ship_name, ships, coordinates, team):
         return False
 
 def create_order(long, larg,  team, ships, units_stats,peaks) :
+
+     """ This function create the order for the IA
+
+    Parameter :
+    ----------
+    long : length of the board 
+    larg : width of the board
+    team : name of the AI team
+    ships : information of each ship (dict)
+    units_stats : get the location of each hub (dict)
+    peaks : dictionnary with all the peaks (dict) 
+
+    Return : 
+    --------
+    AI_order : order from the AI
+
+    Notes :
+    --------
+    Create random order for the IA
+
+    Versions
+    --------
+    specification : Pierre Merveille (v.1 24/02/20)
+                    Johan Rochet (v.2 14/03/20)
+    implémentation : Johan rochet / Pierre Merveille (v1 25/03/20)
+                     Anthony Pierard / Kevin schweitzer (v2 25/03/20)
+    """
 
     nb_order = randint(1,30)
     order_list = []

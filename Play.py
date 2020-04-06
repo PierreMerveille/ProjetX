@@ -48,7 +48,8 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
            
                 order = input("Let's get %s's orders: "% teams[team]['team'])
                 order_list[teams[team]['team']]= order
-                notify_remote_orders(connection, order)
+                if link :
+                    notify_remote_orders(connection, order)
 
             elif  teams[team]['player'] == 'remote':
 
@@ -57,6 +58,8 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             elif teams[team]['player'] == 'AI':
                 order = create_order (long,larg,teams[team]['team'],ships, units_stats,peaks)
                 order_list[teams[team]['team']] = order
+                if link :
+                    notify_remote_orders(connection, order)
     
         
         for team in color_team:
@@ -615,9 +618,8 @@ def move (move_list, ships, team, board, units_stats, peaks) :
 
             else:
                 
-                if ships[instruction[0]]['energy_point'] < max(abs(new_coord[0] - old_coord[0]), abs(new_coord[1] - old_coord[1])) * units_stats[team]['cruiser']['move'] :
-                    print('Not enough energy_point in' + instruction[0])
-                else:
+                if ships[instruction[0]]['energy_point'] > max(abs(new_coord[0] - old_coord[0]), abs(new_coord[1] - old_coord[1])) * units_stats[team]['cruiser']['move'] :
+                    
                     change_value(instruction[0], ships, peaks, ( - (max(abs(new_coord[0] - old_coord[0]), abs(new_coord[1] - old_coord[1])) * units_stats[team]['cruiser']['move'])), 'energy_point', units_stats,team)
                     change_value(instruction[0], ships, peaks, new_coord, 'coordinates', units_stats, team)
                     board[new_coord]['list_entity'].append(instruction[0])

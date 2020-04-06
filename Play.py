@@ -41,10 +41,10 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     link = False
     if teams['first_team']['player'] == 'remote':
 
-        connection = connect_to_player(1, remote_IP='127.0.0.1', verbose=False)
+        connection = remote_play.connect_to_player(1, remote_IP='127.0.0.1', verbose=False)
         link = True
     elif teams['second_team']['player'] == 'remote':
-        connection = connect_to_player(2, remote_IP='127.0.0.1', verbose=False)
+        connection = remote_play.connect_to_player(2, remote_IP='127.0.0.1', verbose=False)
         link = True
     while end == False:
         order_list={}
@@ -56,17 +56,17 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
                 order = input("Let's get %s's orders: "% teams[team]['team'])
                 order_list[teams[team]['team']]= order
                 if link :
-                    notify_remote_orders(connection, order)
+                    remote_play.notify_remote_orders(connection, order)
 
             elif  teams[team]['player'] == 'remote':
 
-                get_remote_orders(connection)
+                remote_play.get_remote_orders(connection)
 
             elif teams[team]['player'] == 'AI':
                 order = create_order (long, larg, teams[team]['team'], ships, units_stats, peaks)
                 order_list[teams[team]['team']] = order
                 if link :
-                    notify_remote_orders(connection, order)
+                    remote_play.notify_remote_orders(connection, order)
     
         
         for team in color_team:
@@ -98,7 +98,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     else : 
         print ('The game ends in a draw.')
     if link : 
-        disconnect_from_player(connection)
+        remote_play.disconnect_from_player(connection)
 
 def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
     """

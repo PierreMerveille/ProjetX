@@ -29,7 +29,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     Versions
     --------
     specification : Pierre Merveille (v.1 24/02/20)
-                    Kevin Schweitzer (v.2 27/03/20)
+                    Johan Rochet (v.2 27/03/20)
 
     Implémentation : Pierre Merveille (v.1 10/03/20)
                      Pierre Merveille (v.2 30/03/20)
@@ -233,6 +233,8 @@ def end_game ( color_team, units_stats, end_counter, team, ennemy_team ):
     --------
     specification : Kevin Schweitzer (v.1 24/02/20)
                     Anthony Pierard (v.2 10/03/20)
+
+    Implementation : Kevin Schweitzer (v.1 12/03/20)
     
     """  
     #at beginning end is false

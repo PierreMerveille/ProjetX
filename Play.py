@@ -17,7 +17,10 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     ----------
     map_tilte : name of the map file (str)
     team_1 : name of the team 1 (str)
+    team_1_type : type of the team 1 (remote, human, AI) (str)
     team_2 : name of the team 2 (str)
+    team_2_type : type of the team 2 (remote, human, AI) (str)
+
     
     Notes :
     --------
@@ -26,9 +29,13 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     Versions
     --------
     specification : Pierre Merveille (v.1 24/02/20)
+                    Kevin Schweitzer (v.2 27/03/20)
+
+    Implémentation : Pierre Merveille (v.1 10/03/20)
+                     Pierre Merveille (v.2 30/03/20)
     """
         
-    board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks,long,larg,teams = set_games(team_1,team_1_type , team_2,team_2_type, map_title)
+    board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks, long, larg, teams = set_games(team_1,team_1_type , team_2,team_2_type, map_title)
     end_counter = 0
     end = False
     link = False
@@ -56,7 +63,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
                 get_remote_orders(connection)
 
             elif teams[team]['player'] == 'AI':
-                order = create_order (long,larg,teams[team]['team'],ships, units_stats,peaks)
+                order = create_order (long, larg, teams[team]['team'], ships, units_stats, peaks)
                 order_list[teams[team]['team']] = order
                 if link :
                     notify_remote_orders(connection, order)
@@ -92,10 +99,19 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
         print ('The game ends in a draw.')
     if link : 
         disconnect_from_player(connection)
+
 def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
     """
     Create all the environnement of the game. Takes the data contained in the file and initializes the data structure (variable)
-    
+
+    Parametre :
+    -----------
+    map_tilte : name of the map file (str)
+    team_1 : name of the team 1 (str)
+    team_1_type : type of the team 1 (remote, human, AI) (str)
+    team_2 : name of the team 2 (str)
+    team_2_type : type of the team 2 (remote, human, AI) (str)
+
     Returns :
     ---------
     ships : information of each ship (dict)
@@ -113,8 +129,12 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
     
     Versions 
     --------
-    specification :Merveille Pierre (v.1 23/02/20)
-    specification :Merveille Pierre (v.2 28/02/20)
+    specification : Pierre Merveille(v.1 23/02/20)
+                    Anthony Pierard(v.2 28/02/20)
+                    Johan Rochet(v.3 27/03/20)
+
+    Implémentation : Merveille Pierre (v.1 10/03/20)
+                     Johan Rochet (v.2 27/03/20)
 
     """
 
@@ -188,7 +208,7 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
 
     return board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks, long,larg,teams
     
-def end_game ( color_team, units_stats, end_counter,team,ennemy_team ): 
+def end_game ( color_team, units_stats, end_counter, team, ennemy_team ): 
 
     """ Verify if game is finished 
     
@@ -197,6 +217,8 @@ def end_game ( color_team, units_stats, end_counter,team,ennemy_team ):
     color_team : dictionnary with the number of the team with the color of each team (dict)
     units_stats : get the structure points of each hub (dict)
     end_counter : number of rounds without attacks (float) (+ O,5 by round)
+    team : name of the team wich play (str)
+    ennemy_team : name of the ennemy_team (str)
 
     Return :
     --------
@@ -210,6 +232,7 @@ def end_game ( color_team, units_stats, end_counter,team,ennemy_team ):
     Versions
     --------
     specification : Kevin Schweitzer (v.1 24/02/20)
+                    Anthony Pierard (v.2 10/03/20)
     
     """  
     #at beginning end is false
@@ -231,7 +254,7 @@ def end_game ( color_team, units_stats, end_counter,team,ennemy_team ):
         end = True
         winner = ennemy_team
     #for each team in color_team
-    return end,winner
+    return end, winner
 
 def separate_instruction (order, ships, units_stats,board,team,peaks):
     """ 
@@ -240,6 +263,11 @@ def separate_instruction (order, ships, units_stats,board,team,peaks):
     Parameter
     ---------
     order: order of the player (str)
+    ships : information of each ship (dict)
+    units_stats : dictionnary containing the stats of each unit (dict)
+    board : dictionary where each coordinates gives a list of entities on this position (dict)
+    team : name of the team wich play (str)
+    peaks : the dictionnary with all the peaks (dict)
     
     Return
     ------
@@ -254,7 +282,11 @@ def separate_instruction (order, ships, units_stats,board,team,peaks):
     
     Version 
     -------
-    specification : Rochet Johan (v.1 22/02/20)
+    specification : Johan Rochet (v.1 22/02/20)
+                    Pierre Merveille (v.2 27/02/20)
+                    Johan Rochet (v.3 20/03/20)
+    implementation : Johan Rochet (v.1 20/03/20)
+                     Kevin Schweitzer (v.2 22/03/20)
     """
     upgrade_list = []
     create_list = []
@@ -367,15 +399,20 @@ def create_units (create_list, ships, team, board, units_stats, peaks) :
     
     Parameters
     ----------
-    instruction : order from the create_list (list)
+    create_list : list of create order (list)
     ships : information of each ship (dict)
-    team : number of the team which is playing (int)
+    team : name of the team which is playing (str)
     board : dictionary where each coordinates gives a list of entities on this position (dict)
+    units_stats : dictionnary containing the stats of each unit (dict)
+    peaks : the dictionnary with all the peaks (dict)
+    
         
     Returns :
     --------
     ships : dictionnary with the new added ship (dict)
     board : add new ship to the list of entities on this position (dict) 
+    units_stats : dictionnary containing the stats of each unit (dict)
+
     
     Notes : 
     -------
@@ -386,6 +423,7 @@ def create_units (create_list, ships, team, board, units_stats, peaks) :
     Versions
     --------
     specification : Johan Rochet (v.1 20/02/20)
+                    Pierre Merveille (v.2 10/03/20)
     implementation : Johan Rochet (v.1 01/03/20) 
                      Johan Rochet (V.2 15/03/20)
      
@@ -404,20 +442,22 @@ def create_units (create_list, ships, team, board, units_stats, peaks) :
             ships[instruction[0]]= {'coordinates': coordinates , 'HP': max_HP, 'energy_point' : energy_point, 'type' : instruction[1], 'team' : team}
             board[coordinates]['list_entity'].append(instruction[0])
             change_value('hub',ships, peaks,-units_stats['common'][instruction[1]]['creation_cost'],'energy_point',units_stats,team)
+
     return ships,board,units_stats
     
-def upgrade (team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list):
+def upgrade (upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade):
    
     """ 
     Permanently upgrade units or hub caracteristics 
     
     Parameters
     ----------
-    upgrade_list : upgrade order from the upgrade_list (list)   
+    upgrade_list : list of the upgrade order (list)
+    team : name of the team which is playing (str)   
     units_stats : dictionnary containing the stats of each unit (dict)
+    ships : information of each ship (dict)
     max_upgrade : tuple containing the values for each upgrade (dict)
     cost_upgrade : tuple containing the price for each upgrade (tuple)
-    team_name : player name (str)
     
     Return
     ------
@@ -436,6 +476,9 @@ def upgrade (team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list):
     Versions
     --------
     specification : Kevin Schweitzer (v.1 20/02/20)
+                    Anthony Pierard (v.2 28/02/20)
+    implementation : Kevin Schweitzer (v.1 20/02/20)
+                     Kevin Schweitzer (v.2 1/03/20)
    
     """
     #verify for each team if they have enough energy in hub to do the requested upgrade
@@ -490,7 +533,8 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
     board : dictionary where each coordinates gives a list with the character to display and a list of entities on this position (dict)
     units_stats : dictionnary containing the stats of each unit (dict)
     ships : information of each ship (dict)
-    team : number of the team which is playing (int)
+    team : name of the team which is playing (str)
+    ennemy_team : name of the ennemy team (str)
     peaks : the dictionnary with all the peaks (dict)
     end_counter : number of rounds without attacks (float) (+ O,5 by round)
     
@@ -507,6 +551,7 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
     specification : Anthony Pierard (v.1 20/02/20)
                     Anthony Pierard (v.2 13/03/20)
     implementation : Anthony Pierard (v.1 03/02/20)
+                     Pierre Merveille (v.2 27/02/20)
     """                       
     #Implementation of the function attack
     #Initialise the coordinate and the attack point
@@ -584,7 +629,7 @@ def move (move_list, ships, team, board, units_stats, peaks) :
     ----------
     move_list : order from the move_list (list)
     ships : information of each ship (dict)
-    team : number of the team which is playing (int)
+    team : name of the team which is playing (str)
     board : dictionary where each coordinates gives a list of entities on this position (dict)
     units_stats : get the travel cost (dict)
     peaks : parameter of change_value (dict)
@@ -601,6 +646,8 @@ def move (move_list, ships, team, board, units_stats, peaks) :
     Versions
     --------
     specification : Pierre Merveille (v.1 20/02/20)
+                    Johan Rochet (v.1 27/02/20)
+    implementation : Pierre Merveille (v.1 2/03/20)
     
     """  
     for instruction in move_list:
@@ -703,11 +750,12 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
 
     Parameters
     ----------
-    instruction : order from the transfer_list (list)
+    transfer_list : list of the transfer order (list)
     ships : information of each ship (dict)
     team : number of the team which is playing (int)
     units_states : get the energy point of the hub (dict)
     peaks : dictionnary with all the peaks (dict)
+    board : 
 
     Return :
     --------
@@ -722,7 +770,8 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
 
     Versions
     --------
-    specification : Pierre Merveille (v.2 24/02/20)
+    specification : Pierre Merveille (v.1 24/02/20)
+                    Pierre Merveille (v.2 10/03/20)
     implementation: Johan Rochet (v.1 01/03/20)
                     Johan ROchet (v.2 15/03/20)
     """    

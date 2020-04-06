@@ -35,7 +35,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
                      Pierre Merveille (v.2 30/03/20)
     """
         
-    long, larg = set_games(team_1,team_1_type , team_2,team_2_type, map_title)
+    max_upgrade, cost_upgrade, teams, board, peaks, ships, long, larg, elements, color_team, units_stats = set_games(team_1,team_1_type , team_2,team_2_type, map_title)
     end_counter = 0
     end = False
     link = False
@@ -203,7 +203,7 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
     board_display(board, color_team, ships, peaks, units_stats, elements)
     display_stats(elements,color_team,ships,units_stats,peaks)
 
-    return long, larg
+    return max_upgrade, cost_upgrade, teams, board, peaks, ships, long, larg, elements, color_team, units_stats
     
 def end_game ( color_team, units_stats, end_counter, team, ennemy_team ): 
 
@@ -571,12 +571,12 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
             print(coord_attack)
             if hithin_range and ships[instruction[0]]['energy_point']>=int(coord_attack[1]):
                 #reduce the energy of the ship
-                ships = change_value(instruction[0], ships, peaks, int(coord_attack[1])*-1, 'energy_point', units_stats, team)
+                change_value(instruction[0], ships, peaks, int(coord_attack[1])*-1, 'energy_point', units_stats, team)
                 #verify the coordinates of all the ship
                 for ship in ships :
                     if ships[ship]['coordinates']==coordinates:
                         #change the value of the point of structure of the ship in the coordinate
-                        ships = change_value(ship, ships, peaks, int(coord_attack[1])*-1, 'HP', units_stats, ennemy_team)
+                        change_value(ship, ships, peaks, int(coord_attack[1])*-1, 'HP', units_stats, ennemy_team)
                         hit+=1
                         end_counter=0
                         
@@ -588,14 +588,14 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                 #verify if the ennemy hub is in the coordinates
                 if units_stats[ennemy_team]['hub']['coordinates']==coordinates :
                     #change the value of the point of structure of the ennemy's hub in the coordinate
-                    untis_stats=change_value('hub', ships, peaks, int(coord_attack[1])*-1, 'HP', units_stats, ennemy_team)
+                    change_value('hub', ships, peaks, int(coord_attack[1])*-1, 'HP', units_stats, ennemy_team)
                     hit+=1
                     end_counter=0
                    
                   
                 elif units_stats[team]['hub']['coordinates']==coordinates :
                     #change the value of the point of structure of the hub in the coordinate
-                    units_stats=change_value('hub', ships, peaks, int(coord_attack[1])*-1, 'HP', units_stats, team)
+                    change_value('hub', ships, peaks, int(coord_attack[1])*-1, 'HP', units_stats, team)
                     hit+=1
                     end_counter=0
                                                 

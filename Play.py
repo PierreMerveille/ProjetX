@@ -78,10 +78,10 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             order = order_list[team]
             
             upgrade_list, create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board, team, peaks)
-            
+
             ships, board, units_stats = create_units(create_list, ships, team, board, units_stats,peaks)
             
-            units_stats = upgrade(team, units_stats, ships, max_upgrade, cost_upgrade, upgrade_list)
+            units_stats = upgrade(upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade)
             
             end_counter = attack(attack_list, board, units_stats, ships, team, ennemy_team, peaks, end_counter)
             
@@ -1430,3 +1430,5 @@ def create_order(long, larg,  team, ships, units_stats,peaks) :
         instruction_str += element +' '
     
     return instruction_str
+
+play ('fichier','LOL','AI','BOB','AI')

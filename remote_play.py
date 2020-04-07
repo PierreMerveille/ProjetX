@@ -1,11 +1,11 @@
-"""Module providing remote play features for Mining Wars.
+"""Module providing remote play features for UNamur programmation project (INFOB132).
 
 Sockets are used to transmit orders on local or remote machines.
-Firewalls or restrictive networks settings can block them.  
+Firewalls or restrictive networks settings may block them.  
 
 More details on sockets: https://docs.python.org/2/library/socket.html.
 
-Author: Benoit Frenay (benoit.frenay@unamur.be)
+Author: Benoit Frenay (benoit.frenay@unamur.be).
 
 """
 
@@ -15,128 +15,243 @@ import socket
 import time
 
 
-
-def get_IP():
-    """Returns the IP of the computer where get_IP is called.
-    
-    Returns
-    -------
-    computer_IP: IP of the computer where get_IP is called (str)
-    
-    Notes
-    -----
-    If you have no internet connection, your IP will be 127.0.0.1.
-    This IP address refers to the local host, i.e. your computer.
-    
-    """   
-    
-    return socket.gethostbyname(socket.gethostname())
-
-
-def connect_to_player(player_id, remote_IP='127.0.0.1', verbose=False):
-    """Initialise communication with remote player.
+def create_server_socket(local_port, verbose):
+    """Creates a server socket.
     
     Parameters
     ----------
-    player_id: player id of the remote player, 1 or 2 (int)
-    remote_IP: IP of the computer where remote player is (str, optional)
+    local_port: port to listen to (int)
+    verbose: True if verbose (bool)
+    
+    Returns
+    -------
+    socket_in: server socket (socket.socket)
+    
+    """
+    
+    socket_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    socket_in.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # deal with a socket in TIME_WAIT state
+
+    if verbose:
+        print(' binding on local port %d to accept a remote connection' % local_port)
+    
+    try:
+        socket_in.bind(('', local_port))
+    except:
+        raise IOError('local port %d already in use by your group or the referee' % local_port)
+    socket_in.listen(1)
+    
+    if verbose:
+        print('   done -> can now accept a remote connection on local port %d\n' % local_port)
+        
+    return socket_in
+
+
+def create_client_socket(remote_IP, remote_port, verbose):
+    """Creates a client socket.
+    
+    Parameters
+    ----------
+    remote_IP: IP address to send to (int)
+    remote_port: port to send to (int)
+    verbose: True if verbose (bool)
+    
+    Returns
+    -------
+    socket_out: client socket (socket.socket)
+    
+    """
+
+    socket_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    socket_out.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # deal with a socket in TIME_WAIT state
+    
+    connected = False
+    msg_shown = False
+    
+    while not connected:
+        try:
+            if verbose and not msg_shown:
+                print(' connecting on %s:%d to send orders' % (remote_IP, remote_port))
+                
+            socket_out.connect((remote_IP, remote_port))
+            connected = True
+            
+            if verbose:
+                print('   done -> can now send orders to %s:%d\n' % (remote_IP, remote_port))
+        except:
+            if verbose and not msg_shown:
+                print('   connection failed -> will try again every 100 msec...')
+                
+            time.sleep(.1)
+            msg_shown = True
+            
+    return socket_out
+    
+    
+def wait_for_connection(socket_in, verbose):
+    """Waits for a connection on a server socket.
+    
+    Parameters
+    ----------
+    socket_in: server socket (socket.socket)
+    verbose: True if verbose (bool)
+    
+    Returns
+    -------
+    socket_in: accepted connection (socket.socket)
+    
+    """
+    
+    if verbose:
+        print(' waiting for a remote connection to receive orders')
+        
+    socket_in, remote_address = socket_in.accept()
+    
+    if verbose:
+        print('   done -> can now receive remote orders from %s:%d\n' % remote_address)
+        
+    return socket_in            
+
+
+def create_connection(your_group, other_group=0, other_IP='127.0.0.1', verbose=False):
+    """Creates a connection with a referee or another group.
+    
+    Parameters
+    ----------
+    your_group: id of your group (int)
+    other_group: id of the other group, if there is no referee (int, optional)
+    other_IP: IP address where the referee or the other group is (str, optional)
     verbose: True only if connection progress must be displayed (bool, optional)
     
     Returns
     -------
-    connection: sockets to receive/send orders (tuple)
+    connection: socket(s) to receive/send orders (dict of socket.socket)
+    
+    Raises
+    ------
+    IOError: if your group fails to create a connection
     
     Notes
     -----
-    Initialisation can take several seconds.  The function only
-    returns after connection has been initialised by both players.
+    Creating a connection can take a few seconds (it must be initialised on both sides).
     
-    Use the default value of remote_IP if the remote player is running on
-    the same machine.  Otherwise, indicate the IP where the other player
-    is running with remote_IP.  On most systems, the IP of a computer
-    can be obtained by calling the get_IP function on that computer.
-        
-    """ 
+    If there is a referee, leave other_group=0, otherwise other_IP is the id of the other group.
+    
+    If the referee or the other group is on the same computer than you, leave other_IP='127.0.0.1',
+    otherwise other_IP is the IP address of the computer where the referee or the other group is.
+    
+    The returned connection can be used directly with other functions in this module.
+            
+    """
     
     # init verbose display
     if verbose:
-        print('\n-------------------------------------------------------------')
+        print('\n[--- starts connection -----------------------------------------------------\n')
         
-    # open socket (as server) to receive orders
-    socket_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    socket_in.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # deal with a socket in TIME_WAIT state
-
-    if remote_IP == '127.0.0.1':
-        local_IP = '127.0.0.1'
+    # check whether there is a referee
+    if other_group == 0:
+        if verbose:
+            print('** group %d connecting to referee on %s **\n' % (your_group, other_IP))
+        
+        # create one socket (client only)
+        socket_out = create_client_socket(other_IP, 42000+your_group, verbose)
+        
+        connection = {'in':socket_out, 'out':socket_out}
+        
+        if verbose:
+            print('** group %d successfully connected to referee on %s **\n' % (your_group, other_IP))
     else:
-        local_IP = get_IP()
-    local_port = 42000 + (3-player_id)
-    
-    try:
         if verbose:
-            print('binding on %s:%d to receive orders from player %d...' % (local_IP, local_port, player_id))
-        socket_in.bind((local_IP, local_port))
-    except:
-        local_port = 42000 + 100+ (3-player_id)
+            print('** group %d connecting to group %d on %s **\n' % (your_group, other_group, other_IP))
+
+        # create two sockets (server and client)
+        socket_in = create_server_socket(42000+your_group, verbose)
+        socket_out = create_client_socket(other_IP, 42000+other_group, verbose)
+        
+        socket_in = wait_for_connection(socket_in, verbose)
+        
+        connection = {'in':socket_in, 'out':socket_out}
+
         if verbose:
-            print('   referee detected, binding instead on %s:%d...' % (local_IP, local_port))
-        socket_in.bind((local_IP, local_port))
-
-    socket_in.listen(1)
-    if verbose:
-        print('   done -> now waiting for a connection on %s:%d\n' % (local_IP, local_port))
-
-    # open client socket used to send orders
-    socket_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    socket_out.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # deal with a socket in TIME_WAIT state
-    
-    remote_port = 42000 + player_id
-    
-    connected = False
-    msg_shown = False
-    while not connected:
-        try:
-            if verbose and not msg_shown:
-                print('connecting on %s:%d to send orders to player %d...' % (remote_IP, remote_port, player_id))
-            socket_out.connect((remote_IP, remote_port))
-            connected = True
-            if verbose:
-                print('   done -> now sending orders to player %d on %s:%d' % (player_id, remote_IP, remote_port))
-        except:
-            if verbose and not msg_shown:
-                print('   connection failed -> will try again every 100 msec...')
-            time.sleep(.1)
-
-            msg_shown = True
-            
-    if verbose:
-        print()
-
-    # accept connection to the server socket to receive orders from remote player
-    socket_in, remote_address = socket_in.accept()
-    if verbose:
-        print('now listening to orders from player %d' % (player_id))
-            
+            print('** group %d successfully connected to group %d on %s **\n' % (your_group, other_group, other_IP))
+        
     # end verbose display
     if verbose:
-        print('\nconnection to remote player %d successful\n-------------------------------------------------------------\n' % player_id)
+        print('----------------------------------------------------- connection started ---]\n')
 
-    # return sockets for further use     
-    return (socket_in, socket_out)
-
-
-def disconnect_from_player(connection):
-    """End communication with remote player.
+    return connection
+        
+        
+def bind_referee(group_1, group_2, verbose=False):
+    """Put a referee between two groups.
     
     Parameters
     ----------
-    connection: sockets to receive/send orders (tuple)
+    group_1: id of the first group (int)
+    group_2: id of the second group (int)
+    verbose: True only if connection progress must be displayed (bool, optional)
+    
+    Returns
+    -------
+    connections: sockets to receive/send orders from both players (dict)
+    
+    Raises
+    ------
+    IOError: if the referee fails to create a connection
+    
+    Notes
+    -----
+    Putting the referee in place can take a few seconds (it must be connect to both groups).
+        
+    connections contains two connections (dict of socket.socket) which can be used directly
+    with other functions in this module.  connection of first (second) player has key 1 (2).
+            
+    """
+    
+    # init verbose display
+    if verbose:
+        print('\n[--- starts connection -----------------------------------------------------\n')
+
+    # create a server socket (first group)
+    if verbose:
+        print('** referee connecting to first group %d **\n' % group_1)        
+
+    socket_in_1 = create_server_socket(42000+group_1, verbose)
+    socket_in_1 = wait_for_connection(socket_in_1, verbose)
+
+    if verbose:
+        print('** referee succcessfully connected to first group %d **\n' % group_1)        
+        
+    # create a server socket (second group)
+    if verbose:
+        print('** referee connecting to second group %d **\n' % group_2)        
+
+    socket_in_2 = create_server_socket(42000+group_2, verbose)
+    socket_in_2 = wait_for_connection(socket_in_2, verbose)
+
+    if verbose:
+        print('** referee succcessfully connected to second group %d **\n' % group_2)        
+    
+    # end verbose display
+    if verbose:
+        print('----------------------------------------------------- connection started ---]\n')
+
+    return {1:{'in':socket_in_1, 'out':socket_in_1},
+            2:{'in':socket_in_2, 'out':socket_in_2}}
+
+
+def close_connection(connection):
+    """Closes a connection with a referee or another group.
+    
+    Parameters
+    ----------
+    connection: socket(s) to receive/send orders (dict of socket.socket)
     
     """
     
     # get sockets
-    socket_in = connection[0]
-    socket_out = connection[1]
+    socket_in = connection['in']
+    socket_out = connection['out']
     
     # shutdown sockets
     socket_in.shutdown(socket.SHUT_RDWR)    
@@ -148,22 +263,18 @@ def disconnect_from_player(connection):
     
     
 def notify_remote_orders(connection, orders):
-    """Notifies orders of the local player to a remote player.
+    """Notifies orders to a remote player.
     
     Parameters
     ----------
-    connection: sockets to receive/send orders (tuple)
-    orders: orders of the local player (str)
+    connection: sockets to receive/send orders (dict of socket.socket)
+    orders: orders to notify (str)
         
     Raises
     ------
     IOError: if remote player cannot be reached
     
     """
-     
-    # get sockets
-    socket_in = connection[0]
-    socket_out = connection[1]
 
     # deal with null orders (empty string)
     if orders == '':
@@ -171,7 +282,7 @@ def notify_remote_orders(connection, orders):
     
     # send orders
     try:
-        socket_out.sendall(orders.encode())
+        connection['out'].sendall(orders.encode())
     except:
         raise IOError('remote player cannot be reached')
 
@@ -181,7 +292,7 @@ def get_remote_orders(connection):
 
     Parameters
     ----------
-    connection: sockets to receive/send orders (tuple)
+    connection: sockets to receive/send orders (dict of socket.socket)
         
     Returns
     ----------
@@ -193,13 +304,9 @@ def get_remote_orders(connection):
             
     """
    
-    # get sockets
-    socket_in = connection[0]
-    socket_out = connection[1]
-
     # receive orders    
     try:
-        orders = socket_in.recv(65536).decode()
+        orders = connection['in'].recv(65536).decode()
     except:
         raise IOError('remote player cannot be reached')
         

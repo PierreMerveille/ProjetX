@@ -1081,11 +1081,12 @@ def display_stats (elements, color_team, ships, units_stats, peaks):
         stats = units_stats[team_name]['hub']
         
         #for each hub display stats
-        hub_stats = ''
+        hub_stats = color_team[team_name]
         for stat in stats :
+            
             value = str(stats[stat])
             if stat == 'coordinates':
-                stat = color_team[team_name] + '⯐ '
+                stat = '⯐ '
 
             elif stat == 'HP':
                 stat = '❤ '

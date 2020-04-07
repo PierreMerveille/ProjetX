@@ -1430,5 +1430,3 @@ def create_order(long, larg,  team, ships, units_stats,peaks) :
         instruction_str += element +' '
     
     return instruction_str
-
-play ('fichier','LOL','AI','BOB','AI')

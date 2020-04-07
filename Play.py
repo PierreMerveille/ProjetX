@@ -1301,7 +1301,7 @@ def range_verification (units_stats, ship_name, ships, coordinates, team):
 
 def create_order(long, larg,  team, ships, units_stats,peaks) :
 
-     """ This function create the order for the IA
+    """ This function create the order for the IA
 
     Parameter :
     ----------

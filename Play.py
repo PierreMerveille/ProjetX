@@ -93,10 +93,11 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
 
         end,winner = end_game(color_team,units_stats,end_counter,team,ennemy_team)
     
-    if winner :
+    if winner != 'NO':
         print ('%s is the winner.' % winner)
     else : 
         print ('The game ends in a draw.')
+
     if link : 
         disconnect_from_player(connection)
 
@@ -240,7 +241,7 @@ def end_game ( color_team, units_stats, end_counter, team, ennemy_team ):
     """  
     #at beginning end is false
     end = False
-    winner = False
+    winner = 'NO'
     #if end_counter >= 40 end is True
     if end_counter >= 40:
         end = True    
@@ -249,7 +250,7 @@ def end_game ( color_team, units_stats, end_counter, team, ennemy_team ):
         elif  units_stats[team]['hub']['HP'] > units_stats[ennemy_team]['hub']['HP'] :
             winner = team 
         else: 
-            winner = False
+            winner = 'NO'
     elif int(units_stats[team]['hub']['HP']) <= 0: 
         end = True
         winner = team 

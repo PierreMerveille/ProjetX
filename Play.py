@@ -83,7 +83,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             
             units_stats = upgrade(upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade)
             
-            end_counter = attack(attack_list, board, units_stats, ships, team, ennemy_team, peaks, end_counter)
+            end_counter = attack(attack_list, board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team)
             
             board, ships = move(move_list, ships, team, board, units_stats, peaks)
             
@@ -527,7 +527,7 @@ def upgrade (upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade):
                         units_stats[team]['hub']['energy_point'] -= 400
     return units_stats
                         
-def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, end_counter):
+def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team):
     
     """Execute an attack on a chosen box
     
@@ -541,6 +541,7 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
     ennemy_team : name of the ennemy_team (str)
     peaks : the dictionnary with all the peaks (dict)
     end_counter : number of rounds without attacks (float)
+    color_team : dictionnary with the number of the team with the color of each team (dict)
     
     Returns
     -------
@@ -595,23 +596,16 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                         if ships[ship]['HP']<=0:
                             #stock a dead cruiser
                             cruiser_dead.append(ship)
-               
-                #verify if the ennemy hub is in the coordinates
-                if units_stats[ennemy_team]['hub']['coordinates']==coordinates :
-                    #change the value of the point of structure of the ennemy's hub in the coordinate
-                    untis_stats=change_value('hub', ships, peaks, int(coord_attack[1])*-1, 'HP', units_stats, ennemy_team)
-                    hit+=1
-                    end_counter=0
-                   
-                  
-                elif units_stats[team]['hub']['coordinates']==coordinates :
-                    #change the value of the point of structure of the hub in the coordinate
-                    units_stats=change_value('hub', ships, peaks, int(coord_attack[1])*-1, 'HP', units_stats, team)
-                    hit+=1
-                    end_counter=0
-                                                
+                for team_name in color_team: 
+                #verify if the is in the coordinates
+                    if units_stats[team_name]['hub']['coordinates']==coordinates :
+                        #change the value of the point of structure of the hub in the coordinate
+                        untis_stats=change_value('hub', ships, peaks, int(coord_attack[1])*-1, 'HP', units_stats, team_name)
+                        hit+=1
+                        end_counter=0 
+                           
                     #if units_stats[team]['hub']['HP']<=0:
-                elif hit==0 : 
+                if hit==0 : 
                     #if nothing is hit than increment the end_counter
                     end_counter += 0.5
                    

@@ -39,13 +39,12 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     end_counter = 0
     end = False
     link = False
-    if teams['first_team']['player'] == 'remote':
-
-        connection = connect_to_player(1, remote_IP='127.0.0.1', verbose=False)
-        link = True
-    elif teams['second_team']['player'] == 'remote':
-        connection = connect_to_player(2, remote_IP='127.0.0.1', verbose=False)
-        link = True
+    if team_1_type == 'remote':
+        connection = remote_play.create_connection(team_2, team_1, verbose=True)
+        link=True
+    if team_2_type == 'remote':
+        connection = remote_play.create_connection(team_1, team_2, verbose=True)
+        link=True
     while end == False:
         order_list={}
         
@@ -56,17 +55,17 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
                 order = input("Let's get %s's orders: "% teams[team]['team'])
                 order_list[teams[team]['team']]= order
                 if link :
-                    notify_remote_orders(connection, order)
+                    remote_play.notify_remote_orders(connection, order)
 
             elif  teams[team]['player'] == 'remote':
 
-                get_remote_orders(connection)
+                order_list[teams[team]['team']] = remote_play.get_remote_orders(connection)
 
             elif teams[team]['player'] == 'AI':
                 order = create_order (long, larg, teams[team]['team'], ships, units_stats, peaks)
                 order_list[teams[team]['team']] = order
                 if link :
-                    notify_remote_orders(connection, order)
+                    remote_play.notify_remote_orders(connection, order)
     
         
         for team in color_team:
@@ -99,7 +98,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
         print ('The game ends in a draw.')
 
     if link : 
-        disconnect_from_player(connection)
+        remote_play.close_connection(connection)
 
 def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
     """
@@ -1067,7 +1066,7 @@ def display_stats (elements, color_team, ships, units_stats, peaks):
     #color legend for each team
     print('\n')
     for element in color_team :
-        print (color_team[element] + '[' + element + '] : \u2588\u2588') 
+        print (color_team[element] + '[' + str(element) + '] : \u2588\u2588') 
     #change color back to white
 
     ##############HUBS#################

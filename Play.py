@@ -173,7 +173,7 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
 
     """
     
-#Initialize the variable use for the design
+    #Initialize the variable use for the design
     elements = {'hub' : '⚑' , 'cruiser': 'ѧ' , 'tanker' : 'ѫ' , 'peak' : 'ϟ'}
     color_team = {team_1 : fg(1), team_2: fg(4)}
 

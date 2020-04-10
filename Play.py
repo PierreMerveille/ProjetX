@@ -55,7 +55,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
         order_list={}
 
         #Separate in 2 the round because there are 2 teams and start the connectique phase
-        for team in teams :
+        for team in team_id :
 
             #Verify if the player is an human
             if teams[team] == 'human' :

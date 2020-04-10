@@ -652,25 +652,27 @@ def move (move_list, ships, team, board, units_stats, peaks) :
             new_coord = instruction[1].split('-')
             new_coord = (int(new_coord[0]), int(new_coord[1]))
             old_coord = ships[instruction[0]]['coordinates']
-            #if ship type is tanker
-            if ships[instruction[0]]['type'] == 'tanker':
-                #change coordinates of moved tanker
-                change_value(instruction[0], ships, peaks, new_coord, 'coordinates', units_stats, team)
-                #add to list_entity the new elements for board
-                board[new_coord]['list_entity'].append(instruction[0])
-                index = board[old_coord]['list_entity'].index(instruction[0])
-                del board[old_coord]['list_entity'][index]
 
-            else:
-                
-                if ships[instruction[0]]['energy_point'] > max(abs(new_coord[0] - old_coord[0]), abs(new_coord[1] - old_coord[1])) * units_stats[team]['cruiser']['move'] :
-                    
-                    change_value(instruction[0], ships, peaks, ( - (max(abs(new_coord[0] - old_coord[0]), abs(new_coord[1] - old_coord[1])) * units_stats[team]['cruiser']['move'])), 'energy_point', units_stats,team)
+            if max (abs(new_coord[0]-old_coord[0]), abs(new_coord[1]-old_coord[1])) < 2 :
+                #if ship type is tanker
+                if ships[instruction[0]]['type'] == 'tanker':
+                    #change coordinates of moved tanker
                     change_value(instruction[0], ships, peaks, new_coord, 'coordinates', units_stats, team)
+                    #add to list_entity the new elements for board
                     board[new_coord]['list_entity'].append(instruction[0])
                     index = board[old_coord]['list_entity'].index(instruction[0])
                     del board[old_coord]['list_entity'][index]
-            
+
+                else:
+                    
+                    if ships[instruction[0]]['energy_point'] > max(abs(new_coord[0] - old_coord[0]), abs(new_coord[1] - old_coord[1])) * units_stats[team]['cruiser']['move'] :
+                        
+                        change_value(instruction[0], ships, peaks, ( - (max(abs(new_coord[0] - old_coord[0]), abs(new_coord[1] - old_coord[1])) * units_stats[team]['cruiser']['move'])), 'energy_point', units_stats,team)
+                        change_value(instruction[0], ships, peaks, new_coord, 'coordinates', units_stats, team)
+                        board[new_coord]['list_entity'].append(instruction[0])
+                        index = board[old_coord]['list_entity'].index(instruction[0])
+                        del board[old_coord]['list_entity'][index]
+                
     return board, ships
             
 def change_value ( entity_name, ships, peaks, new_value, caracteristic, units_stats, team):

@@ -631,7 +631,7 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
             #create a variable verify if something is hit
             hit=0
             #attack if hithin_range is True
-            print(coord_attack)
+            
             if hithin_range and ships[instruction[0]]['energy_point']>=int(coord_attack[1]):
                 #reduce the energy of the ship
                 ships = change_value(instruction[0], ships, peaks, int(coord_attack[1])*-1, 'energy_point', units_stats, team)
@@ -863,9 +863,7 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
                         
                         #transfer energy 
                         if max_storage > in_dico and range_verification(units_stats, instruction[0], ships,instruction[1],team ):
-                            print (in_dico)
-                            print (max_storage)
-                            print (type(peaks[peak]['storage']))
+                            
                             while in_dico < max_storage and peaks[peak]['storage'] >0 :
                     
                                 in_dico += 1
@@ -1012,7 +1010,7 @@ def select_value_to_print (board, coordinates, units_stats, ships, peaks, color_
                 # verify that ther is no hub, cruiser or tanker already placed
                 if value_to_print[0] > 2 :
                     # set 2 and the color 'yellow' in value_to_print
-                    value_to_print = [3, fg(10)+ attr(1), 'peak']
+                    value_to_print = [3, fg(11)+ attr(1), 'peak']
         # center the character in the box
         value_to_print[2] = ' '+ elements[value_to_print[2]] + ' '
         value_to_print = value_to_print[1] + value_to_print[2]
@@ -1252,10 +1250,10 @@ def display_stats (elements, color_team, ships, units_stats, peaks):
             cruiser_common = ' | $:' + value
 
             value = str (common_stats[type]['cost_attack'])
-            cruiser_common += ' | $/\u204c :' + value
+            cruiser_common += ' | $/⁌ :' + value
 
             value = str (common_stats[type]['attack'])
-            cruiser_common += ' | \u204c :' + value
+            cruiser_common += ' | ⁌ :' + value
 
             value = str (common_stats[type]['max_energy'])
             cruiser_common += ' | Max⚡ :' + value
@@ -1274,10 +1272,10 @@ def display_stats (elements, color_team, ships, units_stats, peaks):
         
         #for each key change icon and associate it to value
         value = str(tanker_stats['max_energy'])
-        tanker_team_stats = ' | \U0001F50B :' + value
+        tanker_team_stats = ' | 🔋 :' + value
 
         value = str(cruiser_stats['range'])
-        cruiser_team_stats  = ' | \u2B57 :' + value
+        cruiser_team_stats  = ' | ⭗ :' + value
 
         value = str (cruiser_stats['move'])
         cruiser_team_stats += ' | ⛽ :' + value
@@ -1499,8 +1497,8 @@ def create_order(long, larg,  team, ships, units_stats,peaks) :
             ship_in_movement= choice(ship_list)
             coordinates = ships[ship_in_movement]['coordinates']
 
-            line = coordinates[0] + randint(0,1)
-            column = coordinates [1] + randint(0,1)
+            line = coordinates[0] + randint(-1,1)
+            column = coordinates [1] + randint(-1,1)
 
             #Add the order  
             instruction_list.append(ship_in_movement + ':@' + str(line) + '-' + str(column))

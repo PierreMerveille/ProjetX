@@ -34,9 +34,10 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     Implémentation : Pierre Merveille (v.1 10/03/20)
                      Pierre Merveille (v.2 30/03/20)
     """
-        
+
     board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks, long, larg, teams = set_games(team_1,team_1_type , team_2,team_2_type, map_title)
     end_counter = 0
+    team_id=(team_1,team_2)
     end = False
     link = False
     if team_1_type == 'remote':
@@ -48,8 +49,9 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     while end == False:
         order_list={}
         
-        for team in teams :
-
+        for team in team_id :
+            print(team)
+            print(teams[team]['player'])
             if teams[team]['player'] == 'human' :
            
                 order = input("Let's get %s's orders: "% teams[team]['team'])
@@ -140,12 +142,12 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
                      Johan Rochet (v.2 27/03/20)
 
     """
-
+    
     elements = {'hub' : '⚑' , 'cruiser': 'ѧ' , 'tanker' : 'ѫ' , 'peak' : 'ϟ'}
     color_team = {team_1 : fg(1), team_2: fg(4)}
 
 
-    fh = open(map_title + ".txt",'r')
+    fh = open(map_title + ".eq",'r')
     lines= fh.readlines()
     board_dimension= lines[1][:-1].split(' ')
     long = int(board_dimension[0])

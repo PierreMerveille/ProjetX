@@ -50,22 +50,21 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
         order_list={}
         
         for team in team_id :
-            print(team)
-            print(teams[team]['player'])
-            if teams[team]['player'] == 'human' :
+            
+            if teams[team] == 'human' :
            
-                order = input("Let's get %s's orders: "% teams[team]['team'])
-                order_list[teams[team]['team']]= order
+                order = input("Let's get %s's orders: "% team)
+                order_list[team]= order
                 if link :
                     remote_play.notify_remote_orders(connection, order)
 
-            elif  teams[team]['player'] == 'remote':
+            elif  teams[team] == 'remote':
 
-                order_list[teams[team]['team']] = remote_play.get_remote_orders(connection)
+                order_list[team] = remote_play.get_remote_orders(connection)
 
-            elif teams[team]['player'] == 'AI':
-                order = create_order (long, larg, teams[team]['team'], ships, units_stats, peaks)
-                order_list[teams[team]['team']] = order
+            elif teams[team] == 'AI':
+                order = create_order (long, larg, team, ships, units_stats, peaks)
+                order_list[team] = order
                 if link :
                     remote_play.notify_remote_orders(connection, order)
     
@@ -205,8 +204,8 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
 
     
     ships ={}
-
-    teams= {'first_team' : {'team': team_1,'player' :team_1_type}, 'second_team' : {'team' : team_2, 'player' : team_2_type}} 
+    teams ={team_1 : team_1_type, team_2 : team_2_type}
+    
     #ships ={'name' : {'coordinates' : , 'team' : , 'type' : , 'HP' : , 'energy_point': }
     board_display(board, color_team, ships, peaks, units_stats, elements)
     display_stats(elements,color_team,ships,units_stats,peaks)

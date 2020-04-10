@@ -1389,7 +1389,7 @@ def create_order(long, larg,  team, ships, units_stats,peaks) :
     """
 
     #Set the variable
-    nb_order = randint(1,30)
+    nb_order = randint(1,5)
     order_list = []
     instruction_list =[]
     create_unit = {'tanker' : 0, 'cruiser' : 0}
@@ -1497,8 +1497,10 @@ def create_order(long, larg,  team, ships, units_stats,peaks) :
 
             #Move to a random coordinate        
             ship_in_movement= choice(ship_list)
-            line = randint(0,long)
-            column = randint(0,larg)
+            coordinates = ships[ship_in_movement]['coordinates']
+
+            line = coordinates[0] + randint(0,1)
+            column = coordinates [1] + randint(0,1)
 
             #Add the order  
             instruction_list.append(ship_in_movement + ':@' + str(line) + '-' + str(column))

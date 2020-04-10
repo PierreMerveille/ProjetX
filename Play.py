@@ -178,7 +178,7 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
     color_team = {team_1 : fg(1), team_2: fg(4)}
 
     #Select the dimension of the map
-    fh = open(map_title + ".txt",'r')
+    fh = open(map_title + ".eq",'r')
     lines= fh.readlines()
     board_dimension= lines[1][:-1].split(' ')
     long = int(board_dimension[0])
@@ -1295,7 +1295,7 @@ def display_stats (elements, color_team, ships, units_stats, peaks):
         ship_stats = ship 
 
         value = str(ships[ship]['coordinates'])
-        ship_stats += ': [ ⯐ :' + value
+        ship_stats += ': [ a :' + value
         
         value = str(ships[ship]['HP'])
         ship_stats += ' | ❤ :' + value

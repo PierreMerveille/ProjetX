@@ -58,11 +58,11 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
         for team in teams :
 
             #Verify if the player is an human
-            if teams[team]['player'] == 'human' :
+            if teams[team] == 'human' :
 
                 #Get the order from the human player
-                order = input("Let's get %s's orders: "% teams[team]['team'])
-                order_list[teams[team]['team']]= order
+                order = input("Let's get %s's orders: "% team)
+                order_list[team]= order
 
                 #Give the order to the remote player if there is one
                 if link :
@@ -70,17 +70,17 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
 
 
             #Verify if the player is an remote player
-            elif  teams[team]['player'] == 'remote':
+            elif  teams[team] == 'remote':
 
                 #Get the order from the remote player
-                order_list[teams[team]['team']] = remote_play.get_remote_orders(connection)
+                order_list[team] = remote_play.get_remote_orders(connection)
 
             #Verify if the player is an AI
-            elif teams[team]['player'] == 'AI':
+            elif teams[team] == 'AI':
 
                 #Create the order from the AI
-                order = create_order (long, larg, teams[team]['team'], ships, units_stats, peaks)
-                order_list[teams[team]['team']] = order
+                order = create_order (long, larg, team, ships, units_stats, peaks)
+                order_list[team] = order
 
                 #Give the order to the remote player if there is one
                 if link :

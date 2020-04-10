@@ -280,7 +280,7 @@ def end_game ( color_team, units_stats, end_counter, team, ennemy_team ):
     winner = 'NO'
 
     #check if 40 rounds have passed
-    if end_counter >= 40:
+    if end_counter >= 1000:
         end = True
 
         #Verify wich team has the most health point
@@ -294,10 +294,10 @@ def end_game ( color_team, units_stats, end_counter, team, ennemy_team ):
     #Verify if there is a winner => if someone has 0 HP
     elif int(units_stats[team]['hub']['HP']) <= 0: 
         end = True
-        winner = team 
+        winner = ennemy_team
     elif int(units_stats[ennemy_team]['hub']['HP']) <= 0:
         end = True
-        winner = ennemy_team
+        winner = team
 
     return end, winner
 
@@ -1295,7 +1295,7 @@ def display_stats (elements, color_team, ships, units_stats, peaks):
         ship_stats = ship 
 
         value = str(ships[ship]['coordinates'])
-        ship_stats += ': [ a :' + value
+        ship_stats += ': [ ⯐ :' + value
         
         value = str(ships[ship]['HP'])
         ship_stats += ' | ❤ :' + value

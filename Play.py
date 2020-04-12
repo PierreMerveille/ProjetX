@@ -41,6 +41,8 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     team_id=(team_1,team_2)
     end = False
     link = False
+    
+    connection = 'NO'
 
     #Make a connection if there is one remote player
     for number in range(2):
@@ -113,20 +115,21 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
 
     Returns :
     ---------
-    ships :  dictionnary with the statistics of each ship (tanker or cruiser)(dict)
-    board : dictionnary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    board : dictionary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
     units_states : states of each unit (dict)
     max_upgrade : dictionary containing the values for each upgrade (dict)
     cost_upgrade : dictionary containing the price for each upgrade (dict)
-    peaks : dictionnary with informations about each peak (dict)
+    peaks : dictionary with informations about each peak (dict)
     long : length of the board (int)
     larg : width of the board (int)
-    elements : dictionnary with the type of entity (cruiser, hub,...) with the charactere of each type (dict)
+    elements : dictionary with the type of entity (cruiser, hub,...) with the charactere of each type (dict)
+    teams : dictionary with the teams and their type (remote,...) (dico)
     
     Notes : 
     ------
-    This function create the data structure like the representation of the board in data (dictionnary) and the states of the hub contains in the file, tuple of the upgrade, initialize
-    the list of the ship (dictionnary) and the structures for the design containing the representation of the unit type (cruiser, tanker, peak, hub)
+    This function create the data structure like the representation of the board in data (dictionary) and the states of the hub contains in the file, tuple of the upgrade, initialize
+    the list of the ship (dictionary) and the structures for the design containing the representation of the unit type (cruiser, tanker, peak, hub)
 
     
     Versions 
@@ -189,7 +192,7 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
         info_peak = lines[index][:-1].split(' ')
         name_entity = 'peak' + str(index-5)
         
-        #Create and place the stat peak in a dictionnary
+        #Create and place the stat peak in a dictionary
         if index == 6:
             peaks = {name_entity : {'coordinates' : (int(info_peak[0]), int(info_peak[1])), 'storage' : int(info_peak[2])}}
         else:
@@ -221,8 +224,8 @@ def end_game ( color_team, units_stats, end_counter, team, ennemy_team ):
     
     Parameters
     ----------
-    color_team : dictionnary with the number of the team with the color of each team (dict)
-    units_stats :dictionnary with the stats (different or common) of the teams (hub /ship) (dict)
+    color_team : dictionary with the number of the team with the color of each team (dict)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
     end_counter : number of rounds without attacks (float)
     team : name of the team which is playing (str)   
     ennemy_team : name of the ennemy_team (str)
@@ -230,6 +233,7 @@ def end_game ( color_team, units_stats, end_counter, team, ennemy_team ):
     Return :
     --------
     end : sets the game to finished depending on the structure points or number of pacific rounds (bool)
+    winner : name of the teams who's the winner (if there is one) (str)
     
     Notes : 
     -------
@@ -275,11 +279,11 @@ def separate_instruction (order, ships, units_stats,board,team,peaks):
     Parameter
     ---------
     order: order of the player (str)
-    ships :  dictionnary with the statistics of each ship (tanker or cruiser)(dict)
-    units_stats :dictionnary with the stats (different or common) of the teams (hub /ship) (dict)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
     board : dictionary where each coordinates gives a list of entities on this position (dict)
     team : name of the team which is playing (str)   
-    peaks : dictionnary with all the peaks (dict) 
+    peaks : dictionary with all the peaks (dict) 
     
     Return
     ------
@@ -412,18 +416,18 @@ def create_units (create_list, ships, team, board, units_stats, peaks) :
     Parameters
     ----------
     create_list : list of create order (list)
-    ships :  dictionnary with the statistics of each ship (tanker or cruiser)(dict)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
     team : name of the team which is playing (str)   
-    board : dictionnary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
-    units_stats :dictionnary with the stats (different or common) of the teams (hub /ship) (dict)
-    peaks : the dictionnary with all the peaks (dict)
+    board : dictionary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    peaks : the dictionary with all the peaks (dict)
     
         
     Returns :
     --------
-    ships : dictionnary with the new added ship (dict)
-    board : dictionnary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
-    units_stats :dictionnary with the stats (different or common) of the teams (hub /ship) (dict)
+    ships : dictionary with the new added ship (dict)
+    board : dictionary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
 
     
     Notes : 
@@ -473,14 +477,14 @@ def upgrade (upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade):
     ----------
     upgrade_list : list of the upgrade order (list)
     team : name of the team which is playing (str)   
-    units_stats :dictionnary with the stats (different or common) of the teams (hub /ship) (dict)
-    ships :  dictionnary with the statistics of each ship (tanker or cruiser)(dict)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
     max_upgrade : dictionary containing the values for each upgrade (dict)
     cost_upgrade : dictionary containing the price for each upgrade (dict)
     
     Return
     ------
-    units_stats : update stats in dictionnary (dict)
+    units_stats : update stats in dictionary (dict)
 
     Notes
     -----
@@ -551,14 +555,14 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
     Parameters
     ----------
     attack_list : order from the attack_list (list)
-    board : dictionnary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
-    units_stats :dictionnary with the stats (different or common) of the teams (hub /ship) (dict)
-    ships :  dictionnary with the statistics of each ship (tanker or cruiser)(dict)
+    board : dictionary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
     team : name of the team which is playing (str)
     ennemy_team : name of the ennemy_team (str)
-    peaks : the dictionnary with all the peaks (dict)
+    peaks : the dictionary with all the peaks (dict)
     end_counter : number of rounds without attacks (float)
-    color_team : dictionnary with the number of the team with the color of each team (dict)
+    color_team : dictionary with the number of the team with the color of each team (dict)
     
     Returns
     -------
@@ -644,16 +648,16 @@ def move (move_list, ships, team, board, units_stats, peaks) :
     Parameters
     ----------
     move_list : order from the move_list (list)
-    ships :  dictionnary with the statistics of each ship (tanker or cruiser)(dict)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
     team : name of the team which is playing (str)
-    board : dictionnary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
-    units_stats :dictionnary with the stats (different or common) of the teams (hub /ship) (dict)
+    board : dictionary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
     peaks : parameter of change_value (dict)
         
     Return :
     --------
-    ships :  dictionnary with the statistics of each ship (tanker or cruiser)(dict)
-    board : dictionnary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    board : dictionary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
     
     Notes : 
     -------
@@ -710,24 +714,24 @@ def change_value ( entity_name, ships, peaks, new_value, caracteristic, units_st
     Parameters
     ----------
     entity_name : name of the entity for which you want to change a value (str)
-    ships :  dictionnary with the statistics of each ship (tanker or cruiser)(dict)
-    peaks : dictionnary with all the peaks (dict)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    peaks : dictionary with all the peaks (dict)
     new_value : number of point to change (positive or negative) (int)
     caracteristic : caractrestic you want to change the value with the quantity (str)
-    units_stats :dictionnary with the stats (different or common) of the teams (hub /ship) (dict)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
     team : name of the team which is playing (str)
     
     Return 
     ------
-    units_stats :dictionnary with the stats (different or common) of the teams (hub /ship) (dict)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
     or 
-    ships :  dictionnary with the statistics of each ship (tanker or cruiser)(dict)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
     or 
-    peaks : the dictionnary with the change of value for the caracteristic (dict)
+    peaks : the dictionary with the change of value for the caracteristic (dict)
     
     Notes 
     -----
-    This function change a cracteristic of a ship, a peak or a hub and return a different dictionnary depending on the change
+    This function change a cracteristic of a ship, a peak or a hub and return a different dictionary depending on the change
     
     Version 
     -------
@@ -743,7 +747,7 @@ def change_value ( entity_name, ships, peaks, new_value, caracteristic, units_st
     #change value for the hub
 
     if entity_name == 'hub' :
-        #change the value in function of the caracteristic and return the dictionnary
+        #change the value in function of the caracteristic and return the dictionary
         units_stats[team]['hub'][caracteristic] += new_value
         return units_stats
     else :
@@ -778,17 +782,17 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
     Parameters
     ----------
     transfer_list : list of the transfer order (list)
-    ships :  dictionnary with the statistics of each ship (tanker or cruiser)(dict)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
     team : name of the team which is playing (str)   
-    units_stats :dictionnary with the stats (different or common) of the teams (hub /ship) (dict)
-    peaks : dictionnary with all the peaks (dict)
-    board : dictionnary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    peaks : dictionary with all the peaks (dict)
+    board : dictionary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
 
     Return :
     --------
-    ships :  dictionnary with the statistics of each ship (tanker or cruiser)(dict)
-    units_stats :dictionnary with the stats (different or common) of the teams (hub /ship) (dict) 
-    peaks : dictionnary with the new or not value of storage of a peak (dict)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict) 
+    peaks : dictionary with the new or not value of storage of a peak (dict)
 
     Notes : 
     -------
@@ -881,17 +885,17 @@ def round_end (board, end_counter, units_stats, peaks, elements, color_team, shi
     Parameters  
     ----------
     
-    board : dictionnary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
+    board : dictionary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
     end_counter : number of rounds without attacks (float)
-    units_stats :dictionnary with the stats (different or common) of the teams (hub /ship) (dict)
-    peaks : dictionnary with all the peaks (dict) 
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    peaks : dictionary with all the peaks (dict) 
     elements : character for each type of entity (dict)
-    color_team : dictionnary with the number of the team with the color of each team (dict)
-    ships :  dictionnary with the statistics of each ship (tanker or cruiser)(dict)
+    color_team : dictionary with the number of the team with the color of each team (dict)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
 
     Return :
     --------
-    units_stats :dictionnary with the stats (different or common) of the teams (hub /ship) (dict)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
     
     Notes : 
     -------
@@ -923,13 +927,13 @@ def select_value_to_print (board, coordinates, units_stats, ships, peaks, color_
 
     Parameters
     ----------
-    board : dictionnary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
+    board : dictionary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
     coordinates : tuple with the coordinate of the box (tuple)
-    units_stats :dictionnary with the stats (different or common) of the teams (hub /ship) (dict)
-    ships :  dictionnary with the statistics of each ship (tanker or cruiser)(dict)
-    peaks : dictionnary with all the peaks (dict)
-    color_team : dictionnary with the number of the team with the color of each team (dict)
-    elements : dictionnary with the type of entity (cruiser, hub,...) with the charactere of each type (dict)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    peaks : dictionary with all the peaks (dict)
+    color_team : dictionary with the number of the team with the color of each team (dict)
+    elements : dictionary with the type of entity (cruiser, hub,...) with the charactere of each type (dict)
     
     Return
     ------
@@ -990,12 +994,12 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements) :
 
     Parameters 
     ----------
-    board : dictionnary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
-    color_team : dictionnary with the number of the team with the color of each team (dict)
-    ships :  dictionnary with the statistics of each ship (tanker or cruiser)(dict)
-    peaks : dictionnary with all the peaks (dict)
-    units_stats :dictionnary with the stats (different or common) of the teams (hub /ship) (dict)   
-    elements : dictionnary with the type of entity (cruiser, hub,...) with the charactere of each type (dict)
+    board : dictionary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
+    color_team : dictionary with the number of the team with the color of each team (dict)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    peaks : dictionary with all the peaks (dict)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)   
+    elements : dictionary with the type of entity (cruiser, hub,...) with the charactere of each type (dict)
 
     Notes : 
     -------
@@ -1071,11 +1075,11 @@ def display_stats (elements, color_team, ships, units_stats, peaks):
     
     Parameters
     ----------
-    elements : dictionnary with the type of entity (cruiser, hub,...) with the charactere of each type (dict)
-    color_team : dictionnary with the number of the team with the color of each team (dict)
-    ships :  dictionnary with the statistics of each ship (tanker or cruiser)(dict)
-    units_stats :dictionnary with the stats (different or common) of the teams (hub /ship) (dict)
-    peaks : dictionnary with all the peaks (dict) 
+    elements : dictionary with the type of entity (cruiser, hub,...) with the charactere of each type (dict)
+    color_team : dictionary with the number of the team with the color of each team (dict)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    peaks : dictionary with all the peaks (dict) 
     
     Notes 
     -----
@@ -1296,9 +1300,9 @@ def range_verification (units_stats, ship_name, ships, coordinates, team):
 
     Parameters
     ----------
-    units_stats :dictionnary with the stats (different or common) of the teams (hub /ship) (dict)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
     ship_name : name of the ship (str)
-    ships :  dictionnary with the statistics of each ship (tanker or cruiser)(dict)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
     coordinates : coordinates of the box to attend (tuple)
     team : name of the team which is playing (str)   
 
@@ -1333,9 +1337,9 @@ def create_order(long, larg,  team, ships, units_stats,peaks) :
     long : length of the board  (int)
     larg : width of the board (int)
     team : name of the team which is playing (str)   
-    ships :  dictionnary with the statistics of each ship (tanker or cruiser)(dict)
-    units_stats :dictionnary with the stats (different or common) of the teams (hub /ship) (dict)
-    peaks : dictionnary with all the peaks (dict) 
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    peaks : dictionary with all the peaks (dict) 
 
     Return : 
     --------
@@ -1480,10 +1484,38 @@ def create_order(long, larg,  team, ships, units_stats,peaks) :
     instruction_str = ''
     for element in instruction_list :
         instruction_str += element +' '
+
+    if instruction_str != '' :
+
+        instruction_str = instruction_str[:-1]
     
     return instruction_str
-def ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, peaks) :
 
+def ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, peaks) :
+    """ Ask the order of the players 
+
+    Paremters: 
+    ----------
+    team_id : tuple with the name of both teams (tuple)
+    teams : dictionary with the teams and their type (remote,...) (dico)
+    link : value = True if there is a remote and False if not (bool)
+    connection: socket(s) to receive/send orders (dict of socket.socket)
+    long : length of the board (int)
+    larg : width of the board (int)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    peaks : dictionary with all the peaks (dict)
+
+    Return :
+    --------
+    order_list : dictionary with the orders of each team (dico)
+
+    Versions :
+    ----------
+    specification :Johan Rochet (v.1 12/04/20)
+    implémentation : Anthony Pierard (v.1 05/04/20)
+
+    """
     order_list={}
 
     #Separate in 2 the round because there are 2 teams and start the connectique phase

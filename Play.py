@@ -50,40 +50,9 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     
     #Start the game
     while end == False:
-        order_list={}
-
         #Separate in 2 the round because there are 2 teams and start the connectique phase
-        for team in team_id :
-
-            #Verify if the player is an human
-            if teams[team] == 'human' :
-
-                #Get the order from the human player
-                order = input("Let's get %s's orders: "% team)
-                order_list[team]= order
-
-                #Give the order to the remote player if there is one
-                if link :
-                    remote_play.notify_remote_orders(connection, order)
-
-
-            #Verify if the player is an remote player
-            elif  teams[team] == 'remote':
-
-                #Get the order from the remote player
-                order_list[team] = remote_play.get_remote_orders(connection)
-
-            #Verify if the player is an AI
-            elif teams[team] == 'AI':
-
-                #Create the order from the AI
-                order = create_order (long, larg, team, ships, units_stats, peaks)
-                order_list[team] = order
-
-                #Give the order to the remote player if there is one
-                if link :
-                    remote_play.notify_remote_orders(connection, order)
-    
+        order_list = ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, peaks) 
+           
         #Separate in 2 the round because there are 2 teams and start the gameplay phase
         for team in color_team:
 
@@ -1513,3 +1482,39 @@ def create_order(long, larg,  team, ships, units_stats,peaks) :
         instruction_str += element +' '
     
     return instruction_str
+def ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, peaks) :
+
+    order_list={}
+
+    #Separate in 2 the round because there are 2 teams and start the connectique phase
+    for team in team_id :
+
+        #Verify if the player is an human
+        if teams[team] == 'human' :
+
+            #Get the order from the human player
+            order = input("Let's get %s's orders: "% team)
+            order_list[team]= order
+
+            #Give the order to the remote player if there is one
+            if link :
+                remote_play.notify_remote_orders(connection, order)
+
+
+        #Verify if the player is an remote player
+        elif  teams[team] == 'remote':
+
+            #Get the order from the remote player
+            order_list[team] = remote_play.get_remote_orders(connection)
+
+        #Verify if the player is an AI
+        elif teams[team] == 'AI':
+
+            #Create the order from the AI
+            order = create_order (long, larg, team, ships, units_stats, peaks)
+            order_list[team] = order
+
+            #Give the order to the remote player if there is one
+            if link :
+                remote_play.notify_remote_orders(connection, order)
+    return order_list

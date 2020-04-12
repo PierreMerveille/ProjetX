@@ -43,13 +43,11 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     link = False
 
     #Make a connection if there is one remote player
-    if team_1_type == 'remote':
-        connection = remote_play.create_connection(team_2, team_1, verbose=True)
-        link=True
-    if team_2_type == 'remote':
-        connection = remote_play.create_connection(team_1, team_2, verbose=True)
-        link=True
-
+    for number in range(2):
+        if teams[team_id[number]] == 'remote':
+            connection = remote_play.create_connection(team_id[number], team_id[number-1], verbose=True)
+            link=True
+    
     #Start the game
     while end == False:
         order_list={}

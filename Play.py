@@ -52,7 +52,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     
     #Start the game
     while end == False:
-        #Separate in 2 the round because there are 2 teams and start the connectique phase
+        
         order_list = ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, peaks) 
            
         #Separate in 2 the round because there are 2 teams and start the gameplay phase

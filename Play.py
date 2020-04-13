@@ -507,36 +507,47 @@ def upgrade (upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade):
     #carries out orders.
     for upgrade in upgrade_list:
 
-            #if team has enough energy do requested upgrades, else print('caps(%s): you don't have enough energy stored in your hub')%team
+            #Make the upgrade asked
             if upgrade == 'regeneration':
                 
+                #Verify if you have reached the maximum upgrade
                 if units_stats[team]['hub']['regeneration'] < max_upgrade['max_regen_upgrade']:
                 
+                    #Verify if he has the enegergy
                     if cost_upgrade['cost_regen_upgrade']  <= units_stats[team]['hub']['energy_point']:
                         units_stats[team]['hub']['regeneration'] += 5
                         units_stats[team]['hub']['energy_point'] -= 700
 
+            #Make the upgrade asked
             elif upgrade == 'storage':
                 storage_cost = cost_upgrade['cost_upgrade_capacity']
                 
+                #Verify if you have reached the maximum upgrade
                 if units_stats[team]['tanker']['max_energy'] < max_upgrade['max_capacity_upgrade']:
                     
+                    #Verify if he has the enegergy
                     if storage_cost <= units_stats[team]['hub']['energy_point']:
                         units_stats[team]['tanker']['max_energy'] += 100
                         units_stats[team]['hub']['energy_point'] -= 600           
             
+            #Make the upgrade asked
             elif upgrade == 'move':
                 
+                #Verify if you have reached the maximum upgrade
                 if units_stats[team]['cruiser']['move'] > max_upgrade['max_travel_upgrade']:
-
+                    
+                    #Verify if he has the enegergy
                     if cost_upgrade['cost_travel_upgrade'] <= units_stats[team]['hub']['energy_point']:
                         units_stats[team]['cruiser']['move'] -= 1
                         units_stats[team]['hub']['energy_point'] -= 500
 
+            #Make the upgrade asked
             elif upgrade == 'range':
-                                
+
+                #Verify if you have reached the maximum upgrade          
                 if units_stats[team]['cruiser']['range'] < max_upgrade['max_range_upgrade']:
                     
+                    #Verify if he has the enegergy
                     if cost_upgrade['cost_range_upgrade'] <= units_stats[team]['hub']['energy_point']:
                         units_stats[team]['cruiser']['range'] += 1
                         units_stats[team]['hub']['energy_point'] -= 400
@@ -666,6 +677,7 @@ def move (move_list, ships, team, board, units_stats, peaks) :
     """  
     #carries out orders.
     for instruction in move_list:
+
             #get the oler and the new coordinates
             new_coord = instruction[1].split('-')
             new_coord = (int(new_coord[0]), int(new_coord[1]))
@@ -829,10 +841,12 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
                         #transfer energy 
                         if max_storage > in_dico and range_verification(units_stats, instruction[0], ships,instruction[1],team ):
                             
+
                             while in_dico < max_storage and peaks[peak]['storage'] >0 :
                     
                                 in_dico += 1
                                 peaks[peak]['storage'] -= 1
+
             #if the tanker draw energy in a hub
             elif instruction [1][1:] == 'hub' :
                 out_dico =units_stats[team]['hub']['energy_point']
@@ -1196,9 +1210,11 @@ def display_stats (elements, color_team, ships, units_stats, peaks):
     ship_tanker_stats = ''
 
     ship_team ={}
+    #Get the ships for each team
     for team in color_team :
         ship_team[team] = {'cruiser' : [], 'tanker': []}
 
+    #Display stat of each cruiser and tanker
     for ship in ships:
         ship_stats = ship 
 

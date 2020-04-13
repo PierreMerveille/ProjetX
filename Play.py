@@ -1152,57 +1152,7 @@ def display_stats (elements, color_team, ships, units_stats, peaks):
     ##############SHIPS################
     print(fg(255)+'\nSHIPS')
     print('------------------------------')
-    #for each team get tanker stats from units_stats
-    for team_name in color_team:
-        team_stats = units_stats[team_name]['tanker']
-        common_stats = units_stats['common']['tanker']  
-        
-        #for each tanker get stats from ships 
-        for tanker in ships : 
-            if ships[tanker]['type'] == 'tanker': #verify it's a tanker
-            
-                for ship in ships:
-                
-                    ship_stats = ships[ship]
-                
-                    for team_stat in team_stats:
-                    
-                        value = str(team_stats[team_stat])
-                        if team_stat == 'max_energy':
-                            stat_team = color_team[team_name] + '💼  ' 
-                        tanker_stats_1 = stat_team +': ' + value + '   '         
-                    
-                    for common_stat in common_stats :
-
-                        value = str(common_stats[common_stat])
-                        if common_stat == 'creation_cost':
-                            stat_common = color_team[team_name] + '💵  '
-                            
-                        elif common_stat == 'move':
-                            stat_common = '⛽ '
-
-                        tanker_stats_2 = stat_common +': ' + value + '  '
-                        
-                    for ship_stat in ship_stats:
-
-                        value = str(ship_stats[ship_stat])
-                        if ship_stat == 'coordinates':
-                            stat_ship = color_team[team_name] + '⯐ '
-                        
-                        elif ship_stat == 'team':
-                            stat_ship = '👤 '
-
-                        elif ship_stat == 'type':
-                            stat_ship = 'ѧ/ѫ'
-                        
-                        elif ship_stat == 'HP':
-                            stat_ship = '❤ '
-
-                        elif ship_stat == 'energy_point':
-                            stat_ship = '⚡  '
-
-                        tanker_stats_3 = stat_ship +': ' + value + '  '
-
+    
     #get common stats from unit_stats
     common_stats = units_stats['common'] 
     for type in common_stats:
@@ -1213,7 +1163,7 @@ def display_stats (elements, color_team, ships, units_stats, peaks):
             tanker_common = ' | $:' + value
 
             value = str (common_stats[type]['move'])
-            tanker_common += ' | ⛽ :' + value
+            tanker_common += ' | ⛽ :' + value + ' ]'
 
         elif type == 'cruiser':
             
@@ -1227,12 +1177,8 @@ def display_stats (elements, color_team, ships, units_stats, peaks):
             cruiser_common += ' | ⁌ :' + value
 
             value = str (common_stats[type]['max_energy'])
-            cruiser_common += ' | Max⚡ :' + value
-
-            
-
-    tanker_common += ' ]'
-    cruiser_common += ' ]'                    
+            cruiser_common += ' | Max⚡ :' + value + ' ]'
+                   
 
     team_stats ={}
     #for each team get tanker and cruiser stats depending on team
@@ -1253,6 +1199,8 @@ def display_stats (elements, color_team, ships, units_stats, peaks):
 
         team_stats[team_name] = {'cruiser_stats' : cruiser_team_stats, 'tanker_stats' : tanker_team_stats }
         
+
+
     ship_cruiser_stats =''
     ship_tanker_stats = ''
 
@@ -1281,6 +1229,8 @@ def display_stats (elements, color_team, ships, units_stats, peaks):
             value = elements['tanker']
             ship_tanker_stats = ship_stats + ' | type :' + value 
             ship_team[ships[ship]['team']]['tanker'].append(ship_tanker_stats)
+
+
 
     #for each team get cruiser and tanker info from list in ship_team
     for team in color_team: 
@@ -1525,7 +1475,7 @@ def ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, pe
         if teams[team] == 'human' :
 
             #Get the order from the human player
-            order = input("Let's get %s's orders: "% team)
+            order = str(input("Let's get %s's orders: "% str(team)))
             order_list[team]= order
 
             #Give the order to the remote player if there is one

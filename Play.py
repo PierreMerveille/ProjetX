@@ -526,20 +526,18 @@ def upgrade (upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade):
                         units_stats[team]['hub']['energy_point'] -= 600           
             
             elif upgrade == 'move':
-                move_cost = cost_upgrade['cost_travel_upgrade']
-
+                
                 if units_stats[team]['cruiser']['move'] > max_upgrade['max_travel_upgrade']:
 
-                    if move_cost <= units_stats[team]['hub']['energy_point']:
+                    if cost_upgrade['cost_travel_upgrade'] <= units_stats[team]['hub']['energy_point']:
                         units_stats[team]['cruiser']['move'] -= 1
                         units_stats[team]['hub']['energy_point'] -= 500
 
             elif upgrade == 'range':
-                range_cost = cost_upgrade['cost_range_upgrade']
-                
+                                
                 if units_stats[team]['cruiser']['range'] < max_upgrade['max_range_upgrade']:
                     
-                    if range_cost <= units_stats[team]['hub']['energy_point']:
+                    if cost_upgrade['cost_range_upgrade'] <= units_stats[team]['hub']['energy_point']:
                         units_stats[team]['cruiser']['range'] += 1
                         units_stats[team]['hub']['energy_point'] -= 400
     return units_stats

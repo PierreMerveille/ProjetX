@@ -886,6 +886,8 @@ def round_end (board, end_counter, units_stats, peaks, elements, color_team, shi
     elements : character for each type of entity (dict)
     color_team : dictionary with the number of the team with the color of each team (dict)
     ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    long : length of the board  (int)
+    larg : width of the board (int)
 
     Return :
     --------
@@ -994,6 +996,8 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements, long
     peaks : dictionary with all the peaks (dict)
     units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)   
     elements : dictionary with the type of entity (cruiser, hub,...) with the charactere of each type (dict)
+    long : length of the board  (int)
+    larg : width of the board (int)
 
     Notes : 
     -------
@@ -1295,7 +1299,7 @@ def create_order(long, larg,  team, ships, units_stats,peaks) :
     """
 
     #Set the variable
-    nb_order = randint(1,5)
+    nb_order = randint(0,5)
     order_list = []
     instruction_list =[]
     create_unit = {'tanker' : 0, 'cruiser' : 0}

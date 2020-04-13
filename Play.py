@@ -2,9 +2,6 @@
 
 from colored import *
 from random import *
-import socket
-import time
-import sys
 import remote_play
 
 
@@ -251,7 +248,7 @@ def end_game ( color_team, units_stats, end_counter, team, ennemy_team ):
     winner = 'NO'
 
     #check if 40 rounds have passed
-    if end_counter >= 1000:
+    if end_counter >= 40:
         end = True
 
         #Verify wich team has the most health point

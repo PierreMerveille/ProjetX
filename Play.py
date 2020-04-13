@@ -820,7 +820,7 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
                 instruction[1] = tuple (instruction[1])
 
                 #if the tanker draw energy in his hub
-                if unit_stats[team]['hub']['coordinates'] ==  instrcution[1] :
+                if units_stats[team]['hub']['coordinates'] ==  instruction[1] :
                     out_dico =units_stats[team]['hub']['energy_point']
                     #transfer energy
                     if max_storage > in_dico and units_stats[team]['hub']['energy_point'] >0 and range_verification(units_stats, instruction[0], ships,units_stats[team]['hub']['coordinates'],team ):

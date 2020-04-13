@@ -50,7 +50,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     while end == False:
         
         order_list = ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, peaks) 
-           
+        print (order_list)
         #Separate in 2 the round because there are 2 teams and start the gameplay phase
         for team in color_team:
 
@@ -383,17 +383,8 @@ def separate_instruction (order, ships, units_stats,board,team,peaks):
                 elif order[1][0] == '*'and correct:
                     attack_list .append([order[0], order[1][1:]])
                 # add to the transfer_list if it's a good transfer
-                elif order[1][0] == '<' :
-                    if order[1][1:] == 'hub' or correct :
-                        if correct :
-                            
-                            peak_list =[]
-                            for peak in peaks :
-                                peak_list. append (peaks[peak]['coordinates'])
-                            if (int(coordinates[0]),int(coordinates[1])) in peak_list :
-                                transfer_list.append([order[0],order[1]])
-                        else : 
-                            transfer_list.append([order[0],order[1]])
+                elif order[1][0] == '<' and correct :
+                    transfer_list.append([order[0],order[1]])
                                         
                 elif order[1][0] == '>' :
                     if order[1][1:] == 'hub' or order[1][1:] in ships:
@@ -821,43 +812,41 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
                 in_dico = ships[instruction[0]]['energy_point']
                 # max_storage  = max stroage of a tanker 
                 max_storage = units_stats[team]['tanker']['max_energy']
-            # set all to 0 if it isn't a tanker 
-            else :
-                max_storage = 0
-                in_dico = 0
-                       
-            #if the tanker draw energy in a peak 
-            
-            if not instruction [1][1:] == 'hub' :
-                # split and store the coordinates if it's a peak 
+                                               
+                # split and store the coordinates
                 instruction[1] = instruction[1][1:].split ('-')
                 instruction[1][0] = int(instruction[1][0])
                 instruction[1][1] = int(instruction[1][1])
                 instruction[1] = tuple (instruction[1])
-                           
-                for peak in peaks : 
-                    if peaks[peak]['coordinates'] == instruction[1] :
+
+                #if the tanker draw energy in his hub
+                if unit_stats[team]['hub']['coordinates'] ==  instrcution[1] :
+                    out_dico =units_stats[team]['hub']['energy_point']
+                    #transfer energy
+                    if max_storage > in_dico and units_stats[team]['hub']['energy_point'] >0 and range_verification(units_stats, instruction[0], ships,units_stats[team]['hub']['coordinates'],team ):
+                    
+                        while in_dico < max_storage and units_stats[team]['hub']['energy_point'] >0 :
                         
-                        #transfer energy 
-                        if max_storage > in_dico and range_verification(units_stats, instruction[0], ships,instruction[1],team ):
+                            in_dico += 1
+                            units_stats[team]['hub']['energy_point'] -= 1
+                #if the tanker draw energy in a peak 
+                else :
+                    
+                    
                             
+                    for peak in peaks : 
+                        if peaks[peak]['coordinates'] == instruction[1] :
+                            
+                            #transfer energy 
+                            if max_storage > in_dico and range_verification(units_stats, instruction[0], ships,instruction[1],team ):
+                                
 
-                            while in_dico < max_storage and peaks[peak]['storage'] >0 :
-                    
-                                in_dico += 1
-                                peaks[peak]['storage'] -= 1
+                                while in_dico < max_storage and peaks[peak]['storage'] >0 :
+                        
+                                    in_dico += 1
+                                    peaks[peak]['storage'] -= 1
 
-            #if the tanker draw energy in a hub
-            elif instruction [1][1:] == 'hub' :
-                out_dico =units_stats[team]['hub']['energy_point']
-                #transfer energy
-                if max_storage > in_dico and units_stats[team]['hub']['energy_point'] >0 and range_verification(units_stats, instruction[0], ships,units_stats[team]['hub']['coordinates'],team ):
-                   
-                    while in_dico < max_storage and units_stats[team]['hub']['energy_point'] >0 :
-                    
-                        in_dico += 1
-                        units_stats[team]['hub']['energy_point'] -= 1
-            if ships[instruction[0]]['type'] == 'tanker':
+                
                 ships[instruction[0]]['energy_point'] = in_dico
                     
         #--------------------------------------------------------------------------------------------------------
@@ -867,7 +856,7 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
             
             if ships[instruction[0]]['type'] == 'tanker' :
                 out_dico = ships[instruction[0]]['energy_point']
-                
+                #give energy to a hub
                 if  instruction[1][1:] == 'hub' :
                     if range_verification(units_stats, instruction[0], ships,units_stats[team][instruction[1][1:]]['coordinates'], team) :
                     
@@ -883,7 +872,7 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
                             
                             ships[instruction[1][1:]]['energy_point'] += 1 
                             ships[instruction[0]]['energy_point'] -= 1
-                    #give energy to a hub    
+                        
                 
     return ships, units_stats , peaks
 def round_end (board, end_counter, units_stats, peaks, elements, color_team, ships, long , larg):
@@ -1495,6 +1484,7 @@ def ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, pe
 
             #Get the order from the remote player
             order_list[team] = remote_play.get_remote_orders(connection)
+            print (order_list[team])
 
         #Verify if the player is an AI
         elif teams[team] == 'AI':

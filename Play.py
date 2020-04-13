@@ -38,7 +38,6 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     team_id=(team_1,team_2)
     end = False
     link = False
-    
     connection = 'NO'
 
     #Make a connection if there is one remote player
@@ -83,7 +82,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             ships, units_stats, peaks = transfer(transfer_list, ships, team, units_stats, peaks, board)
             
         #Do the update after the round
-        units_stats = round_end(board, end_counter, units_stats, peaks, elements, color_team, ships)
+        units_stats = round_end(board, end_counter, units_stats, peaks, elements, color_team, ships,long,larg)
 
         #Select the winner
         end, winner = end_game(color_team,units_stats,end_counter,team,ennemy_team)
@@ -210,7 +209,7 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
     #ships ={'name' : {'coordinates' : , 'team' : , 'type' : , 'HP' : , 'energy_point': }
 
     #Display the board and the stat of the element (peak, cruiser,...)
-    board_display(board, color_team, ships, peaks, units_stats, elements)
+    board_display(board, color_team, ships, peaks, units_stats, elements,long, larg)
     display_stats(elements,color_team,ships,units_stats,peaks)
 
     return board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks, long,larg,teams
@@ -875,7 +874,7 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
                     #give energy to a hub    
                 
     return ships, units_stats , peaks
-def round_end (board, end_counter, units_stats, peaks, elements, color_team, ships):
+def round_end (board, end_counter, units_stats, peaks, elements, color_team, ships, long , larg):
 
     """ Print new board and stats and make "end of round changes" and do the regeneration of the hub energy
     
@@ -912,7 +911,7 @@ def round_end (board, end_counter, units_stats, peaks, elements, color_team, shi
             change_value('hub', ships, peaks, units_stats[team]['hub']['regeneration'], 'energy_point', units_stats, team)
         
     #display board every round end
-    board_display(board, color_team, ships, peaks, units_stats, elements)
+    board_display(board, color_team, ships, peaks, units_stats, elements, long, larg)
 
     #display stats every round end
     display_stats (elements, color_team, ships, units_stats, peaks)
@@ -985,7 +984,7 @@ def select_value_to_print (board, coordinates, units_stats, ships, peaks, color_
    
     return value_to_print
     
-def board_display ( board, color_team, ships, peaks, units_stats, elements) :
+def board_display ( board, color_team, ships, peaks, units_stats, elements, long, larg) :
     """ 
     Display the board 
 
@@ -1013,14 +1012,7 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements) :
                     Johan Rochet (v.2 03/03/20)
                     
     """
-    larg = 0
-    long = 0
-    bord = fg(255)
-    for coordinates in board :
-        if coordinates[1] > larg :
-            larg = coordinates[1]
-        if coordinates[0] > long :
-            long = coordinates[0]
+    bord= fg(255)
     # creation of the board
     for i in range (larg+2):
         #jump for each row

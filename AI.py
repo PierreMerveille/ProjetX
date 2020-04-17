@@ -1,0 +1,1 @@
+#At game start create tanker and tranfer energy back into hub

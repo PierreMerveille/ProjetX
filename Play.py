@@ -73,10 +73,10 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             units_stats = upgrade(upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade)
             
             #Attack phase
-            end_counter = attack(attack_list, board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team)
+            end_counter,attacking_list = attack(attack_list, board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team)
             
             #Move phase
-            board, ships = move(move_list, ships, team, board, units_stats, peaks)
+            board, ships = move(move_list, ships, team, board, units_stats, peaks,attacking_list)
             
             #transfer phase
             ships, units_stats, peaks = transfer(transfer_list, ships, team, units_stats, peaks, board)
@@ -578,6 +578,7 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
     #Implementation of the function attack
     #Initialise the coordinate and the attack point
     #attack_point = coord_attack[1]
+    attacking_list = []
     if len(attack_list)==0:
         end_counter+=0.5
         
@@ -626,6 +627,8 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                 if hit==0 : 
                     #if nothing is hit than increment the end_counter
                     end_counter += 0.5
+                else : 
+                    attacking_list.append(instruction[0])
                    
                     
             else :
@@ -635,9 +638,9 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                     index = board[ships[ship]['coordinates']]['list_entity'].index(ship)
                     del (board[ships[ship]['coordinates']]['list_entity'][index])
                     del ships[ship]   
-    return end_counter
+    return end_counter,attacking_list
     
-def move (move_list, ships, team, board, units_stats, peaks) :
+def move (move_list, ships, team, board, units_stats, peaks, attacking_list) :
     
     """ Move a ship on the board
     
@@ -675,7 +678,7 @@ def move (move_list, ships, team, board, units_stats, peaks) :
             old_coord = ships[instruction[0]]['coordinates']
 
             #Verify if the ship can go to the new coordinates
-            if max (abs(new_coord[0]-old_coord[0]), abs(new_coord[1]-old_coord[1])) < 2 :
+            if max (abs(new_coord[0]-old_coord[0]), abs(new_coord[1]-old_coord[1])) < 2 and instruction[0] not in attacking_list :
 
                 #Verify if the ship is a tanker
                 if ships[instruction[0]]['type'] == 'tanker':

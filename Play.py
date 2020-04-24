@@ -1629,6 +1629,27 @@ def count_distance (coord_1, coord_2):
     return distance
 
 def create_IA_ship (type,team, ships, count_created):
+    """
+    Create an instruction to create a new ship 
+
+    Parameters
+    ----------
+    type : type of the ship to create
+    team : name of the IA team (int/str)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    count_created : dictionary with the created tanker and cruiser per turn (dict)
+
+    Return 
+    ------
+    instruction: the instruction of creation of the ship (str)
+
+    Version
+    -------
+    specification : Johan Rochet (v.1 24/04/20)
+    implementation : Johan Rochet (v.1 24/04/20)
+
+    """
+
     #initialise the list of element 
     cruiser_list=[]
     tanker_list = []
@@ -1664,4 +1685,6 @@ def create_IA_ship (type,team, ships, count_created):
         #Add the order  
         instruction = ( type + '_'+ str(team) +'_' + str(count_ship) + ':' + type)
         
-    count_created += 1
+    count_created[type] += 1
+
+    return instruction

@@ -1558,11 +1558,11 @@ def stance (ships,team,ennemy_team):
 
         return 'defensive'
 
-        if (ennemy_cruiser < ennemy_tanker or ally_cruiser > ennemy_cruiser) and peak_farm_is_worth():
-            return 'control'
-            
-        else:
-            print('')
+    elif (ennemy_cruiser < ennemy_tanker or ally_cruiser > ennemy_cruiser) and peak_farm_is_worth():
+        return 'control'
+
+    else:
+        print('')
                 
 def peak_farm_is_worth ():
     return True
@@ -1627,3 +1627,41 @@ def count_distance (coord_1, coord_2):
 
     distance = max (abs(coord_1[0]-coord_2[0]), abs(coord_1[1]-coord_2[1]))
     return distance
+
+def create_IA_ship (type,team, ships, count_created):
+    #initialise the list of element 
+    cruiser_list=[]
+    tanker_list = []
+    
+
+    #count the number of cruiser
+    for ship in ships :
+
+        if ships[ship]['type'] == 'cruiser' and ships[ship]['team'] == team : 
+            cruiser_list.append(ship)
+        
+    #count the number of tanker
+    for ship in ships :
+
+        if ships[ship]['type'] == 'tanker' and ships[ship]['team'] == team : 
+            tanker_list.append(ship)
+
+    
+            
+    if type == 'tanker' :
+        type_list = tanker_list 
+    else :
+        type_list = cruiser_list
+
+    #verify if a ship is already done or not                
+    if len(type_list) == 0 :
+
+        #Add the order  
+        instruction = (type + '_'+ str(team) +'_' + str(count_created) + ':' + type)
+    else:
+        count_ship = (len(type_list) + count_created)
+
+        #Add the order  
+        instruction = ( type + '_'+ str(team) +'_' + str(count_ship) + ':' + type)
+        
+    count_created += 1

@@ -1518,7 +1518,7 @@ def ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, pe
                 remote_play.notify_remote_orders(connection, order)
     return order_list
 
-def stance ():
+def stance (ships,team,ennemy_team):
     """Decide if the adopted stance by the AI should be defensive or offensive
 
     Parameters
@@ -1533,17 +1533,22 @@ def stance ():
 
     stance : sets the stance to adopt by the AI
     """
+    ally_cruiser = 0 
+    ally_tanker = 0
+    ennemy_cruiser = 0
+    ennemy_tanker = 0
 
     for ship in ships:
-        if ships[ship][team]['type'] == 'cruiser' :
-            ally_cruiser += 1
-        else:
-            ally_tanker += 1
-
-        if ships[ship][ennemy_team]['type'] == 'cruiser' :
-            ennemy_cruiser += 1
-        else:
-            ennemy_tanker += 1
+        if ships[ship]['team'] == team :
+            if ships[ship][team]['type'] == 'cruiser' :
+                ally_cruiser += 1
+            else:
+                ally_tanker += 1
+        else : 
+            if ships[ship][ennemy_team]['type'] == 'cruiser' :
+                ennemy_cruiser += 1
+            else:
+                ennemy_tanker += 1
 
     if ennemy_cruiser == 0 or ((ally_cruiser > ennemy_cruiser ) and not peak_farm_is_worth):
 
@@ -1553,9 +1558,9 @@ def stance ():
 
         return 'defensive'
 
-        if (((ennemy_cruiser < ennemy_tanker) or (ally_cruiser > ennemy_cruiser) )and peak_farm_is_worth):
-
+        if (ennemy_cruiser < ennemy_tanker or ally_cruiser > ennemy_cruiser) and peak_farm_is_worth():
             return 'control'
+            
         else:
             print('')
                 
@@ -1563,7 +1568,7 @@ def peak_farm_is_worth ():
     return True
 
 def go_to_profitable_peak(ships,peaks) :
-    
+
     #initialise the variable
     most_profitable = 0 
     instructions = ''
@@ -1599,15 +1604,7 @@ def go_to_profitable_peak(ships,peaks) :
 
             instructions += instruction
 
-    return instructions    
-            
-            
-            
-            
-            
-            
-            
-
+    return instructions 
 
 def count_distance (coord_1, coord_2):
     """

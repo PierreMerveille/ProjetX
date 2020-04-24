@@ -693,7 +693,7 @@ def move (move_list, ships, team, board, units_stats, peaks, attacking_list) :
                 old_coord = ships[instruction[0]]['coordinates']
 
                 #Verify if the ship can go to the new coordinates
-                if max (abs(new_coord[0]-old_coord[0]), abs(new_coord[1]-old_coord[1])) < 2 and instruction[0] not in attacking_list :
+                if count_distance((new_coord[0],new_coord[1]),(old_coord[0],old_coord[1])) < 2 and instruction[0] not in attacking_list :
 
                     #Verify if the ship is a tanker
                     if ships[instruction[0]]['type'] == 'tanker':

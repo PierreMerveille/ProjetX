@@ -1553,11 +1553,80 @@ def stance ():
 
         return 'defensive'
 
-        elif (((ennemy_cruiser < ennemy_tanker) or (ally_cruiser > ennemy_cruiser) )and peak_farm_is_worth):
+        if (((ennemy_cruiser < ennemy_tanker) or (ally_cruiser > ennemy_cruiser) )and peak_farm_is_worth):
 
             return 'control'
-            else:
-                print('')
+        else:
+            print('')
                 
 def peak_farm_is_worth ():
-    return true
+    return True
+
+def go_to_profitable_peak(ships,peaks) :
+    
+    #initialise the variable
+    most_profitable = 0 
+    instructions = ''
+    for ship in ships :
+        if ships[ship]['type'] == 'tanker':
+
+            for peak in peaks :
+                #calculate the distance between the peak and the tanker
+                distance = count_distance (peaks[peak]['coordinates'], ships[ship]['coordinates']) 
+                #formula of profitability
+                profitability = peaks[peak]['storage'] - distance * 50
+                #select the peak if it's the most profitable
+                if profitability > most_profitable :
+                    profitable_distance = distance
+                    most_profitable = profitability
+                    peak_coordinates = peaks[peak]['coordinates']
+            if profitable_distance <=1 :
+                instruction = ship +':@' + str(peak_coordinates[0]) + '-' + str(peak_coordinates[1])
+            else : 
+                if peak_coordinates[0] < ships[ship]['coordinates'][0] :
+                    x = -1
+                elif peak_coordinates[0] > ships[ship]['coordinates'][0] :
+                    x = 1
+                else : 
+                    x = 0 
+                if peak_coordinates[1] < ships[ship]['coordinates'][1] :
+                    y = -1
+                elif peak_coordinates[1] > ships[ship]['coordinates'][1] :
+                    y = 1
+                else : 
+                    y = 0
+                instruction = ship +':@' + str(x) + '-' + str(y)
+
+            instructions += instruction
+
+    return instructions    
+            
+            
+            
+            
+            
+            
+            
+
+
+def count_distance (coord_1, coord_2):
+    """
+    Calculate the distance between coordinates
+
+    Parameters
+    ----------
+    coord_1 : first coordinate to compare (tuple)
+    coord_2: second coordinate to compare (tuple)
+
+    Return
+    ------
+    distance: distance between the coordinates
+
+    Version
+    -------
+    specification : Johan Rochet (v.1 24/04/20)
+    implementation : Johan Rochet (v.1 24/04/20)
+    """
+
+    distance = max (abs(coord_1[0]-coord_2[0]), abs(coord_1[1]-coord_2[1]))
+    return distance

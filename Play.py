@@ -1553,3 +1553,5 @@ def stance ():
 
         elif (((ennemy_cruiser < ennemy_tanker) or (ally_cruiser > ennemy_cruiser) )and peak_farm_is_worth):
             return 'control'
+            else:
+                

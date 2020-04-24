@@ -1515,3 +1515,41 @@ def ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, pe
             if link :
                 remote_play.notify_remote_orders(connection, order)
     return order_list
+
+def stance ():
+    """Decide if the adopted stance by the AI should be defensive or offensive
+
+    Parameters
+    ----------
+
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    team : name of the team which is playing (str) 
+    ennemy_team : name of the ennemy_team (str)
+
+    Return
+    ------
+
+    stance : sets the stance to adopt by the AI
+    """
+
+    for ship in ships:
+        if ships[ship][team]['type'] == 'cruiser' :
+            ally_cruiser += 1
+        else:
+            ally_tanker += 1
+
+        if ships[ship][ennemy_team]['type'] == 'cruiser' :
+            ennemy_cruiser += 1
+        else:
+            ennemy_tanker += 1
+
+    if ennemy_cruiser == 0 or ((ally_cruiser > ennemy_cruiser ) and not peak_farm_is_worth):
+
+        return 'offensive'
+
+    elif (ennemy_cruiser >0 and ennemy_tanker ==0) or (ennemy_cruiser > ally_cruiser):
+
+        return 'defensive'
+
+        elif (((ennemy_cruiser < ennemy_tanker) or (ally_cruiser > ennemy_cruiser) )and peak_farm_is_worth):
+            return 'control'

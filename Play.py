@@ -28,7 +28,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     specification : Pierre Merveille (v.1 24/02/20)
                     Kevin Schweitzer (v.2 27/03/20)
 
-    Implémentation : Pierre Merveille (v.1 10/03/20)
+    Implementation : Pierre Merveille (v.1 10/03/20)
                      Pierre Merveille (v.2 30/03/20)
     """
 
@@ -50,36 +50,50 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     while end == False:
         
         order_list = ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, peaks) 
-        print (order_list)
+        order_dico = {team_1 :{'upgrade' : '', 'move':'', 'create' : '', 'attack' :'' , 'transfer' : ''},
+                      team_2 :{'upgrade' : '', 'move':'', 'create' : '', 'attack' :'' , 'transfer' : ''}}
         #Separate in 2 the round because there are 2 teams and start the gameplay phase
-        for team in color_team:
-
-            #Get the team who is playing and the ennemy team
-            if team==team_1:
-                ennemy_team=team_2
-            else :
-                ennemy_team = team_1
+        for team in color_team :
 
             #get the order of the team wich play
             order = order_list[team]
             
             #Separate the instruction in category
             upgrade_list, create_list, move_list, attack_list, transfer_list = separate_instruction(order, ships, units_stats, board, team, peaks)
+           
+           #store the orders of each teams 
+            
+            order_dico[team]['upgrade'] = upgrade_list
+            order_dico[team]['create'] = create_list
+            order_dico[team]['move'] = move_list
+            order_dico[team]['attack'] = attack_list
+            order_dico[team]['transfer'] = transfer_list
 
+        for team in color_team :
+            
             #Create phase
-            ships, board, units_stats = create_units(create_list, ships, team, board, units_stats,peaks)
+            ships, board, units_stats = create_units(order_dico[team]['create'], ships, team, board, units_stats,peaks)
             
+        for team in color_team :
             #Upgrade phase
-            units_stats = upgrade(upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade)
+            units_stats = upgrade(order_dico[team]['upgrade'], team, units_stats, ships, max_upgrade, cost_upgrade)
             
+        for team in color_team :
+            #Get the team who is playing and the ennemy team
+            if team==team_1:
+                ennemy_team=team_2
+            else :
+                ennemy_team = team_1
             #Attack phase
-            end_counter,attacking_list = attack(attack_list, board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team)
+            end_counter,attacking_list = attack(order_dico[team]['attack'], board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team)
             
+        for team in color_team :
             #Move phase
-            board, ships = move(move_list, ships, team, board, units_stats, peaks,attacking_list)
-            
+            board, ships = move(order_dico[team]['move'], ships, team, board, units_stats, peaks,attacking_list)
+
+        for team in color_team :
             #transfer phase
-            ships, units_stats, peaks = transfer(transfer_list, ships, team, units_stats, peaks, board)
+            ships, units_stats, peaks = transfer(order_dico[team]['transfer'], ships, team, units_stats, peaks, board)
             
         #Do the update after the round
         units_stats = round_end(board, end_counter, units_stats, peaks, elements, color_team, ships,long,larg)
@@ -134,7 +148,7 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
                     Anthony Pierard(v.2 28/02/20)
                     Johan Rochet(v.3 27/03/20)
 
-    Implémentation : Merveille Pierre (v.1 10/03/20)
+    Implementation : Merveille Pierre (v.1 10/03/20)
                      Johan Rochet (v.2 27/03/20)
 
     """
@@ -737,7 +751,7 @@ def change_value ( entity_name, ships, peaks, new_value, caracteristic, units_st
     -------
     specification : Johan Rochet (v.1 22/02/20)
                     Anthony Pierard (v.2 01/03/20)
-    implémentation : Anthony Pierard (v.1 01/03/20)
+    implementation : Anthony Pierard (v.1 01/03/20)
                      Anthony Pierard (v.2 04/03/20)
 
     
@@ -908,7 +922,7 @@ def round_end (board, end_counter, units_stats, peaks, elements, color_team, shi
     --------
     specification : Kevin Schweitzer (v.1 24/02/20)
     
-    implémentation : Kevin Schweitzer (v.1 01/03/20)
+    implementation : Kevin Schweitzer (v.1 01/03/20)
     
     """    
     #add energy to hub every round end
@@ -1016,7 +1030,7 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements, long
     specification : Johan Rochet (v.1 22/02/20)
                     Anthony Pierard (v.2 01/03/20)
                     Johan Rochet (v.3 06/04/20)
-    implémentation : Anthony Pierard (v.1 01/03/20)
+    implementation : Anthony Pierard (v.1 01/03/20)
                     Johan Rochet (v.2 03/03/20)
                     
     """
@@ -1209,8 +1223,9 @@ def display_stats (elements, color_team, ships, units_stats, peaks):
     #Display stat of each cruiser and tanker
     for ship in ships:
         ship_stats = ship 
-
+        
         value = str(ships[ship]['coordinates'])
+        
         ship_stats += ': [ ⯐ :' + value
         
         value = str(ships[ship]['HP'])
@@ -1266,7 +1281,7 @@ def range_verification (units_stats, ship_name, ships, coordinates, team):
     Versions
     --------
     specification : Johan Rochet (v.1 24/02/20)
-    implémentation : Anthony Pierard (v.1 27/02/20)
+    implementation : Anthony Pierard (v.1 27/02/20)
                      Pierre Merveille (v.2 12/03/20)
     """
 
@@ -1302,7 +1317,7 @@ def create_order(long, larg,  team, ships, units_stats,peaks) :
     --------
     specification : Pierre Merveille (v.1 24/02/20)
                     Johan Rochet (v.2 14/03/20)
-    implémentation : Johan rochet / Pierre Merveille (v1 25/03/20)
+    implementation : Johan rochet / Pierre Merveille (v1 25/03/20)
                      Anthony Pierard / Kevin schweitzer (v2 25/03/20)
     """
 
@@ -1462,7 +1477,7 @@ def ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, pe
     Versions :
     ----------
     specification :Johan Rochet (v.1 12/04/20)
-    implémentation : Anthony Pierard (v.1 05/04/20)
+    implementation : Anthony Pierard (v.1 05/04/20)
 
     """
     order_list={}

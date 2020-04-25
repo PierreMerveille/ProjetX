@@ -102,8 +102,8 @@ def peaks_on_our_map_side(team, units_stats, peaks):
     for peak in peaks:
         #get peek coordinates and get distance between our hub and peak and then between their hub and peak
         peak_coordinates = peaks[peak]['coordinates']
-        distance_our_hub_and_peak = max(abs(our_hub_coordinates[0] - peak_coordinates[0]), abs(our_hub_coordinates[1] - peak_coordinates[1]))
-        distance_their_hub_and_peak = max(abs(their_hub_coordinates[0] - peak_coordinates[0]), abs(their_hub_coordinates[1] - peak_coordinates[1]))
+        distance_our_hub_and_peak = count_distance (our_hub_coordinates, peak_coordinates)
+        distance_their_hub_and_peak = count_distance (their_hub_coordinates, peak_coordinates)
 
         if distance_our_hub_and_peak <= distance_their_hub_and_peak:
             #if our distance to peak is smaller then peak is on our side of the map

@@ -65,7 +65,7 @@ def find_grouped_peaks(team, peaks, units_stats):
         #check if other peaks are in range (-3,4)
         for check_range_X in range(-3,4):
             for check_range_Y in range(-3,4):
-                coord_to_check.append(check_range_X, check_range_Y)
+                coord_to_check.append((check_range_X, check_range_Y))
                 
     for peak in peaks:
         for coords in coord_to_check:

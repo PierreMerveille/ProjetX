@@ -1605,7 +1605,7 @@ def go_to_profitable_peak(ships,peaks,team,units_stats) :
     instructions = ''
     for ship in ships :
         if ships[ship]['type'] == 'tanker':
-            if ships[ship]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 :
+            if ships[ship]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 : # rajouter une condition dans le cas où plus d'énergie dans les peaks
 
                 for peak in peaks :
                     if peaks[peak]['storage'] > 0 :
@@ -1640,6 +1640,11 @@ def go_to_profitable_peak(ships,peaks,team,units_stats) :
                         instruction = ship +':@' + str(x) + '-' + str(y)
 
                     instructions += instruction
+                
+            else : 
+                give_to_profitable ()
+
+
 
             return instructions 
 

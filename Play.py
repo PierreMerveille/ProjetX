@@ -39,12 +39,17 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     end = False
     link = False
     connection = 'NO'
-
+    AI_stats ={}
     #Make a connection if there is one remote player
     for number in range(2):
         if teams[team_id[number]] == 'remote':
             connection = remote_play.create_connection(team_id[number], team_id[number-1], verbose=True)
             link=True
+    if team_1_type == 'AI' :
+        AI_Stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0}
+    if team_2_type == 'AI' :
+        AI_Stats[team_2]={'nb_tanker' : 0, 'nb_cruiser': 0}   
+
     
     #Start the game
     while end == False:
@@ -1654,6 +1659,7 @@ def create_IA_ship (type,team, ships, count_created, nb_ship):
     implementation : Johan Rochet (v.1 24/04/20)
 
     """
+    
     instruction = (type + '_'+ str(team) +'_' + str(nb_ship) + ':' + type)
     nb_ship += 1
    

@@ -45,6 +45,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
         if teams[team_id[number]] == 'remote':
             connection = remote_play.create_connection(team_id[number], team_id[number-1], verbose=True)
             link=True
+
     if team_1_type == 'AI' :
         AI_Stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0}
     if team_2_type == 'AI' :
@@ -1523,6 +1524,34 @@ def ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, pe
                 remote_play.notify_remote_orders(connection, order)
     return order_list
 
+
+"""          AI
+--------------------------
+----------------------------- """
+def order_AI (team,ships,untis_stats,peaks, ennemy_team,AI_stats) : 
+    """ 
+    Main fonction to get the IA orders 
+
+    Parameters 
+    ----------
+    team : name of the team which is playing (str)   
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    peaks : dictionary with all the peaks (dict)
+    ennemy_team : name of the ennemy_team (str)
+    AI_stats: dictionary of the specific information for the AI(s)
+
+    Return : 
+    --------
+    AI_order : order from the AI
+
+    Version :
+    ---------
+    specification : Johan Rochet (v.1 25/04/20)
+    
+    """
+    stance (ships)
+
 def stance (ships,team,ennemy_team):
     """Decide if the adopted stance by the AI should be defensive or offensive
 
@@ -1565,16 +1594,14 @@ def stance (ships,team,ennemy_team):
 
     elif (ennemy_cruiser < ennemy_tanker or ally_cruiser > ennemy_cruiser) and peak_farm_is_worth():
         return 'control'
-
-    
-                
+               
 def peak_farm_is_worth ():
     return True
 
 def go_to_profitable_peak(ships,peaks,team,units_stats) :
 
     #initialise the variable
-    most_profitable = -10000
+    most_profitable = 0
     instructions = ''
     for ship in ships :
         if ships[ship]['type'] == 'tanker':
@@ -1592,7 +1619,7 @@ def go_to_profitable_peak(ships,peaks,team,units_stats) :
                             most_profitable = profitability
                             peak_coordinates = peaks[peak]['coordinates']
 
-                if most_profitable != -10000:
+                if most_profitable != 0:
 
                     if profitable_distance <=1 :
                 
@@ -1638,7 +1665,7 @@ def count_distance (coord_1, coord_2):
     distance = max (abs(coord_1[0]-coord_2[0]), abs(coord_1[1]-coord_2[1]))
     return distance
 
-def create_IA_ship (type,team, ships, count_created, nb_ship):
+def create_IA_ship (type,team, nb_ship):
     """
     Create an instruction to create a new ship 
 
@@ -1665,3 +1692,5 @@ def create_IA_ship (type,team, ships, count_created, nb_ship):
    
 
     return instruction, nb_ship
+
+def go_to_profiatble_target () :

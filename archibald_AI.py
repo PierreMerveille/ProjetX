@@ -10,14 +10,14 @@ def control_is_worth (team, peaks, ships, units_stats) :
 
     Return
     ------
-    peak_farm_is_worth : True if it's still worth farming the energy out of peaks, False if not (bool)
+    control_is_worth : True if it's still worth farming the energy out of peaks, False if not (bool)
     
     Versions
     --------
     specification : Kevin Schweitzer (v.1 24/04/20)
 
     """
-    #total_peak_energy from our half of the map <= total_tanker_storage (for each tanker storage = units_stats[team]['tanker']['max_energy'])
+    #not worth if total_peak_energy from our half of the map <= total_tanker_storage + 900 (for each tanker storage = units_stats[team]['tanker']['max_energy'])
     control_is_worth = True
     for ship in ships :
         if ships[ship]['type'] = 'tanker':
@@ -29,7 +29,7 @@ def control_is_worth (team, peaks, ships, units_stats) :
         total_peak_energy += peaks[peak]['storage']
 
     if total_peak_energy <= total_tanker_storage:
-        peak_farm_is_worth = False # --> stop making tankers
+        is_worth = False # --> stop making tankers
 
 def find_grouped_peaks(team, peaks, units_stats):
     """
@@ -59,18 +59,21 @@ def find_grouped_peaks(team, peaks, units_stats):
     #check if there are other peaks in range of our favorable peaks, from less probable groupement (ex : 3x3) to most probable 
     #get favorable_peak coordinates
     grouped_peaks_list = []
+    coord_to_check = []
     number = 0
     for peak in favorable_peaks:
         #check if other peaks are in range (-3,4)
         for check_range_X in range(-3,4):
             for check_range_Y in range(-3,4):
-                coord_to_check = (check_range_X, check_range_Y)
-
-                if coord_to_check == peaks[peak]['coordinates']:
-                    number += 1
-                    grouped_peaks = 'grouped_peaks_' + str(number)
-                    our_grouped_peaks = {grouped_peaks : grouped_peaks_list.append(peak) }
-                    
+                coord_to_check.append(check_range_X, check_range_Y)
+                
+    for peak in peaks:
+        for coords in coord_to_check:
+            if coords == peaks[peak]['coordinates']:
+                number += 1
+                grouped_peaks = 'grouped_peaks_' + str(number)
+                our_grouped_peaks = {grouped_peaks : grouped_peaks_list.append(peak) }
+                        
     return our_grouped_peaks
 
 def peaks_on_our_map_side(team, units_stats, peaks):

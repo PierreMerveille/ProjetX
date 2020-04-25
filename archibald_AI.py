@@ -20,7 +20,7 @@ def control_is_worth (team, peaks, ships, units_stats) :
     #not worth if total_peak_energy from our half of the map <= total_tanker_storage + 900 (for each tanker storage = units_stats[team]['tanker']['max_energy'])
     control_is_worth = True
     for ship in ships :
-        if ships[ship]['type'] = 'tanker':
+        if ships[ship]['type'] == 'tanker':
             nb_tanker += 1
 
     total_tanker_storage = nb_tanker * units_stats[team]['tanker']['max_energy']
@@ -52,29 +52,32 @@ def find_grouped_peaks(team, peaks, units_stats):
     specification : Kevin Schweitzer (v.1 24/04/20)
 
     """
-
+    
+    peaks_coord = []
+    peak_name = []
+    our_grouped_peaks ={}
     #peaks = {name_entity : {'coordinates' : (int(info_peak[0]), int(info_peak[1])), 'storage' : int(info_peak[2])}}
     #peaks on our map side
-    peaks_on_our_map_side(team, units_stats, peaks)
+    favorable_peaks = peaks_on_our_map_side(team, units_stats, peaks)
     #check if there are other peaks in range of our favorable peaks, from less probable groupement (ex : 3x3) to most probable 
     #get favorable_peak coordinates
-    grouped_peaks_list = []
-    coord_to_check = []
-    number = 0
     for peak in favorable_peaks:
-        #check if other peaks are in range (-3,4)
-        for check_range_X in range(-3,4):
-            for check_range_Y in range(-3,4):
-                coord_to_check.append(check_range_X, check_range_Y)
-                
-    for peak in peaks:
-        for coords in coord_to_check:
-            if coords == peaks[peak]['coordinates']:
-                number += 1
-                grouped_peaks = 'grouped_peaks_' + str(number)
-                our_grouped_peaks = {grouped_peaks : grouped_peaks_list.append(peak) }
-                        
+        peaks_coord .append(peaks[peak]['coordinates'])
+        peak_name.append (peak)
+    
+    for index in range(len(peaks_coord)) :
+
+        number = 1
+        our_grouped_peaks[number] = [] 
+
+        for index_2 in range (len(peaks_coord)) :
+
+            if count_distance (peaks_coord[index], peaks_coord[index_2]) < 4 :
+                our_grouped_peaks[number].append (peak_name[index_2])
+               
     return our_grouped_peaks
+
+
 
 def peaks_on_our_map_side(team, units_stats, peaks):
     """

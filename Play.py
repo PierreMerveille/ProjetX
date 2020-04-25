@@ -1633,7 +1633,7 @@ def count_distance (coord_1, coord_2):
     distance = max (abs(coord_1[0]-coord_2[0]), abs(coord_1[1]-coord_2[1]))
     return distance
 
-def create_IA_ship (type,team, ships, count_created):
+def create_IA_ship (type,team, ships, count_created, nb_ship):
     """
     Create an instruction to create a new ship 
 
@@ -1643,7 +1643,7 @@ def create_IA_ship (type,team, ships, count_created):
     team : name of the IA team (int/str)
     ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
     count_created : dictionary with the created tanker and cruiser per turn (dict)
-
+    nb_ship : nb_IA_tanker or nb_IA_cruiser depending on the type
     Return 
     ------
     instruction: the instruction of creation of the ship (str)
@@ -1654,42 +1654,8 @@ def create_IA_ship (type,team, ships, count_created):
     implementation : Johan Rochet (v.1 24/04/20)
 
     """
+    instruction = (type + '_'+ str(team) +'_' + str(nb_ship) + ':' + type)
+    nb_ship += 1
+   
 
-    #initialise the list of element 
-    cruiser_list=[]
-    tanker_list = []
-    
-
-    #count the number of cruiser
-    for ship in ships :
-
-        if ships[ship]['type'] == 'cruiser' and ships[ship]['team'] == team : 
-            cruiser_list.append(ship)
-        
-    #count the number of tanker
-    for ship in ships :
-
-        if ships[ship]['type'] == 'tanker' and ships[ship]['team'] == team : 
-            tanker_list.append(ship)
-
-    
-            
-    if type == 'tanker' :
-        type_list = tanker_list 
-    else :
-        type_list = cruiser_list
-
-    #verify if a ship is already done or not                
-    if len(type_list) == 0 :
-
-        #Add the order  
-        instruction = (type + '_'+ str(team) +'_' + str(count_created) + ':' + type)
-    else:
-        count_ship = (len(type_list) + count_created)
-
-        #Add the order  
-        instruction = ( type + '_'+ str(team) +'_' + str(count_ship) + ':' + type)
-        
-    count_created[type] += 1
-
-    return instruction
+    return instruction, nb_ship

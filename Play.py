@@ -182,7 +182,7 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
     #Create the variable with the info of the cruiser, tanker and hub for each team and the common state
     units_stats  = {team_1 : { 'cruiser' : {'range' : 1 , 'move' : 10}, 'tanker': {'max_energy' : 600}, 'hub' :  {'coordinates' : 123, 'HP': 123, 'energy_point' :123, 'regeneration':123}},
                 team_2 : { 'cruiser' : {'range' : 1 , 'move' : 10}, 'tanker': {'max_energy' : 600}, 'hub' :  {'coordinates' : 123, 'HP': 123, 'energy_point' :123, 'regeneration':123, }},
-                'common' : {'cruiser' : {'max_energy' : 400, 'cost_attack' : 10, 'creation_cost' : 750, 'attack' : 1, 'max_HP': 100}, 'tanker' : {'creation_cost' : 1000, 'move': 0, 'max_HP': 50}, 'hub': {'max_energy_point' : 0}}}
+                'common' : {'cruiser' : {'max_energy' : 400, 'cost_attack' : 10, 'creation_cost' : 750, 'attack' : 1, 'max_HP': 100}, 'tanker' : {'creation_cost' : 1000, 'move': 0, 'max_HP': 50}, 'hub': {'max_energy_point' : 1500}}}
 
     #Select the info of the hub in the file
     for ligne in range (3, 5):
@@ -1584,7 +1584,7 @@ def stance (ships,team,ennemy_team):
             else:
                 ennemy_tanker += 1
 
-    if ennemy_cruiser == 0 or ((ally_cruiser > ennemy_cruiser ) and not peak_farm_is_worth):
+    if ennemy_cruiser == 0 or ((ally_cruiser > ennemy_cruiser ) and not control_is_worth):
 
         return 'offensive'
 
@@ -1592,10 +1592,10 @@ def stance (ships,team,ennemy_team):
 
         return 'defensive'
 
-    elif (ennemy_cruiser < ennemy_tanker or ally_cruiser > ennemy_cruiser) and peak_farm_is_worth():
+    elif (ennemy_cruiser < ennemy_tanker or ally_cruiser > ennemy_cruiser) and control_is_worth():
         return 'control'
                
-def peak_farm_is_worth ():
+def control_is_worth ():
     return True
 
 def go_to_profitable_peak(ships,peaks,team,units_stats) :

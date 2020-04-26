@@ -59,7 +59,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
         order_dico = {team_1 :{'upgrade' : '', 'move':'', 'create' : '', 'attack' :'' , 'transfer' : ''},
                       team_2 :{'upgrade' : '', 'move':'', 'create' : '', 'attack' :'' , 'transfer' : ''}}
         #Separate in 2 the round because there are 2 teams and start the gameplay phase
-        for team in color_team :
+        for team in team_id :
 
             #get the order of the team wich play
             order = order_list[team]
@@ -75,16 +75,16 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             order_dico[team]['attack'] = attack_list
             order_dico[team]['transfer'] = transfer_list
 
-        for team in color_team :
+        for team in team_id :
             
             #Create phase
             ships, board, units_stats = create_units(order_dico[team]['create'], ships, team, board, units_stats,peaks)
             
-        for team in color_team :
+        for team in team_id :
             #Upgrade phase
             units_stats = upgrade(order_dico[team]['upgrade'], team, units_stats, ships, max_upgrade, cost_upgrade)
             
-        for team in color_team :
+        for team in team_id :
             #Get the team who is playing and the ennemy team
             if team==team_1:
                 ennemy_team=team_2
@@ -93,11 +93,11 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             #Attack phase
             end_counter,attacking_list = attack(order_dico[team]['attack'], board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team)
             
-        for team in color_team :
+        for team in team_id :
             #Move phase
             board, ships = move(order_dico[team]['move'], ships, team, board, units_stats, peaks,attacking_list)
 
-        for team in color_team :
+        for team in team_id :
             #transfer phase
             ships, units_stats, peaks = transfer(order_dico[team]['transfer'], ships, team, units_stats, peaks, board)
             
@@ -1605,7 +1605,7 @@ def go_to_profitable_peak(ships,peaks,team,units_stats) :
     instructions = ''
     for ship in ships :
         if ships[ship]['type'] == 'tanker':
-            if ships[ship]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 : # rajouter une condition dans le cas où plus d'énergie dans les peaks
+            if ships[ship]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 and total_peak_energy !=0 : # rajouter une condition dans le cas où plus d'énergie dans les peaks
 
                 for peak in peaks :
                     if peaks[peak]['storage'] > 0 :

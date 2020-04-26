@@ -176,6 +176,7 @@ def create_IA_ship (type, team, nb_ship,AI_stats):
     
     instruction = (type + '_'+ str(team) +'_' + str(AI_stats[team][nb_ship]) + ':' + type)
     AI_stats[team][nb_ship] += 1
+    
    
 
     return instruction
@@ -246,7 +247,7 @@ def find_grouped_peaks(team, peaks, units_stats):
     favorable_peaks = peaks_on_our_map_side(team, units_stats, peaks)
     #check if there are other peaks in range of our favorable peaks, from less probable groupement (ex : 3x3) to most probable 
     #get favorable_peak coordinates
-    for peak in favorable_peaks:
+    for peak in favorable_peaks: #################### idée de changer cette fonction en récupérant tous groupes de peaks et de mettre la fonction favorable dans go-to-profitable_peaks(dans la formule)
         peaks_coord .append(peaks[peak]['coordinates'])
         peak_name.append (peak)
     

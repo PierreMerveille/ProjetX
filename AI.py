@@ -1,5 +1,5 @@
 #At game start create tanker and tranfer energy back into hub
-def order_AI (team,ships,units_stats,peaks, ennemy_team,AI_stats) : 
+def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) : 
     """ 
     Main fonction to get the IA orders 
 
@@ -26,7 +26,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team,AI_stats) :
         
         
         while units_stats[team]['hub']['energy_point'] > units_stats['Common']['tanker']['creation_cost'] : 
-            if AI_stats[team]['nb_tanker'] != 4 :
+            if AI_stats[team]['nb_tanker'] != 4 or AI_stats[team]['nb_cruiser'] >0 :
                 instruction = create_IA_ship('tanker',team,'nb_tanker',AI_stats)
             #create a security_cruiser
             else :
@@ -83,16 +83,18 @@ def go_to_profitable_peak(ships,peaks,team,units_stats,total_peak_energy,our_gro
     #initialise the variable
     most_profitable = 0
     instructions = ''
+    favorable_peaks = peaks_on_our_map_side(team, units_stats, peaks)
     for ship in ships :
         if ships[ship]['type'] == 'tanker':
-            if ships[ship]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 and total_peak_energy !=0 : 
+            if ships[ship]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 or total_peak_energy !=0 : # reflechir aux conditions
+                # si le tranker a moins de 60 % , calculer combien d'énergie restant, pour voir si plus rentable d'aller au hub ou au peak puis de rmeplir avec une totalité de réserve
 
                 for index in peak_name :
                     if peaks[peak_name[index]]['storage'] > 0 :
                     #calculate the distance between the peak and the tanker
                         distance = count_distance (peaks[peak_name[index]]['coordinates'], ships[ship]['coordinates']) 
                         #formula of profitability
-                        profitability = (peaks[peak_name[index]]['storage']/distance) * len(our_grouped_peaks[index])
+                        profitability = (peaks[peak_name[index]]['storage']/distance) * len(our_grouped_peaks[index]) 
                         
                         #select the peak if it's the most profitable
                         if profitability >= most_profitable :
@@ -177,6 +179,7 @@ def create_IA_ship (type, team, nb_ship,AI_stats):
     instruction = (type + '_'+ str(team) +'_' + str(AI_stats[team][nb_ship]) + ':' + type)
     AI_stats[team][nb_ship] += 1
     
+    
    
 
     return instruction
@@ -244,10 +247,10 @@ def find_grouped_peaks(team, peaks, units_stats):
     our_grouped_peaks ={}
     #peaks = {name_entity : {'coordinates' : (int(info_peak[0]), int(info_peak[1])), 'storage' : int(info_peak[2])}}
     #peaks on our map side
-    favorable_peaks = peaks_on_our_map_side(team, units_stats, peaks)
+   
     #check if there are other peaks in range of our favorable peaks, from less probable groupement (ex : 3x3) to most probable 
     #get favorable_peak coordinates
-    for peak in favorable_peaks: #################### idée de changer cette fonction en récupérant tous groupes de peaks et de mettre la fonction favorable dans go-to-profitable_peaks(dans la formule)
+    for peak in peaks: #################### idée de changer cette fonction en récupérant tous groupes de peaks et de mettre la fonction favorable dans go-to-profitable_peaks(dans la formule)
         peaks_coord .append(peaks[peak]['coordinates'])
         peak_name.append (peak)
     
@@ -356,44 +359,37 @@ def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, e
     """
     alert_tanker = False
     alert_cruiser = False
-    favorable_peaks_coordinates = []
-    #get coordinates of each favorable peak
-    for peak in favorable_peaks : 
-        
-        favorable_peaks_coordinates.append(peaks[peak]['coordinates'])
-        
-    #get coordinates of each ennemy ship
-    for ship in ships:
-        
-        if ships[ship]['team'] == ennemy_team and ships[ship]['type'] == 'tanker':
-           ennemy_tanker_coordinates = []
-           ennemy_tanker_coordinates.append(ships[ship]['coordinates'])
-
-        elif ships[ship]['team'] == ennemy_team and ships[ship]['type'] == 'cruiser':
-            ennemy_cruiser_coordinates = []
-            ennemy_cruiser_coordinates.append(ships[ship]['coordinates'])
-
-    #check distance between each ennemy tanker and our peaks
-    for tanker_coordinates in ennemy_tanker_coordinates:
-
-        for peak_coordinates in favorable_peaks_coordinates:
-
-            distance = count_distance (peak_coordinates, tanker_coordinates)  
+    close_ennemy_tanker = []
+    close_ennemy_cruiser = []
             
-            if distance <= 10 :
+    #get coordinates of each ennemy ship
+    
+    for ship in ships:
+        if ships[ship]['team'] == ennemy_team :
+            for peak in favorable_peaks :
 
-                alert_tanker = True
-                nb_tankers += 1
+                    distance = count_distance (peaks[peak]['coordinates'], ships[ship]['coordinates'])  
                 
-    #check distance between each ennemy cruiser and our peaks
-    for cruiser_coordinates in ennemy_cruiser_coordinates:
+                    if distance <= 10  : # reflechir a une formule adequate 
 
-        for peak_coordinates in favorable_peaks_coordinates:
+                        if ships[ship]['type'] == 'tanker' : 
+                            close_ennemy_tanker .append(ship)
 
-            distance = count_distance(peak_coordinates, tanker_coordinates)
+                        elif ships[ship]['type'] == 'cruiser'  :
+                            close_ennemy_cruiser.append(ship)
 
-            if distance <= 10 :
-                
-                alert_cruiser = True
-                nb_cruisers += 1
+    if len(close_ennemy_tanker) > 0 : 
+        alert_tanker = True
+
+    if len(close_ennemy_cruiser) > 0:
+        alert_cruiser = True
+                        
+            
+            
+
+
+       
+            
+
+    
  

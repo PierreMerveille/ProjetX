@@ -47,9 +47,9 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             link=True
 
     if team_1_type == 'AI' :
-        AI_Stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0}
+        AI_Stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_1]['hub']['energy_point'] }
     if team_2_type == 'AI' :
-        AI_Stats[team_2]={'nb_tanker' : 0, 'nb_cruiser': 0}   
+        AI_Stats[team_2]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_2]['hub']['energy_point']  }
 
     
     #Start the game
@@ -180,9 +180,9 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
 
 
     #Create the variable with the info of the cruiser, tanker and hub for each team and the common state
-    units_stats  = {team_1 : { 'cruiser' : {'range' : 1 , 'move' : 10}, 'tanker': {'max_energy' : 600}, 'hub' :  {'coordinates' : 123, 'HP': 123, 'energy_point' :123, 'regeneration':123}},
-                team_2 : { 'cruiser' : {'range' : 1 , 'move' : 10}, 'tanker': {'max_energy' : 600}, 'hub' :  {'coordinates' : 123, 'HP': 123, 'energy_point' :123, 'regeneration':123, }},
-                'common' : {'cruiser' : {'max_energy' : 400, 'cost_attack' : 10, 'creation_cost' : 750, 'attack' : 1, 'max_HP': 100}, 'tanker' : {'creation_cost' : 1000, 'move': 0, 'max_HP': 50}, 'hub': {'max_energy_point' : 1500}}}
+    units_stats  = {team_1 : { 'cruiser' : {'range' : 1 , 'move' : 10}, 'tanker': {'max_energy' : 600}, 'hub' :  {'coordinates' : 0, 'HP': 0, 'energy_point' :0, 'regeneration':0}},
+                team_2 : { 'cruiser' : {'range' : 1 , 'move' : 10}, 'tanker': {'max_energy' : 600}, 'hub' :  {'coordinates' : 0, 'HP': 0, 'energy_point' :0, 'regeneration':0, }},
+                'common' : {'cruiser' : {'max_energy' : 400, 'cost_attack' : 10, 'creation_cost' : 750, 'attack' : 1, 'max_HP': 100}, 'tanker' : {'creation_cost' : 1000, 'move': 0, 'max_HP': 50}, 'hub': {'max_energy_point' : 0}}}
 
     #Select the info of the hub in the file
     for ligne in range (3, 5):
@@ -1525,177 +1525,3 @@ def ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, pe
     return order_list
 
 
-"""          AI
---------------------------
------------------------------ """
-def order_AI (team,ships,untis_stats,peaks, ennemy_team,AI_stats) : 
-    """ 
-    Main fonction to get the IA orders 
-
-    Parameters 
-    ----------
-    team : name of the team which is playing (str)   
-    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
-    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
-    peaks : dictionary with all the peaks (dict)
-    ennemy_team : name of the ennemy_team (str)
-    AI_stats: dictionary of the specific information for the AI(s)
-
-    Return : 
-    --------
-    AI_order : order from the AI
-
-    Version :
-    ---------
-    specification : Johan Rochet (v.1 25/04/20)
-    
-    """
-    stance (ships)
-
-def stance (ships,team,ennemy_team):
-    """Decide if the adopted stance by the AI should be defensive or offensive
-
-    Parameters
-    ----------
-
-    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
-    team : name of the team which is playing (str) 
-    ennemy_team : name of the ennemy_team (str)
-
-    Return
-    ------
-
-    stance : sets the stance to adopt by the AI
-    """
-    ally_cruiser = 0 
-    ally_tanker = 0
-    ennemy_cruiser = 0
-    ennemy_tanker = 0
-
-    for ship in ships:
-        if ships[ship]['team'] == team :
-            if ships[ship][team]['type'] == 'cruiser' :
-                ally_cruiser += 1
-            else:
-                ally_tanker += 1
-        else : 
-            if ships[ship][ennemy_team]['type'] == 'cruiser' :
-                ennemy_cruiser += 1
-            else:
-                ennemy_tanker += 1
-
-    if ennemy_cruiser == 0 or ((ally_cruiser > ennemy_cruiser ) and not control_is_worth):
-
-        return 'offensive'
-
-    elif (ennemy_cruiser >0 and ennemy_tanker ==0) or (ennemy_cruiser > ally_cruiser):
-
-        return 'defensive'
-
-    elif (ennemy_cruiser < ennemy_tanker or ally_cruiser > ennemy_cruiser) and control_is_worth():
-        return 'control'
-               
-def control_is_worth ():
-    return True
-
-def go_to_profitable_peak(ships,peaks,team,units_stats) :
-
-    #initialise the variable
-    most_profitable = 0
-    instructions = ''
-    for ship in ships :
-        if ships[ship]['type'] == 'tanker':
-            if ships[ship]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 and total_peak_energy !=0 : # rajouter une condition dans le cas où plus d'énergie dans les peaks
-
-                for peak in peaks :
-                    if peaks[peak]['storage'] > 0 :
-                    #calculate the distance between the peak and the tanker
-                        distance = count_distance (peaks[peak]['coordinates'], ships[ship]['coordinates']) 
-                        #formula of profitability
-                        profitability = peaks[peak]['storage'] * (1/distance)
-                        #select the peak if it's the most profitable
-                        if profitability >= most_profitable :
-                            profitable_distance = distance
-                            most_profitable = profitability
-                            peak_coordinates = peaks[peak]['coordinates']
-
-                if most_profitable != 0:
-
-                    if profitable_distance <=1 :
-                
-                        instruction = ship +':@' + str(peak_coordinates[0]) + '-' + str(peak_coordinates[1])
-                    else : 
-                        if peak_coordinates[0] < ships[ship]['coordinates'][0] :
-                            x = -1
-                        elif peak_coordinates[0] > ships[ship]['coordinates'][0] :
-                            x = 1
-                        else : 
-                            x = 0 
-                        if peak_coordinates[1] < ships[ship]['coordinates'][1] :
-                            y = -1
-                        elif peak_coordinates[1] > ships[ship]['coordinates'][1] :
-                            y = 1
-                        else : 
-                            y = 0
-                        instruction = ship +':@' + str(x) + '-' + str(y)
-
-                    instructions += instruction
-                
-            else : 
-                give_to_profitable ()
-
-
-
-            return instructions 
-
-def count_distance (coord_1, coord_2):
-    """
-    Calculate the distance between coordinates
-
-    Parameters
-    ----------
-    coord_1 : first coordinate to compare (tuple)
-    coord_2: second coordinate to compare (tuple)
-
-    Return
-    ------
-    distance: distance between the coordinates
-
-    Version
-    -------
-    specification : Johan Rochet (v.1 24/04/20)
-    implementation : Johan Rochet (v.1 24/04/20)
-    """
-
-    distance = max (abs(coord_1[0]-coord_2[0]), abs(coord_1[1]-coord_2[1]))
-    return distance
-
-def create_IA_ship (type, team, nb_ship):
-    """
-    Create an instruction to create a new ship 
-
-    Parameters
-    ----------
-    type : type of the ship to create
-    team : name of the IA team (int/str)
-    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
-    count_created : dictionary with the created tanker and cruiser per turn (dict)
-    nb_ship : nb_IA_tanker or nb_IA_cruiser depending on the type
-    Return 
-    ------
-    instruction: the instruction of creation of the ship (str)
-
-    Version
-    -------
-    specification : Johan Rochet (v.1 24/04/20)
-    implementation : Johan Rochet (v.1 24/04/20)
-
-    """
-    
-    instruction = (type + '_'+ str(team) +'_' + str(nb_ship) + ':' + type)
-    nb_ship += 1
-   
-
-    return instruction, nb_ship
-
-def go_to_profiatble_target () :

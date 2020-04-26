@@ -21,11 +21,18 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team,AI_stats) :
     specification : Johan Rochet (v.1 25/04/20)
     
     """
-    stance= stance (ships)
+    stance,total_peak_energy = stance (ships)
     if stance == 'control' :
+        
+        
+        while units_stats[team]['hub']['energy_point'] > units_stats['Common']['tanker']['creation_cost'] : #peut-etre ajouter le fait de créer un croiseur de défense
+            if not alert :
+                instruction = create_IA_ship('tanker',team,'nb_tanker',AI_stats)
+                
         find_grouped_peaks(team, peaks, units_stats)
         
-        go_to_profitable_peak (ships,peaks,team,units_stats,total_peak_energy) 
+        peak_instructions = go_to_profitable_peak (ships,peaks,team,units_stats,total_peak_energy) 
+        
 
 def stance (ships,team,ennemy_team,peaks,units_stats,AI_stats):
     """Decide if the adopted stance by the AI should be defensive or offensive
@@ -56,15 +63,16 @@ def stance (ships,team,ennemy_team,peaks,units_stats,AI_stats):
     control_is_worth, total_peak_energy = control_is_worth(team, peaks, ships, units_stats,AI_stats)
 
     if ennemy_cruiser == 0 or ((AI_stats[team]['nb_cruiser'] > ennemy_cruiser ) and not control_is_worth):
-
-        return 'offensive'
+        stance = 'offensive'
+        
 
     elif (ennemy_cruiser >0 and ennemy_tanker ==0) or (ennemy_cruiser > AI_stats[team]['nb_cruiser']):
 
-        return 'defensive'
+        stance = 'defensive'
 
     elif (ennemy_cruiser < ennemy_tanker or AI_stats[team]['nb_cruiser'] > ennemy_cruiser) and control_is_worth:
-        return 'control'
+        stance = 'control'
+    return stance,total_peak_energy
 
 
 def go_to_profitable_peak(ships,peaks,team,units_stats,total_peak_energy,our_grouped_peaks,peak_name) :
@@ -109,7 +117,8 @@ def go_to_profitable_peak(ships,peaks,team,units_stats,total_peak_energy,our_gro
                             y = 0
                         instruction = ship +':@' + str(x) + '-' + str(y)
 
-                    instructions += instruction
+                    instructions += instruction + ' '
+                
                 
             else : 
                 give_to_profitable ()
@@ -140,7 +149,7 @@ def count_distance (coord_1, coord_2):
     distance = max (abs(coord_1[0]-coord_2[0]), abs(coord_1[1]-coord_2[1]))
     return distance
 
-def create_IA_ship (type, team, nb_ship):
+def create_IA_ship (type, team, nb_ship,AI_stats):
     """
     Create an instruction to create a new ship 
 
@@ -162,11 +171,11 @@ def create_IA_ship (type, team, nb_ship):
 
     """
     
-    instruction = (type + '_'+ str(team) +'_' + str(nb_ship) + ':' + type)
-    nb_ship += 1
+    instruction = (type + '_'+ str(team) +'_' + str(AI_stats[team][nb_ship]) + ':' + type)
+    AI_stats[team][nb_ship] += 1
    
 
-    return instruction, nb_ship
+    return instruction
 
 def go_to_profiatble_target () :
     """"""
@@ -252,3 +261,134 @@ def find_grouped_peaks(team, peaks, units_stats):
     return our_grouped_peaks,peak_name
 
 def peaks_on_our_map_side(team, units_stats, peaks):
+    """
+    Parameters
+    ----------
+
+    team : name of the team which is playing (str)   
+    peaks : dictionary with informations about each peak (dict)
+    units_stats : dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+
+    Return
+    ------
+    favorable_peaks : list with the name of peaks situated closer to our hub (our side of the map) (list)
+
+    Notes
+    -----
+    get distance between the two hubs and the peaks find the ones with minimal distance to each hub
+   
+    """
+
+    our_hub_coordinates = units_stats[team]['hub']['coordinates']
+    their_hub_coordinates = units_stats[team]['hub']['coordinates']
+    favorable_peaks = []
+
+    for peak in peaks:
+        #get peek coordinates and get distance between our hub and peak and then between their hub and peak
+        peak_coordinates = peaks[peak]['coordinates']
+        distance_our_hub_and_peak = count_distance (our_hub_coordinates, peak_coordinates)
+        distance_their_hub_and_peak = count_distance (their_hub_coordinates, peak_coordinates)
+
+        if distance_our_hub_and_peak <= distance_their_hub_and_peak:
+            #if our distance to peak is smaller then peak is on our side of the map
+            favorable_peaks.append(peak)
+        
+    return favorable_peaks
+    #favorable_peaks = [peak_1, peak_2]
+
+
+def create_selected_type_list_from_ships(ships, type):
+    """
+    Parameters
+    ----------
+    ships : dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    type : ship type (tanker or cruiser) you want  (str)
+
+    Return
+    ------
+    <selected_type>_list : makes a list of the selected type from the ships list (list)
+
+    """
+    if type == 'tanker':
+        tanker_list = []        
+        for ship in ships:
+
+            if ships[ship]['type'] == type:      
+            
+                tanker_list.append(ship)
+        
+        return tanker_list
+    
+    if type == 'cruiser':
+        cruiser_list = []
+        for ship in ships:
+
+            if ships[ship]['type'] == type:
+
+                cruiser_list.append(ship)
+        
+        return cruiser_list
+    
+
+def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, ennemy_team):
+
+    """
+    Parameters
+    ----------
+    
+    favorable_peaks : list of peaks situated on our side of the map (list)
+    units_stats : dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    peaks : dictionary with informations about each peak (dict)
+    ships : dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    ennemy_team : name of the ennemy_team (str)
+
+    Return
+    ------
+    alert_cruiser : If cruisers are closing in on one of our peaks True, else False (bool)
+    nb_cruisers : number of cruisers for the alert (int)
+    alert_tanker : If tankers are closinig in on one of our peaks True, else False (bool)
+    nb_tankers : number of tankers for the alert (int)
+
+    """
+    alert_tanker = False
+    alert_cruiser = False
+    favorable_peaks_coordinates = []
+    #get coordinates of each favorable peak
+    for peak in favorable_peaks : 
+        
+        favorable_peaks_coordinates.append(peaks[peak]['coordinates'])
+        
+    #get coordinates of each ennemy ship
+    for ship in ships:
+        
+        if ships[ship]['team'] == ennemy_team and ships[ship]['type'] == 'tanker':
+           ennemy_tanker_coordinates = []
+           ennemy_tanker_coordinates.append(ships[ship]['coordinates'])
+
+        elif ships[ship]['team'] == ennemy_team and ships[ship]['type'] == 'cruiser':
+            ennemy_cruiser_coordinates = []
+            ennemy_cruiser_coordinates.append(ships[ship]['coordinates'])
+
+    #check distance between each ennemy tanker and our peaks
+    for tanker_coordinates in ennemy_tanker_coordinates:
+
+        for peak_coordinates in favorable_peaks_coordinates:
+
+            distance = count_distance (peak_coordinates, tanker_coordinates)  
+            
+            if distance <= 10 :
+
+                alert_tanker = True
+                nb_tankers += 1
+                
+    #check distance between each ennemy cruiser and our peaks
+    for cruiser_coordinates in ennemy_cruiser_coordinates:
+
+        for peak_coordinates in favorable_peaks_coordinates:
+
+            distance = count_distance(peak_coordinates, tanker_coordinates)
+
+            if distance <= 10 :
+                
+                alert_cruiser = True
+                nb_cruisers += 1

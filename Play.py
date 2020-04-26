@@ -1670,7 +1670,7 @@ def count_distance (coord_1, coord_2):
     distance = max (abs(coord_1[0]-coord_2[0]), abs(coord_1[1]-coord_2[1]))
     return distance
 
-def create_IA_ship (type,team, nb_ship):
+def create_IA_ship (type, team, nb_ship):
     """
     Create an instruction to create a new ship 
 

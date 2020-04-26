@@ -1,5 +1,5 @@
 #At game start create tanker and tranfer energy back into hub
-def order_AI (team,ships,untis_stats,peaks, ennemy_team,AI_stats) : 
+def order_AI (team,ships,units_stats,peaks, ennemy_team,AI_stats) : 
     """ 
     Main fonction to get the IA orders 
 
@@ -21,9 +21,13 @@ def order_AI (team,ships,untis_stats,peaks, ennemy_team,AI_stats) :
     specification : Johan Rochet (v.1 25/04/20)
     
     """
-    stance (ships)
+    stance= stance (ships)
+    if stance == 'control' :
+        find_grouped_peaks(team, peaks, units_stats)
+        
+        go_to_profitable_peak (ships,peaks,team,units_stats,total_peak_energy) 
 
-def stance (ships,team,ennemy_team):
+def stance (ships,team,ennemy_team,peaks,units_stats,AI_stats):
     """Decide if the adopted stance by the AI should be defensive or offensive
 
     Parameters
@@ -38,57 +42,52 @@ def stance (ships,team,ennemy_team):
 
     stance : sets the stance to adopt by the AI
     """
-    ally_cruiser = 0 
-    ally_tanker = 0
     ennemy_cruiser = 0
     ennemy_tanker = 0
 
     for ship in ships:
-        if ships[ship]['team'] == team :
-            if ships[ship][team]['type'] == 'cruiser' :
-                ally_cruiser += 1
-            else:
-                ally_tanker += 1
-        else : 
+        if ships[ship]['team'] == ennemy_team :
+            
             if ships[ship][ennemy_team]['type'] == 'cruiser' :
                 ennemy_cruiser += 1
             else:
                 ennemy_tanker += 1
 
-    if ennemy_cruiser == 0 or ((ally_cruiser > ennemy_cruiser ) and not control_is_worth):
+    control_is_worth, total_peak_energy = control_is_worth(team, peaks, ships, units_stats,AI_stats)
+
+    if ennemy_cruiser == 0 or ((AI_stats[team]['nb_cruiser'] > ennemy_cruiser ) and not control_is_worth):
 
         return 'offensive'
 
-    elif (ennemy_cruiser >0 and ennemy_tanker ==0) or (ennemy_cruiser > ally_cruiser):
+    elif (ennemy_cruiser >0 and ennemy_tanker ==0) or (ennemy_cruiser > AI_stats[team]['nb_cruiser']):
 
         return 'defensive'
 
-    elif (ennemy_cruiser < ennemy_tanker or ally_cruiser > ennemy_cruiser) and control_is_worth():
+    elif (ennemy_cruiser < ennemy_tanker or AI_stats[team]['nb_cruiser'] > ennemy_cruiser) and control_is_worth:
         return 'control'
-               
-def control_is_worth ():
-    return True
 
-def go_to_profitable_peak(ships,peaks,team,units_stats,total_peak_energy) :
+
+def go_to_profitable_peak(ships,peaks,team,units_stats,total_peak_energy,our_grouped_peaks,peak_name) :
 
     #initialise the variable
     most_profitable = 0
     instructions = ''
     for ship in ships :
         if ships[ship]['type'] == 'tanker':
-            if ships[ship]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 and total_peak_energy !=0 : # rajouter une condition dans le cas où plus d'énergie dans les peaks
+            if ships[ship]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 and total_peak_energy !=0 : 
 
-                for peak in peaks :
-                    if peaks[peak]['storage'] > 0 :
+                for index in peak_name :
+                    if peaks[peak_name[index]]['storage'] > 0 :
                     #calculate the distance between the peak and the tanker
-                        distance = count_distance (peaks[peak]['coordinates'], ships[ship]['coordinates']) 
+                        distance = count_distance (peaks[peak_name[index]]['coordinates'], ships[ship]['coordinates']) 
                         #formula of profitability
-                        profitability = peaks[peak]['storage'] * (1/distance)
+                        profitability = (peaks[peak_name[index]]['storage']/distance) * len(our_grouped_peaks[index])
+                        
                         #select the peak if it's the most profitable
                         if profitability >= most_profitable :
                             profitable_distance = distance
                             most_profitable = profitability
-                            peak_coordinates = peaks[peak]['coordinates']
+                            peak_coordinates = peaks[peak_name[index]]['coordinates']
 
                 if most_profitable != 0:
 
@@ -171,7 +170,7 @@ def create_IA_ship (type, team, nb_ship):
 
 def go_to_profiatble_target () :
     """"""
-def control_is_worth (team, peaks, ships, units_stats) :
+def control_is_worth (team, peaks, ships, units_stats,AI_stats) :
     """Calculate if farming the energy out of peaks (staying in control) is worth the time
 
     Parameters
@@ -190,19 +189,20 @@ def control_is_worth (team, peaks, ships, units_stats) :
     specification : Kevin Schweitzer (v.1 24/04/20)
 
     """
+    total_peak_energy = 0
     #not worth if total_peak_energy from our half of the map <= total_tanker_storage + 900 (for each tanker storage = units_stats[team]['tanker']['max_energy'])
     control_is_worth = True
-    for ship in ships :
-        if ships[ship]['type'] == 'tanker':
-            nb_tanker += 1
+    
 
-    total_tanker_storage = nb_tanker * units_stats[team]['tanker']['max_energy']
+    total_tanker_storage = AI_stats[team]['nb_tanker'] * units_stats[team]['tanker']['max_energy']
 
     for peak in peaks :
         total_peak_energy += peaks[peak]['storage']
 
     if total_peak_energy <= total_tanker_storage:
-        is_worth = False # --> stop making tankers
+        control_is_worth = False # --> stop making tankers
+
+    return control_is_worth, total_peak_energy
 
 def find_grouped_peaks(team, peaks, units_stats):
     """
@@ -238,16 +238,17 @@ def find_grouped_peaks(team, peaks, units_stats):
         peaks_coord .append(peaks[peak]['coordinates'])
         peak_name.append (peak)
     
-    for index in range(len(peaks_coord)) :
+    for index_1 in range(len(peaks_coord)) :
 
-        number = 1
-        our_grouped_peaks[number] = [] 
+        our_grouped_peaks[index_1] =[]
 
-        for index_2 in range (len(peaks_coord)) :
+        if peaks[peak_name[index_1]]['storage']!=0 :
 
-            if count_distance (peaks_coord[index], peaks_coord[index_2]) < 4 :
-                our_grouped_peaks[number].append (peak_name[index_2])
+            for index_2 in range (len(peaks_coord)) :
+
+                if count_distance (peaks_coord[index_1], peaks_coord[index_2]) < 4 and peaks and peaks[peak_name[index_2]]['storage']!=0 :
+                    our_grouped_peaks[index_1].append (peak_name[index_2])
                
-    return our_grouped_peaks
+    return our_grouped_peaks,peak_name
 
 def peaks_on_our_map_side(team, units_stats, peaks):

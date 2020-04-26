@@ -25,9 +25,12 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team,AI_stats) :
     if stance == 'control' :
         
         
-        while units_stats[team]['hub']['energy_point'] > units_stats['Common']['tanker']['creation_cost'] : #peut-etre ajouter le fait de créer un croiseur de défense
-            if not alert :
+        while units_stats[team]['hub']['energy_point'] > units_stats['Common']['tanker']['creation_cost'] : 
+            if AI_stats[team]['nb_tanker'] != 4 :
                 instruction = create_IA_ship('tanker',team,'nb_tanker',AI_stats)
+            #create a security_cruiser
+            else :
+                instruction = create_IA_ship('cruiser',team,'nb_cruiser',AI_stats)
                 
         find_grouped_peaks(team, peaks, units_stats)
         

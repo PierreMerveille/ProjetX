@@ -396,3 +396,4 @@ def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, e
                 
                 alert_cruiser = True
                 nb_cruisers += 1
+ 

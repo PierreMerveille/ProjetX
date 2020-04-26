@@ -63,9 +63,10 @@ def stance (ships,team,ennemy_team,peaks,units_stats,AI_stats):
             else:
                 ennemy_tanker += 1
 
-    control_is_worth, total_peak_energy = control_is_worth(team, peaks, ships, units_stats,AI_stats)
+    control_is_worth, total_peak_energy = control_is_worth(team, peaks, ships, units_stats, AI_stats) #question d'archibald, pourquoi avoir besion de total_peak_energy ici? 
 
     if ennemy_cruiser == 0 or ((AI_stats[team]['nb_cruiser'] > ennemy_cruiser ) and not control_is_worth):
+        
         stance = 'offensive'
         
 
@@ -74,7 +75,9 @@ def stance (ships,team,ennemy_team,peaks,units_stats,AI_stats):
         stance = 'defensive'
 
     elif (ennemy_cruiser < ennemy_tanker or AI_stats[team]['nb_cruiser'] > ennemy_cruiser) and control_is_worth:
+       
         stance = 'control'
+
     return stance,total_peak_energy
 
 
@@ -186,7 +189,7 @@ def create_IA_ship (type, team, nb_ship,AI_stats):
 
 def go_to_profiatble_target () :
     """"""
-def control_is_worth (team, peaks, ships, units_stats,AI_stats) :
+def control_is_worth (team, ennemy_team, peaks, ships, units_stats,AI_stats) :
     """Calculate if farming the energy out of peaks (staying in control) is worth the time
 
     Parameters
@@ -205,20 +208,28 @@ def control_is_worth (team, peaks, ships, units_stats,AI_stats) :
     specification : Kevin Schweitzer (v.1 24/04/20)
 
     """
+    our_total_peak_energy = 0
     total_peak_energy = 0
-    #not worth if total_peak_energy from our half of the map <= total_tanker_storage + 900 (for each tanker storage = units_stats[team]['tanker']['max_energy'])
+    #not worth if total_peak_energy from our half of the map < total_tanker_storage + 900 
     control_is_worth = True
+
+    total_tanker_storage = AI_stats[team]['nb_tanker'] * units_stats[team]['tanker']['max_energy'] #change nb_tanker to nb_current_tanker
+    #get total energy from peaks in our half of the map
+    favorable_peaks = peaks_on_our_map_side(team, units_stats, peaks)
+    for favorable_peak in favorable_peaks:
+        our_total_peak_energy += peaks[favorable_peak]['storage']
     
-
-    total_tanker_storage = AI_stats[team]['nb_tanker'] * units_stats[team]['tanker']['max_energy']
-
-    for peak in peaks :
+    for peak in peaks:
         total_peak_energy += peaks[peak]['storage']
+    
+    #if (ennemy has more energy on his side of the map) and (ennemy has currently more energy in his hub than we do) and (has more tankers and cruisers), control is not worth
+    if ((total_peak_energy - our_total_peak_energy)>(total_peak_energy/2)) and ((units_stats[ennemy_team]['hub']['energy_point']/units_stats['common']['hub']['max_energy_point']) > (units_stats[team]['hub']['energy_point']/units_stats['common']['hub']['max_energy_point'])) and ((AI_stats[ennemy_team]['nb_tanker'] > AI_stats[team]['nb_tanker']) and (AI_stats[ennemy_team]['nb_cruiser'] > AI_stats[team]['nb_cruiser'])):
+        control_is_worth = False
 
-    if total_peak_energy <= total_tanker_storage:
+    if our_total_peak_energy < total_tanker_storage + units_stats[team]['tanker']['max_energy']:
         control_is_worth = False # --> stop making tankers
 
-    return control_is_worth, total_peak_energy
+    return control_is_worth, our_total_peak_energy
 
 def find_grouped_peaks(team, peaks, units_stats):
     """
@@ -309,7 +320,7 @@ def create_selected_type_list_from_ships(ships, type):
     Parameters
     ----------
     ships : dictionary with the statistics of each ship (tanker or cruiser)(dict)
-    type : ship type (tanker or cruiser) you want  (str)
+    type : ship type (tanker or cruiser) you want (str)
 
     Return
     ------
@@ -383,10 +394,6 @@ def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, e
 
     if len(close_ennemy_cruiser) > 0:
         alert_cruiser = True
-                        
-            
-            
-
 
        
             

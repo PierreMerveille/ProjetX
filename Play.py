@@ -219,7 +219,7 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
 
     
     #Get the stat for the upgrade
-    max_upgrade = {'max_regen_upgrade' :  50,  'max_range_upgrade' : 5, 'max_travel_upgrade' : 5, 'max_capacity_upgrade' : 1200}
+    max_upgrade = {'max_regen_upgrade' :  50,  'max_range_upgrade' : 5, 'max_travel_upgrade' : 5, 'max_capacity_upgrade' : 900}
     cost_upgrade = {'cost_regen_upgrade' : 750, 'cost_range_upgrade' : 400, 'cost_travel_upgrade' : 500, 'cost_upgrade_capacity':600}
 
     

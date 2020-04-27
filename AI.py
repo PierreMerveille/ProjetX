@@ -580,6 +580,34 @@ def create_proximity_order_full_tankers_our_hub(team, ships, units_stats):
 
     return proximity_order_full_tankers_our_hub
 
+def flee_tanker(ships, units_stats, team, ennemy_team):
+    """
+    Parameters
+    ----------
+   
+    ships : dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    units_stats : dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    team : name of the team which is playing (str)   
+    ennemy_team : name of the ennemy_team (str)
+
+    Return
+    ------
+    instruction : move tanker out of ennemy cruiser range
+    
+    """
+
+    tanker_list = create_selected_list_from_ships(ships, team)
+    cruiser_list = create_selected_list_from_ships(ships, ennemy_team)
+
+    for tanker in tanker_list:
+        for cruiser in cruiser_list:
+            
+            distance = count_distance(ships[tanker]['coordinates'], ships[cruiser]['coordinates'])
+
+            if distance <= (units_stats[ennemy_team]['cruiser']['range'] + 1): 
+
+                #move cruiser out of (range + 1)
+
 def what_upgrade_to_use(team, AI_stats, units_stats, nb_rounds, stance, favorable_peaks):
 
     """ Decides which upgrades to use, and when to use them

@@ -467,7 +467,7 @@ def create_units (create_list, ships, team, board, units_stats, peaks) :
 
             #Get the other stat of the ship and create it and put it on the board
             max_HP = units_stats['common'][instruction[1]]['max_HP'] 
-            ships[instruction[0]]= {'coordinates': coordinates , 'HP': max_HP, 'energy_point' : energy_point, 'type' : instruction[1], 'team' : team}
+            ships[instruction[0]]= {'coordinates': coordinates , 'HP': max_HP, 'energy_point' : energy_point, 'type' : instruction[1], 'team' : team, 'coordinates_to_go' : coordinates}
             board[coordinates]['list_entity'].append(instruction[0])
             change_value('hub',ships, peaks,-units_stats['common'][instruction[1]]['creation_cost'],'energy_point',units_stats,team)
 

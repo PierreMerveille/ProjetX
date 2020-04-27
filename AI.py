@@ -133,8 +133,6 @@ def go_to_profitable_peak(ships,peaks,team,units_stats,total_peak_energy,our_gro
             else : 
                 give_to_profitable ()
 
-
-
             return instructions 
 
 def count_distance (coord_1, coord_2):
@@ -184,9 +182,6 @@ def create_IA_ship (type, team, nb_ship,AI_stats):
     instruction = (type + '_'+ str(team) +'_' + str(AI_stats[team][nb_ship]) + ':' + type)
     AI_stats[team][nb_ship] += 1
     
-    
-   
-
     return instruction
 
 def go_to_profiatble_target () :
@@ -409,7 +404,6 @@ def create_selected_list_from_ships(ships,team):
     
 
 def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, ennemy_team):
-
     """
     Parameters
     ----------
@@ -434,29 +428,74 @@ def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, e
     close_ennemy_cruiser = []
     
             
-    #get coordinates of each ennemy ship
+    #distance between each ennemy ship and our favorable peaks
     
     for ship in ships:
         if ships[ship]['team'] == ennemy_team :
             for peak in favorable_peaks :
-
+                    #calc dist between favorable peaks and ennemy ships
                     distance = count_distance (peaks[peak]['coordinates'], ships[ship]['coordinates'])  
                 
                     if distance <= 10  : # reflechir a une formule adequate 
-
+                        #check ship type
                         if ships[ship]['type'] == 'tanker' : 
                             close_ennemy_tanker.append(ship)
 
                         elif ships[ship]['type'] == 'cruiser'  :
                             close_ennemy_cruiser.append(ship)
-
+    #if ships in list then alert
     if len(close_ennemy_tanker) > 0 : 
         alert_tanker = True
 
     if len(close_ennemy_cruiser) > 0:
         alert_cruiser = True
 
-       
+def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
+    """
+    Parameters
+    ----------
+ 
+    units_stats : dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    ships : dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    team : name of the team which is playing (str)   
+    ennemy_team : name of the ennemy_team (str)
+    
+    Return
+    ------
+    alert_hub_cruiser : If cruisers are closing in on our hub True, else False (bool)
+    nb_hub_cruisers : number of cruisers for the alert (int)
+    alert_hub_tanker : If tankers are closinig in on our hub True, else False (bool)
+    nb_hub_tankers : number of tankers for the alert (int)
+
+    """
+    alert_hub_tanker = False
+    alert_hub_cruiser = False
+    close_ennemy_hub_tanker = []
+    close_ennemy_hub_cruiser = []
+
+    for ship in ships:
+        if ships[ship]['team'] == ennemy_team:
+            #calc dist between ennemy ships and hub
+            distance = count_distance(units_stats[team]['hub']['coordinates'], ships[ship]['coordinates'])
+
+            if distance <= 10: #réfléchir à une formule pour changer 10
+                #check ship type
+                if ships[ship]['type'] == 'tanker' : 
+                    close_ennemy_hub_tanker.append(ship)
+
+                elif ships[ship]['type'] == 'cruiser'  :
+                    close_ennemy_hub_cruiser.append(ship)
+    #if ships in list then alert
+    if len(close_ennemy_hub_tanker) > 0: 
+        alert_hub_tanker = True
+
+    if len(close_ennemy_hub_cruiser) > 0:
+        alert_hub_cruiser = True
+
+    
+        
+
+
             
 
     

@@ -252,8 +252,9 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cru
             order = cruiser_target +':@' + str(x) + '-' + str(y)
             return order
 
-def control_is_worth (team, ennemy_team, peaks, ships, units_stats,AI_stats) :
-    """Calculate if farming the energy out of peaks (staying in control) is worth the time
+def control_is_worth (team, ennemy_team, peaks, ships, units_stats,AI_stats):
+    """
+    Calculate if farming the energy out of peaks (staying in control) is worth the time
 
     Parameters
     ----------
@@ -292,7 +293,7 @@ def control_is_worth (team, ennemy_team, peaks, ships, units_stats,AI_stats) :
     if our_total_peak_energy < total_tanker_storage + units_stats[team]['tanker']['max_energy']:
         control_is_worth = False # --> stop making tankers
 
-    return control_is_worth, our_total_peak_energy
+    return control_is_worth, our_total_peak_energy, total_peak_energy
 
 def find_grouped_peaks(team, peaks, units_stats):
     """

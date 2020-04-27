@@ -389,11 +389,11 @@ def create_selected_list_from_ships(ships,team):
     Parameters
     ----------
     ships : dictionary with the statistics of each ship (tanker or cruiser)(dict)
-    type : ship type (tanker or cruiser) you want (str)
+    team : name of the team which is playing (str)       
 
     Return
     ------
-    <selected_type>_list : makes a list of the selected type from the ships list (list)
+    <ship_type>_list : makes a list of the different types from the ships list for the selected team (list)
 
     """
     tanker_list = [] 
@@ -432,6 +432,7 @@ def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, e
     alert_cruiser = False
     close_ennemy_tanker = []
     close_ennemy_cruiser = []
+    
             
     #get coordinates of each ennemy ship
     
@@ -444,7 +445,7 @@ def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, e
                     if distance <= 10  : # reflechir a une formule adequate 
 
                         if ships[ship]['type'] == 'tanker' : 
-                            close_ennemy_tanker .append(ship)
+                            close_ennemy_tanker.append(ship)
 
                         elif ships[ship]['type'] == 'cruiser'  :
                             close_ennemy_cruiser.append(ship)

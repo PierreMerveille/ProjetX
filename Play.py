@@ -47,10 +47,13 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             link=True
 
     if team_1_type == 'AI' :
-        AI_Stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_1]['hub']['energy_point'] }
+        AI_stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_1]['hub']['energy_point'] }
+    elif team_1_type == 'remote' or team_1_type == 'human' :
+        AI_stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0}
     if team_2_type == 'AI' :
-        AI_Stats[team_2]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_2]['hub']['energy_point']  }
-
+        AI_stats[team_2]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_2]['hub']['energy_point'] }
+    elif team_2_type == 'remote' or team_2_type == 'human' :
+        AI_stats[team_2]={'nb_tanker' : 0, 'nb_cruiser': 0}
     
     #Start the game
     while end == False:
@@ -657,7 +660,8 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                     for ship in cruiser_dead:
                             index = board[ships[ship]['coordinates']]['list_entity'].index(ship)
                             del (board[ships[ship]['coordinates']]['list_entity'][index])
-                            del ships[ship]   
+                            del ships[ship] 
+                           
     return end_counter,attacking_list
     
 def move (move_list, ships, team, board, units_stats, peaks, attacking_list) :

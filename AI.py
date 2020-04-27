@@ -46,7 +46,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
         alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, ennemy_team)         
         
         # Attaquer l'intrus
-    
+
 
         
          
@@ -56,12 +56,12 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
         
         ### note à l'attention de ce très cher Anthony, idée: attaquer en priorité un croiseur ayant plus d'énergie que les qutres et aussi ceux avec le moins d'HP
     elif stance == 'defensive' :
-        attack_tanker(stance,AI_stats,ships,units_stats,team,ennemy_team,alive_tanker,alive_ennemy_tanker)
+        attack_tanker(stance,AI_stats,ships,units_stats,team,ennemy_team,alive_tanker,alive_ennemy_tanker,alive_ennemy_tanker, alive_ennemy_cruiser)
         defense_()
     
     coordinates_to_go (ships)
 
-def stance(ships, team, ennemy_team, peaks, units_stats, AI_stats):
+def stance(ships, team, ennemy_team, peaks, units_stats, AI_stats,alive_tanker, alive_cruiser,alive_ennemy_tanker, alive_ennemy_cruiser):
     """Decide if the adopted stance by the AI should be defensive or offensive
 
     Parameters
@@ -76,28 +76,19 @@ def stance(ships, team, ennemy_team, peaks, units_stats, AI_stats):
 
     stance : sets the stance to adopt by the AI
     """
-    ennemy_cruiser = 0
-    ennemy_tanker = 0
-
-    for ship in ships:
-        if ships[ship]['team'] == ennemy_team :
-            
-            if ships[ship][ennemy_team]['type'] == 'cruiser' :
-                ennemy_cruiser += 1
-            else:
-                ennemy_tanker += 1
+    
 
     control_is_worth, our_total_peak_energy, total_peak_energy, favorable_peaks = control_is_worth(team, peaks, ships, units_stats, AI_stats) 
 
-    if ennemy_cruiser == 0 or ((AI_stats[team]['nb_cruiser'] > ennemy_cruiser ) and not control_is_worth):
+    if alive_ennemy_cruiser == 0 or ((AI_stats[team]['nb_cruiser'] > alive_ennemy_cruiser ) and not control_is_worth):
         
         stance = 'offensive'
         
-    if (ennemy_cruiser >0 and ennemy_tanker ==0) or (ennemy_cruiser > AI_stats[team]['nb_cruiser']): # rajouter close to our hub dans la condition
+    if (alive_ennemy_cruiser >0 and alive_ennemy_tanker ==0) or (alive_ennemy_cruiser > AI_stats[team]['nb_cruiser']): # rajouter close to our hub dans la condition
 
         stance = 'defensive'
 
-    elif (ennemy_cruiser < ennemy_tanker or AI_stats[team]['nb_cruiser'] > ennemy_cruiser) and control_is_worth:
+    elif (alive_ennemy_cruiser < alive_ennemy_tanker or AI_stats[team]['nb_cruiser'] > alive_ennemy_cruiser) and control_is_worth:
        
         stance = 'control'
 

@@ -647,7 +647,80 @@ def what_upgrade_to_use(team, AI_stats, units_stats, nb_rounds, stance, favorabl
     #if for each peak, peak_energy % max_tanker_energy != 0 then check if peak_energy % max_tanker_energy + tanker_upgrade = 0 if yes do the amount of upgrades
 
 
+def place_cruiser_def(ships, board, team, ally_cruiser):
+     """"""
+    coord_hub_ally = untis_state[team]['hub']['coordinates']
+    coord_hub_ennemy = untis_state[ennemy]['hub']['coordinates']
+     
+    m = coord_hub_ally[0] - coord_hub_ennemy[0] / coord_hub_ally[1] - coord_hub_ennemy[1]
+    p = (coord_hub_ally[1] - m * coord_hub_ally[0])
+    midl = (((coord_hub_ally[0] + coord_hub_ennemy[0])/2), ((coord_hub_ally[1] + coord_hub_ennemy[1])/2))
+    new_m = - (m**-1)
+    new_p = (coord_hub_ally[1] - new_m * coord_hub_ally[0])
 
+    X_mid_value = coord_hub_ally[0] 
+    Y_mid_value = round(X_mid_value * new_m + new_P)
+
+    list_entity = board[(X_value, Y_value)]['list_entity']
+    cruiser_on_coord = get_cruiser(list_entity)
+
+    for x_value in range ( X_mid_value - 2, X_mid_value + 2, X_mid_value - 1, X_mid_value + 1, X_mid_value):
+        Y_value = round(X_value * new_m + new_P)
+
+        row += (X_value, Y_value)
+
+        if board[(X_value, Y_value)]['list_entity'] == ():
+            case_uncomplet += (X_value, Y_value)
+
+            
+    for case_to_complete in case_uncomplet
+        if (case_to_complete[1] - X_mid_value) = 1 :
+            Y_value = round((X_mid_value+2) * new_m + new_P)
+
+            list_entity = board[(X_mid_value, Y_mid_value)]['list_entity']
+            cruiser_on_coord = get_cruiser(list_entity)
+
+            if board[(X_mid_value + 2, Y_value)]['list_entity'] == ():
+                #move 2 croiseurs
+            else:
+                #juste 1
+        elif (case_to_complete[1] - X_mid_value) = 2:
+
+            Y_value = round((X_mid_value+1) * new_m + new_P)
+
+            list_entity = board[(X_mid_value + 1, Y_value)]['list_entity']
+            cruiser_on_coord = get_cruiser(list_entity)
+
+            #juste 1
+        elif (case_to_complete[1] - X_mid_value) = - 1 :
+            Y_value = round((X_mid_value-2) * new_m + new_P)
+
+            list_entity = board[(X_mid_value, Y_mid_value)]['list_entity']
+            cruiser_on_coord = get_cruiser(list_entity)
+
+            if board[(X_mid_value - 2, Y_value)]['list_entity'] == ():
+                #move 2 croiseurs
+            else:
+                #juste 1
+
+        else:
+            Y_value = round((X_mid_value+1) * new_m + new_P)
+
+            list_entity = board[(X_mid_value - 1, Y_value)]['list_entity']
+            cruiser_on_coord = get_cruiser(list_entity)
+
+            #juste 1
+
+
+    list_entity = board[(X_mid_value, Y_mid_value)]['list_entity']
+    cruiser_on_coord = get_cruiser(list_entity)
+    new_P = new_P + 1
+    new_x_mid_value = X_mid_value - 1
+    new_Y_mid_value = round(new_X_mid_value * new_m + new_P)
+
+    #deplacer tous sauf 1
+
+    #Si ils sont plic ploc
 
 
 

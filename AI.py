@@ -190,7 +190,7 @@ def create_IA_ship (type, team, nb_ship,AI_stats):
 def go_to_profiatble_target () :
     """"""
 def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team):
-    """Command to a cruiser to attack the first tanker's ennemy if he is defensive
+    """Command to a cruiser to attack the first tanker's ennemy if the AI is offensive.
 
     Parameters
     ----------

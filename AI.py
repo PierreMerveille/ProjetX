@@ -580,7 +580,7 @@ def create_proximity_order_full_tankers_our_hub(team, ships, units_stats):
 
     return proximity_order_full_tankers_our_hub
 
-def flee_tanker(ships, units_stats, team, ennemy_team):
+def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team):
     """
     Parameters
     ----------
@@ -595,16 +595,26 @@ def flee_tanker(ships, units_stats, team, ennemy_team):
     instruction : move tanker out of ennemy cruiser range + 1 (str)
     
     """
-
-    tanker_list = create_selected_list_from_ships(ships, team)
-    cruiser_list = create_selected_list_from_ships(ships, ennemy_team)
-
-    for tanker in tanker_list:
-        for cruiser in cruiser_list:
+    for tanker in alive_tanker:
+        for ennemy_cruiser in alive_ennemy_cruiser:
             
-            distance = count_distance(ships[tanker]['coordinates'], ships[cruiser]['coordinates'])
+            distance = count_distance(ships[tanker]['coordinates'], ships[ennemy_cruiser]['coordinates'])
 
             if distance <= (units_stats[ennemy_team]['cruiser']['range'] + 1): 
+
+                if ships[tanker]['coordinates'][0] < ships[ennemy_cruiser]['coordinates'][0] :
+                    x = -1
+                elif ships[tanker]['coordinates'][0] > ships[ennemy_cruiser]['coordinates'][0] :
+                    x = 1
+                else : 
+                    x = 0 
+                if ships[tanker]['coordinates'][1] < ships[ennemy_cruiser]['coordinates'][1] :
+                    y = -1
+                elif ships[tanker]['coordinates'][1] < ships[ennemy_cruiser]['coordinates'][1] :
+                    y = 1
+                else : 
+                    y = 0
+                instruction = tanker +':@' + str(x) + '-' + str(y) #ça ferait tanker:@1-1 par exemple, manque l'ajout des coordonnées de base non ?
 
                 #move cruiser out of (range + 1)
 

@@ -237,7 +237,7 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team):
                         distance_min = max (abs(cruiser_target_coordinate[0]-tanker_target_coordinate[0]), abs(cruiser_target_coordinate[1]-tanker_target_coordinate[1]))
                 nbr_ship+=1
         if range_verification (units_stats,cruiser_target,ships,tanker_target_coordinate,team):
-            order = cruiser_target + ':*' + tanker_target_coordinate[0] + '-' + tanker_target_coordinate[1] + '=' + ships[cruiser_target]['energy_point']/200
+            order = cruiser_target + ':*' + tanker_target_coordinate[0] + '-' + tanker_target_coordinate[1] + '=' + ships[cruiser_target]['energy_point']/20
             return order
         else :
             x = ships[cruiser_target]['coordinate'][0]

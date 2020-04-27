@@ -83,7 +83,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
         for team in color_team :
             #Upgrade phase
             units_stats = upgrade(order_dico[team]['upgrade'], team, units_stats, ships, max_upgrade, cost_upgrade)
-            
+        cruiser_dead = []
         for team in color_team :
             #Get the team who is playing and the ennemy team
             if team==team_1:
@@ -91,13 +91,13 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             else :
                 ennemy_team = team_1
             #Attack phase
-            end_counter,attacking_list,cruiser_dead = attack(order_dico[team]['attack'], board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team)
+            end_counter,attacking_list,cruiser_dead = attack(order_dico[team]['attack'], board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team,cruiser_dead)
             
             #delete the ships which are destroyed
-            for ship in cruiser_dead:
-                index = board[ships[ship]['coordinates']]['list_entity'].index(ship)
-                del (board[ships[ship]['coordinates']]['list_entity'][index])
-                del ships[ship] 
+        for ship in cruiser_dead:
+            index = board[ships[ship]['coordinates']]['list_entity'].index(ship)
+            del (board[ships[ship]['coordinates']]['list_entity'][index])
+            del ships[ship] 
         for team in color_team :
             #Move phase
             board, ships = move(order_dico[team]['move'], ships, team, board, units_stats, peaks,attacking_list)
@@ -567,7 +567,7 @@ def upgrade (upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade):
                         units_stats[team]['hub']['energy_point'] -= 400
     return units_stats
                         
-def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team):
+def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team,cruiser_dead):
     
     """Execute an attack on a chosen box
     
@@ -582,6 +582,7 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
     peaks : the dictionary with all the peaks (dict)
     end_counter : number of rounds without attacks (float)
     color_team : dictionary with the number of the team with the color of each team (dict)
+    cruiser_dead : list of killed cruiser during the attack (list)
     
     Returns
     -------
@@ -618,9 +619,9 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                     coordinates = (int(coordinates[0]),int(coordinates[1]))
                     #verify in another function if we have the range
                     hithin_range = range_verification (units_stats, instruction[0], ships, coordinates, team)
-                    #create a list for delete cruiser
-                    cruiser_dead=[]
-                    position=[]
+                    
+                    
+                    
                     #create a variable verify if something is hit
                     hit=0
                     #attack if hithin_range is True

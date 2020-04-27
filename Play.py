@@ -91,8 +91,13 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             else :
                 ennemy_team = team_1
             #Attack phase
-            end_counter,attacking_list = attack(order_dico[team]['attack'], board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team)
+            end_counter,attacking_list,cruiser_dead = attack(order_dico[team]['attack'], board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team)
             
+            #delete the ships which are destroyed
+            for ship in cruiser_dead:
+                index = board[ships[ship]['coordinates']]['list_entity'].index(ship)
+                del (board[ships[ship]['coordinates']]['list_entity'][index])
+                del ships[ship] 
         for team in color_team :
             #Move phase
             board, ships = move(order_dico[team]['move'], ships, team, board, units_stats, peaks,attacking_list)
@@ -653,13 +658,9 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                             
                     else :
                         end_counter += 0.5
-                    #delete the ships which are destroyed
-                    for ship in cruiser_dead:
-                            index = board[ships[ship]['coordinates']]['list_entity'].index(ship)
-                            del (board[ships[ship]['coordinates']]['list_entity'][index])
-                            del ships[ship] 
+                    
                            
-    return end_counter,attacking_list
+    return end_counter,attacking_list,cruiser_dead
     
 def move (move_list, ships, team, board, units_stats, peaks, attacking_list) :
     

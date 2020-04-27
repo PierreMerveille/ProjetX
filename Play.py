@@ -48,12 +48,9 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
 
     if team_1_type == 'AI' :
         AI_stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_1]['hub']['energy_point'] }
-    elif team_1_type == 'remote' or team_1_type == 'human' :
-        AI_stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0}
+    
     if team_2_type == 'AI' :
         AI_stats[team_2]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_2]['hub']['energy_point'] }
-    elif team_2_type == 'remote' or team_2_type == 'human' :
-        AI_stats[team_2]={'nb_tanker' : 0, 'nb_cruiser': 0}
     
     #Start the game
     while end == False:
@@ -623,9 +620,9 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                     hit=0
                     #attack if hithin_range is True
                     
-                    if hithin_range and ships[instruction[0]]['energy_point']>=int(coord_attack[1]):
+                    if hithin_range and ships[instruction[0]]['energy_point']>=( int(coord_attack[1])*units_stats['common']['cruiser']['cost_attack'] ):
                         #reduce the energy of the ship
-                        ships = change_value(instruction[0], ships, peaks, int(coord_attack[1])*-1, 'energy_point', units_stats, team)
+                        ships = change_value(instruction[0], ships, peaks, units_stats['common']['cruiser']['cost_attack'] * int(coord_attack[1])*-1, 'energy_point', units_stats, team)
                         #verify the coordinates of all the ship
                         for ship in ships :
                             if ships[ship]['coordinates']==coordinates:

@@ -21,7 +21,10 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
     specification : Johan Rochet (v.1 25/04/20)
     
     """
+    alive_tanker, alive_cruiser = create_selected_list_from_ships(ships,team)
+    alive_ennemy_tanker, alive_ennemy_cruiser = create_selected_list_from_ships(ships,ennemy_team)
     stance,total_peak_energy = stance (ships)
+    
     if stance == 'control' :
         
         
@@ -63,13 +66,12 @@ def stance (ships,team,ennemy_team,peaks,units_stats,AI_stats):
             else:
                 ennemy_tanker += 1
 
-    control_is_worth, total_peak_energy = control_is_worth(team, peaks, ships, units_stats, AI_stats) #question d'archibald, pourquoi avoir besion de total_peak_energy ici? 
+    control_is_worth, total_peak_energy = control_is_worth(team, peaks, ships, units_stats, AI_stats) 
 
     if ennemy_cruiser == 0 or ((AI_stats[team]['nb_cruiser'] > ennemy_cruiser ) and not control_is_worth):
         
         stance = 'offensive'
         
-
     elif (ennemy_cruiser >0 and ennemy_tanker ==0) or (ennemy_cruiser > AI_stats[team]['nb_cruiser']):
 
         stance = 'defensive'
@@ -90,7 +92,7 @@ def go_to_profitable_peak(ships,peaks,team,units_stats,total_peak_energy,our_gro
     for ship in ships :
         if ships[ship]['type'] == 'tanker':
             if ships[ship]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 or total_peak_energy !=0 : # reflechir aux conditions
-                # si le tranker a moins de 60 % , calculer combien d'énergie restant, pour voir si plus rentable d'aller au hub ou au peak puis de rmeplir avec une totalité de réserve
+                # si le tanker a moins de 60 % , calculer combien d'énergie restant, pour voir si plus rentable d'aller au hub ou au peak puis de rmeplir avec une totalité de réserve
 
                 for index in peak_name :
                     if peaks[peak_name[index]]['storage'] > 0 :
@@ -199,7 +201,7 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team):
     ships : the dictionnary with all the ships (dictionnary).
     units_stats : the dictionnary with the info of the hub (dictionnary).
     team = the name of our team (string).
-    Ennemy_team = the name of the ennemy team (string).
+    ennemy_team = the name of the ennemy team (string).
 
     Notes
     -----
@@ -254,6 +256,7 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team):
                 y -= 1
             order = cruiser_target +':@' + str(x) + '-' + str(y)
             return order
+
 def control_is_worth (team, ennemy_team, peaks, ships, units_stats,AI_stats) :
     """Calculate if farming the energy out of peaks (staying in control) is worth the time
 
@@ -380,7 +383,8 @@ def peaks_on_our_map_side(team, units_stats, peaks):
     #favorable_peaks = [peak_1, peak_2]
 
 
-def create_selected_type_list_from_ships(ships, type):
+def create_selected_list_from_ships(ships,team):
+
     """
     Parameters
     ----------
@@ -392,25 +396,16 @@ def create_selected_type_list_from_ships(ships, type):
     <selected_type>_list : makes a list of the selected type from the ships list (list)
 
     """
-    if type == 'tanker':
-        tanker_list = []        
-        for ship in ships:
-
-            if ships[ship]['type'] == type:      
-            
+    tanker_list = [] 
+    cruiser_list = []
+    for ship in ships:
+        if ships[ship]['team'] == team : 
+            if ships[ship]['type'] == 'tanker':
                 tanker_list.append(ship)
-        
-        return tanker_list
-    
-    if type == 'cruiser':
-        cruiser_list = []
-        for ship in ships:
-
-            if ships[ship]['type'] == type:
-
+            else :
                 cruiser_list.append(ship)
         
-        return cruiser_list
+    return tanker_list,cruiser_list
     
 
 def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, ennemy_team):

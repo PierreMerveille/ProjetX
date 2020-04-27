@@ -592,7 +592,7 @@ def flee_tanker(ships, units_stats, team, ennemy_team):
 
     Return
     ------
-    instruction : move tanker out of ennemy cruiser range
+    instruction : move tanker out of ennemy cruiser range + 1 (str)
     
     """
 

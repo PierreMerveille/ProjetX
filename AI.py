@@ -21,7 +21,8 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
     specification : Johan Rochet (v.1 25/04/20)
     
     """
-    alive_tanker, alive_cruiser = create_selected_type_list_from_ships(ships)
+    alive_tanker, alive_cruiser = create_selected_list_from_ships(ships,team)
+    alive_ennemy_tanker, alive_ennemy_cruiser = create_selected_list_from_ships(ships,ennemy_team)
     stance,total_peak_energy = stance (ships)
     
     if stance == 'control' :
@@ -200,7 +201,7 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team):
     ships : the dictionnary with all the ships (dictionnary).
     units_stats : the dictionnary with the info of the hub (dictionnary).
     team = the name of our team (string).
-    Ennemy_team = the name of the ennemy team (string).
+    ennemy_team = the name of the ennemy team (string).
 
     Notes
     -----
@@ -255,6 +256,7 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team):
                 y -= 1
             order = cruiser_target +':@' + str(x) + '-' + str(y)
             return order
+
 def control_is_worth (team, ennemy_team, peaks, ships, units_stats,AI_stats) :
     """Calculate if farming the energy out of peaks (staying in control) is worth the time
 
@@ -381,7 +383,8 @@ def peaks_on_our_map_side(team, units_stats, peaks):
     #favorable_peaks = [peak_1, peak_2]
 
 
-def create_selected_type_list_from_ships(ships,team):
+def create_selected_list_from_ships(ships,team):
+
     """
     Parameters
     ----------

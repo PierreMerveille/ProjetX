@@ -42,7 +42,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
         attack_tanker(stance,AI_stats,ships,units_stats,team,ennemy_team,alive_tanker,alive_ennemy_tanker)
         
 
-def stance(ships, team, ennemy_team, peaks, units_stats, AI_stats):
+def stance (ships,team,ennemy_team,peaks,units_stats,AI_stats):
     """Decide if the adopted stance by the AI should be defensive or offensive
 
     Parameters
@@ -127,7 +127,7 @@ def go_to_profitable_peak(ships,peaks,team,units_stats,total_peak_energy,our_gro
                             y = 1
                         else : 
                             y = 0
-                        instruction = ship +':@' + str(x) + '-' + str(y)
+                        instruction = ship +':@' + str(ships[ship]['coordinates'][0] + x) + '-' + str(ships[ship]['coordinates'][1] + y)
 
                     instructions += instruction + ' '
                 
@@ -187,7 +187,7 @@ def create_IA_ship (type, team, nb_ship,AI_stats):
     AI_stats[team][nb_ship] += 1
     
     
-
+   
 
     return instruction
 
@@ -235,8 +235,8 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cru
                         distance_min = count_distance (ships[cruiser]['coordinates'], ships[tanker]['coordinates'])
                 nbr_ship+=1
 
-        if range_verification (units_stats,cruiser_target,ships,tanker_target_coordinate,team):
-            order = cruiser_target + ':*' + tanker_target_coordinate[0] + '-' + tanker_target_coordinate[1] + '=' + ships[cruiser_target]['energy_point']/ (2 * units_stats['common']['cruiser']['cost_attack']) 
+        if range_verification (units_stats,cruiser_target,ships,ships[tanker_target]['coordinates'],team):
+            order = cruiser_target + ':*' + ships[tanker_target]['coordinates'][0] + '-' + ships[tanker_target]['coordinates'][1] + '=' + ships[cruiser_target]['energy_point']/ (2 * units_stats['common']['cruiser']['cost_attack']) 
             return order
         else :
             x = ships[cruiser_target]['coordinate'][0]
@@ -447,214 +447,13 @@ def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, e
                         elif ships[ship]['type'] == 'cruiser'  :
                             close_ennemy_cruiser.append(ship)
 
-    if len(close_ennemy_tanker) > 0: 
+    if len(close_ennemy_tanker) > 0 : 
         alert_tanker = True
 
     if len(close_ennemy_cruiser) > 0:
         alert_cruiser = True
 
-def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
-    """
-    Parameters
-    ----------
- 
-    units_stats : dictionary with the stats (different or common) of the teams (hub /ship) (dict)
-    ships : dictionary with the statistics of each ship (tanker or cruiser)(dict)
-    team : name of the team which is playing (str)   
-    ennemy_team : name of the ennemy_team (str)
-    
-    Return
-    ------
-    alert_hub_cruiser : If cruisers are closing in on our hub True, else False (bool)
-    nb_hub_cruisers : number of cruisers for the alert (int)
-    alert_hub_tanker : If tankers are closinig in on our hub True, else False (bool)
-    nb_hub_tankers : number of tankers for the alert (int)
-
-    """
-    alert_hub_tanker = False
-    alert_hub_cruiser = False
-    close_ennemy_hub_tanker = []
-    close_ennemy_hub_cruiser = []
-
-    for ship in ships:
-        if ships[ship]['team'] == ennemy_team:
-            #calc dist between ennemy ships and hub
-            distance = count_distance(units_stats[team]['hub']['coordinates'], ships[ship]['coordinates'])
-
-            if distance <= 10: #réfléchir à une formule pour changer 10
-                #check ship type
-                if ships[ship]['type'] == 'tanker' : 
-                    close_ennemy_hub_tanker.append(ship)
-
-                elif ships[ship]['type'] == 'cruiser'  :
-                    close_ennemy_hub_cruiser.append(ship)
-    #if ships in list then alert
-    if len(close_ennemy_hub_tanker) > 0: 
-        alert_hub_tanker = True
-
-    if len(close_ennemy_hub_cruiser) > 0:
-        alert_hub_cruiser = True
-
-def find_nb_rounds(team, ships, units_stats, AI_stats):
-    
-    """Finds the number of rounds you'd have to wait until you can create a new tanker (without taking into account the hub regeneration)
-
-    Parameters
-    ----------
-
-    team : name of the team which is playing (str)   
-    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
-    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
-    AI_stats : 
-
-    Return
-    ------
-
-    nb_rounds : number of rounds to wait for THE closest FULL tanker to come back or number of rounds to wait for the TWO closest FULL tankers to come back (int)
-    
-    """
-    proximity_order_full_tankers_our_hub = create_proximity_order_full_tankers_our_hub(team, ships, units_stats)
-
-    #nb_rounds = number of rounds to wait for the closest FULL tanker to come back #current energy + 1 tanker haul          
-    if AI_stats[team]['virtual_energy_point'] + units_stats[team]['tanker']['max_energy'] >= 1000:
-
-        #take the closest from proximity_order_full_tankers_our_hub list
-        tanker = proximity_order_full_tankers_our_hub[0]
-        
-    #nb_rounds = number of rounds to wait for the two closest FULL tankers to come back #current energy + 2 tanker hauls
-    else :
-        
-        #take the second closest from proximity_order_full_tankers_our_hub list
-        tanker = proximity_order_full_tankers_our_hub[1]
-    
-    #nb_rounds = calc distance between FIRST closest full tanker and hub OR SECOND closest full tanker and hub. Depending on if condition before the operation.
-    nb_rounds = count_dist(ships[tanker]['coordinates'], units_stats[team]['hub']['coordinates'])   
-
-    return nb_rounds     
-        
-def create_proximity_order_full_tankers_our_hub(team, ships, units_stats):
-
-    """ Creates a list of full tankers ordered from closest to furthest away from hub
-
-    Parameters
-    ----------
-    
-    team : name of the team which is playing (str)   
-    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
-    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
-
-    Return
-    ------
-
-    proximity_order_full_tankers_our_hub : list with full tankers in proximity order to our hub (list)
-
-    """
-    full_tankers = []
-    distance_list = []
-    proximity_order_full_tankers_our_hub = []
-    tanker_number = 0
-
-    for ship in ships: 
-
-        if (ships[ship]['team'] == team) and (ships[ship]['type'] == 'tanker') and (ships[ship]['energy_point'] == units_stats[team]['tanker']['max_energy']):
-        
-            full_tankers.append(ship)
-
-    for ship in full_tankers:
-
-            distance = count_distance(ships[ship]['coordinates'], units_stats[team]['hub']['coordinates'])
-            distance_list.append(distance) #distance_list = [5, 10, 4]
-        
-    #make a list in order of closest tankers
-    
-    for distance in distance_list:
-
-        closest_distance = min(distance_list)
-        tanker_number += 1  #tanker_number = 1...2...3
-
-        if distance == closest_distance: 
-            
-            proximity_order_full_tankers_our_hub.append(full_tankers[tanker_number]) # add tanker_3 to proximity list
-        
-            distance_list.delete(distance)
-
-    return proximity_order_full_tankers_our_hub
-
-def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team):
-    """
-    Parameters
-    ----------
-   
-    ships : dictionary with the statistics of each ship (tanker or cruiser)(dict)
-    units_stats : dictionary with the stats (different or common) of the teams (hub /ship) (dict)
-    team : name of the team which is playing (str)   
-    ennemy_team : name of the ennemy_team (str)
-
-    Return
-    ------
-    instruction : move tanker out of ennemy cruiser range + 1 (str)
-    
-    """
-    for tanker in alive_tanker:
-        for ennemy_cruiser in alive_ennemy_cruiser:
-            
-            distance = count_distance(ships[tanker]['coordinates'], ships[ennemy_cruiser]['coordinates'])
-
-            if distance <= (units_stats[ennemy_team]['cruiser']['range'] + 1): 
-
-                if ships[tanker]['coordinates'][0] < ships[ennemy_cruiser]['coordinates'][0] :
-                    x = -1
-                elif ships[tanker]['coordinates'][0] > ships[ennemy_cruiser]['coordinates'][0] :
-                    x = 1
-                else : 
-                    x = 0 
-                if ships[tanker]['coordinates'][1] < ships[ennemy_cruiser]['coordinates'][1] :
-                    y = -1
-                elif ships[tanker]['coordinates'][1] < ships[ennemy_cruiser]['coordinates'][1] :
-                    y = 1
-                else : 
-                    y = 0
-                instruction = tanker +':@' + str(x) + '-' + str(y) #ça ferait tanker:@1-1 par exemple, manque l'ajout des coordonnées de base non ?
-
-                #move cruiser out of (range + 1)
-
-def what_upgrade_to_use(team, AI_stats, units_stats, nb_rounds, stance, favorable_peaks):
-
-    """ Decides which upgrades to use, and when to use them
-
-    Parameters
-    ----------
-
-    team : name of the team which is playing (str) 
-    AI_stats :   
-    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
-    nb_rounds : number of rounds to wait for THE closest FULL tanker to come back or number of rounds to wait for the TWO closest FULL tankers to come back (int)
-    stance :
-    favorable_peaks : 
-
-    Return
-    ------
-    instruction : instruction to make the selected upgrade 
-
-    """
-    stance = stance(ships, team, ennemy_team, peaks, units_stats, AI_stats)
-
-    # peak 1 2000 peak 2 2000 peak_3 2000
-
-    #don't do any tanker upgrades, take max and then go to next if peak_energy < tanker_max_energy
-    #if for more than half of the favorable peaks (len(favorable_peaks)/2) are tested positive for a tanker upgrade, do it, else don't 
-    #if for each peak, peak_energy % max_tanker_energy != 0 then check if peak_energy % max_tanker_energy + tanker_upgrade = 0 if yes do the amount of upgrades
-
-
-
-
-
-
-        
-    
-        
-
-
+       
             
 
     

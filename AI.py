@@ -35,6 +35,13 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
         find_grouped_peaks(team, peaks, units_stats)
         
         peak_instructions = go_to_profitable_peak (ships,peaks,team,units_stats,total_peak_energy) 
+    
+    elif stance =='defensive' :
+
+        while units_stats[team]['hub']['energy_point'] > units_stats['Common']['cruiser']['creation_cost'] : 
+            instruction = create_IA_ship('cruiser',team,'nb_cruiser',AI_stats)
+
+        place_cruiser()
         
 
 def stance (ships,team,ennemy_team,peaks,units_stats,AI_stats):
@@ -65,7 +72,7 @@ def stance (ships,team,ennemy_team,peaks,units_stats,AI_stats):
 
     control_is_worth, total_peak_energy = control_is_worth(team, peaks, ships, units_stats, AI_stats) #question d'archibald, pourquoi avoir besion de total_peak_energy ici? 
 
-    if ennemy_cruiser == 0 or ((AI_stats[team]['nb_cruiser'] > ennemy_cruiser ) and not control_is_worth):
+    if (ennemy_cruiser == 0 or (AI_stats[team]['nb_cruiser'] > ennemy_cruiser )) and not control_is_worth):
         
         stance = 'offensive'
         

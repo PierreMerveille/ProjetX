@@ -223,31 +223,27 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team):
                 tanker_coordinate=ships[tanker]['coordinate']
                 if nbr_ship==1:
                     cruiser_target=cruiser
-                    cruiser_target_coordinate=ships[cruiser_target]['coordinate']
                     tanker_target=tanker
-                    tanker_target_coordinate=ships[tanker_target]['coordinate']
                     distance_min= max (abs(cruiser_target_coordinate[0]-tanker_target_coordinate[0]), abs(cruiser_target_coordinate[1]-tanker_target_coordinate[1]))
                 else :
                     if max (abs(cruiser_coordinate[0]-tanker_coordinate[0]), abs(cruiser_coordinate[1]-tanker_coordinate[1])) < distance_min:
                         cruiser_target=cruiser
-                        cruiser_target_coordinate=ships[cruiser_target]['coordinate']
                         tanker_target=tanker
-                        tanker_target_coordinate=ships[tanker_target]['coordinate']
                         distance_min = max (abs(cruiser_target_coordinate[0]-tanker_target_coordinate[0]), abs(cruiser_target_coordinate[1]-tanker_target_coordinate[1]))
                 nbr_ship+=1
         if range_verification (units_stats,cruiser_target,ships,tanker_target_coordinate,team):
-            order = cruiser_target + ':*' + tanker_target_coordinate[0] + '-' + tanker_target_coordinate[1]
+            order = cruiser_target + ':*' + tanker_target_coordinate[0] + '-' + tanker_target_coordinate[1] + '=' + ships[cruiser_target]['energy_point']/20
             return order
         else :
-            x=cruiser_target_coordinate[0]
-            y=cruiser_target_coordinate[1]
-            if cruiser_target_coordinate[0] < tanker_target_coordinate[0] :
+            x = ships[cruiser_target]['coordinate'][0]
+            y = ships[cruiser_target]['coordinate'][1]
+            if x < ships[tanker_target]['coordinate'][0] :
                 x += 1
-            elif cruiser_target_coordinate[0] > tanker_target_coordinate[0] :
+            elif x > ships[tanker_target]['coordinate'][0] :
                 x -= 1 
-            if cruiser_target_coordinate[1] < tanker_target_coordinate[1] :
+            if y < ships[tanker_target]['coordinate'][1] :
                 y += 1
-            elif cruiser_target_coordinate[1] > tanker_target_coordinate[1] :
+            elif y > ships[tanker_target]['coordinate'][1]] :
                 y -= 1
             order = cruiser_target +':@' + str(x) + '-' + str(y)
             return order

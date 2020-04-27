@@ -42,7 +42,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
         attack_tanker(stance,AI_stats,ships,units_stats,team,ennemy_team,alive_tanker,alive_ennemy_tanker)
         
 
-def stance (ships,team,ennemy_team,peaks,units_stats,AI_stats):
+def stance(ships, team, ennemy_team, peaks, units_stats, AI_stats):
     """Decide if the adopted stance by the AI should be defensive or offensive
 
     Parameters
@@ -187,7 +187,7 @@ def create_IA_ship (type, team, nb_ship,AI_stats):
     AI_stats[team][nb_ship] += 1
     
     
-   
+
 
     return instruction
 
@@ -447,7 +447,7 @@ def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, e
                         elif ships[ship]['type'] == 'cruiser'  :
                             close_ennemy_cruiser.append(ship)
 
-    if len(close_ennemy_tanker) > 0 : 
+    if len(close_ennemy_tanker) > 0: 
         alert_tanker = True
 
     if len(close_ennemy_cruiser) > 0:
@@ -496,6 +496,7 @@ def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
         alert_hub_cruiser = True
 
 def find_nb_rounds(team, ships, units_stats, AI_stats):
+    
     """Finds the number of rounds you'd have to wait until you can create a new tanker (without taking into account the hub regeneration)
 
     Parameters
@@ -533,7 +534,8 @@ def find_nb_rounds(team, ships, units_stats, AI_stats):
         
 def create_proximity_order_full_tankers_our_hub(team, ships, units_stats):
 
-    """
+    """ Creates a list of full tankers ordered from closest to furthest away from hub
+
     Parameters
     ----------
     
@@ -577,6 +579,39 @@ def create_proximity_order_full_tankers_our_hub(team, ships, units_stats):
             distance_list.delete(distance)
 
     return proximity_order_full_tankers_our_hub
+
+def what_upgrade_to_use(team, AI_stats, units_stats, nb_rounds, stance, favorable_peaks):
+
+    """ Decides which upgrades to use, and when to use them
+
+    Parameters
+    ----------
+
+    team : name of the team which is playing (str) 
+    AI_stats :   
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    nb_rounds : number of rounds to wait for THE closest FULL tanker to come back or number of rounds to wait for the TWO closest FULL tankers to come back (int)
+    stance :
+    favorable_peaks : 
+
+    Return
+    ------
+    instruction : instruction to make the selected upgrade 
+
+    """
+    stance = stance(ships, team, ennemy_team, peaks, units_stats, AI_stats)
+
+    # peak 1 2000 peak 2 2000 peak_3 2000
+
+    #don't do any tanker upgrades, take max and then go to next if peak_energy < tanker_max_energy
+    #if for more than half of the favorable peaks (len(favorable_peaks)/2) are tested positive for a tanker upgrade, do it, else don't 
+    #if for each peak, peak_energy % max_tanker_energy != 0 then check if peak_energy % max_tanker_energy + tanker_upgrade = 0 if yes do the amount of upgrades
+
+
+
+
+
+
         
     
         

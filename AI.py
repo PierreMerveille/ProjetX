@@ -207,7 +207,8 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team):
 
     Version
     -------
-    specification : Anthony Pierard (v.1)
+    specification : Anthony Pierard (v.1 24/04/20)
+    implementation : Anthony Pierard (v.1 27/04/20)
     """
     #verify if the ennemy is a defensive
     if stance=="offensive":

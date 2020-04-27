@@ -128,7 +128,7 @@ def go_to_profitable_peak(ships,peaks,team,units_stats,total_peak_energy,our_gro
                         else : 
                             y = 0
                         
-                        instruction = ship +':@' + str(x) + '-' + str(y)
+                        instruction = ship +':@' + str(ships[ship]['coordinates'][0] + x) + '-' + str(ships[ship]['coordinates'][1] + y)
 
                     instructions += instruction + ' '
                 
@@ -603,6 +603,7 @@ def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, en
 
             if distance <= (units_stats[ennemy_team]['cruiser']['range'] + 1): 
 
+                #move cruiser out of (range + 1)
                 if ships[tanker]['coordinates'][0] < ships[ennemy_cruiser]['coordinates'][0] :
                     x = -1
                 elif ships[tanker]['coordinates'][0] > ships[ennemy_cruiser]['coordinates'][0] :
@@ -615,9 +616,7 @@ def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, en
                     y = 1
                 else : 
                     y = 0
-                instruction = tanker +':@' + str(x) + '-' + str(y) #ça ferait tanker:@1-1 par exemple, manque l'ajout des coordonnées de base non ?
-
-                #move cruiser out of (range + 1)
+                instruction = instruction = tanker +':@' + str(ships[tanker]['coordinates'][0] + x) + '-' + str(ships[tanker]['coordinates'][1] + y)
 
 def what_upgrade_to_use(team, AI_stats, units_stats, nb_rounds, stance, favorable_peaks):
 

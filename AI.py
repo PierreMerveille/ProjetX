@@ -192,7 +192,7 @@ def create_IA_ship (type, team, nb_ship,AI_stats):
 def go_to_profiatble_target () :
     """"""
 def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team):
-    """Command to a cruiser to attack the first tanker's ennemy if he is defensive
+    """Command to a cruiser to attack the first tanker's ennemy if the AI is offensive.
 
     Parameters
     ----------
@@ -228,31 +228,27 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team):
                 tanker_coordinate=ships[tanker]['coordinate']
                 if nbr_ship==1:
                     cruiser_target=cruiser
-                    cruiser_target_coordinate=ships[cruiser_target]['coordinate']
                     tanker_target=tanker
-                    tanker_target_coordinate=ships[tanker_target]['coordinate']
                     distance_min= max (abs(cruiser_target_coordinate[0]-tanker_target_coordinate[0]), abs(cruiser_target_coordinate[1]-tanker_target_coordinate[1]))
                 else :
                     if max (abs(cruiser_coordinate[0]-tanker_coordinate[0]), abs(cruiser_coordinate[1]-tanker_coordinate[1])) < distance_min:
                         cruiser_target=cruiser
-                        cruiser_target_coordinate=ships[cruiser_target]['coordinate']
                         tanker_target=tanker
-                        tanker_target_coordinate=ships[tanker_target]['coordinate']
                         distance_min = max (abs(cruiser_target_coordinate[0]-tanker_target_coordinate[0]), abs(cruiser_target_coordinate[1]-tanker_target_coordinate[1]))
                 nbr_ship+=1
         if range_verification (units_stats,cruiser_target,ships,tanker_target_coordinate,team):
-            order = cruiser_target + ':*' + tanker_target_coordinate[0] + '-' + tanker_target_coordinate[1]
+            order = cruiser_target + ':*' + tanker_target_coordinate[0] + '-' + tanker_target_coordinate[1] + '=' + ships[cruiser_target]['energy_point']/200
             return order
         else :
-            x=cruiser_target_coordinate[0]
-            y=cruiser_target_coordinate[1]
-            if cruiser_target_coordinate[0] < tanker_target_coordinate[0] :
+            x = ships[cruiser_target]['coordinate'][0]
+            y = ships[cruiser_target]['coordinate'][1]
+            if x < ships[tanker_target]['coordinate'][0] :
                 x += 1
-            elif cruiser_target_coordinate[0] > tanker_target_coordinate[0] :
+            elif x > ships[tanker_target]['coordinate'][0] :
                 x -= 1 
-            if cruiser_target_coordinate[1] < tanker_target_coordinate[1] :
+            if y < ships[tanker_target]['coordinate'][1] :
                 y += 1
-            elif cruiser_target_coordinate[1] > tanker_target_coordinate[1] :
+            elif y > ships[tanker_target]['coordinate'][1]] :
                 y -= 1
             order = cruiser_target +':@' + str(x) + '-' + str(y)
             return order
@@ -389,11 +385,11 @@ def create_selected_list_from_ships(ships,team):
     Parameters
     ----------
     ships : dictionary with the statistics of each ship (tanker or cruiser)(dict)
-    type : ship type (tanker or cruiser) you want (str)
+    team : name of the team which is playing (str)       
 
     Return
     ------
-    <selected_type>_list : makes a list of the selected type from the ships list (list)
+    <ship_type>_list : makes a list of the different types from the ships list for the selected team (list)
 
     """
     tanker_list = [] 
@@ -432,6 +428,7 @@ def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, e
     alert_cruiser = False
     close_ennemy_tanker = []
     close_ennemy_cruiser = []
+    
             
     #get coordinates of each ennemy ship
     
@@ -444,7 +441,7 @@ def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, e
                     if distance <= 10  : # reflechir a une formule adequate 
 
                         if ships[ship]['type'] == 'tanker' : 
-                            close_ennemy_tanker .append(ship)
+                            close_ennemy_tanker.append(ship)
 
                         elif ships[ship]['type'] == 'cruiser'  :
                             close_ennemy_cruiser.append(ship)

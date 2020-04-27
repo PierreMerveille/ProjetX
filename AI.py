@@ -127,6 +127,7 @@ def go_to_profitable_peak(ships,peaks,team,units_stats,total_peak_energy,our_gro
                             y = 1
                         else : 
                             y = 0
+                        
                         instruction = ship +':@' + str(x) + '-' + str(y)
 
                     instructions += instruction + ' '

@@ -25,13 +25,12 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
     
     """
     order_AI = ''
-    alive_tanker, alive_cruiser = create_selected_list_from_ships(ships,team)
-    alive_ennemy_tanker, alive_ennemy_cruiser = create_selected_list_from_ships(ships,ennemy_team)
+    alive_tanker, alive_cruiser = create_ships_lists(ships,team)
+    alive_ennemy_tanker, alive_ennemy_cruiser = create_ships_lists(ships,ennemy_team)
     grouped_peaks, peak_name = find_grouped_peaks(team, peaks, units_stats)
     stance,total_peak_energy,our_total_peak_energy, favorable_peaks= stance (ships)
     
     if stance == 'control' :
-        
         
         while units_stats[team]['hub']['energy_point'] > units_stats['Common']['tanker']['creation_cost'] : 
             if AI_stats[team]['nb_tanker'] != 4 or AI_stats[team]['nb_cruiser'] >0 :
@@ -46,20 +45,30 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
 
         flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team)
 
-        alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, ennemy_team)         
+        close_ennemy_cruiser,close_ennemy_tanker, alert_cruiser,alert_tanker = alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, ennemy_team)         
         
-        # Attaquer l'intrus
+        if alert_cruiser == True :
+            attack_cruiser ()
 
-
-        
-         
+        elif alert_tanker == True :
+            attack_tanker(stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cruiser,close_ennemy_tanker)
+              
 
     elif stance == 'offensive':
+
+        AI_transfer_and_destination (ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name)
+
         attack_cruiser()
+        
         
         ### note à l'attention de ce très cher Anthony, idée: attaquer en priorité un croiseur ayant plus d'énergie que les qutres et aussi ceux avec le moins d'HP
     elif stance == 'defensive' :
-        attack_tanker(stance,AI_stats,ships,units_stats,team,ennemy_team,alive_tanker,alive_ennemy_tanker,alive_ennemy_tanker, alive_ennemy_cruiser)
+
+        AI_transfer_and_destination (ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name)
+
+        flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team)
+
+       
         defense_()
     
     coordinates_to_go (ships)
@@ -97,7 +106,7 @@ def stance(ships, team, ennemy_team, peaks, units_stats, AI_stats,alive_tanker, 
 
     return stance,total_peak_energy,our_total_peak_energy, favorable_peaks
 
-def create_selected_list_from_ships(ships,team):
+def create_ships_lists(ships,team):
 
     """
     Parameters
@@ -336,6 +345,8 @@ def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, e
 
     if len(close_ennemy_cruiser) > 0:
         alert_cruiser = True
+
+    return close_ennemy_cruiser,close_ennemy_tanker, alert_cruiser,alert_tanker
 
 def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
     """
@@ -621,8 +632,6 @@ def peaks_on_our_map_side(team, units_stats, peaks):
 
 
 """ offensive function"""
-                
-
 
 """ Upgrade functions """
 
@@ -740,7 +749,6 @@ def nb_hauls(storage_without_upgrade, storage_with_upgrade, team, units_stats, p
 
     return average_nb_hauls
 
-
 def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, stance, favorable_peaks,cost_upgrade, max_upgrade, nb_tankers_to_create_this_round):
 
     """ Decides which upgrades to use, and when to use them
@@ -835,4 +843,3 @@ def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, 
         #deplacer tous sauf 1
 
         #Si ils sont plic ploc
-

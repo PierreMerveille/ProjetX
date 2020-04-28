@@ -649,7 +649,7 @@ def create_proximity_order_full_tankers_our_hub(team, ships, units_stats):
 
     return proximity_order_full_tankers_our_hub
 
-def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, stance, favorable_peaks):
+def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, stance, favorable_peaks,cost_upgrade, max_upgrade):
 
     """ Decides which upgrades to use, and when to use them
 
@@ -677,13 +677,13 @@ def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, 
 
         #control upgrades are tanker_capacity, regen and range
         #check regen:    
-        tanker_cost = 1000
+        
         current_hub_energy = AI_stats[team]['virtual_energy_point']
         regen_without_upgrade = units_stats[team]['hub']['regeneration']
         lost_money_without_regen_upgrade_list = []
         lost_money_without_storage_upgrade_list = []
         
-        for times_upgraded in  range (6):
+        for times_upgraded in  range (1, (max_upgrade['max_regen_upgrade'] - regen_without_upgrade)/5 + 1):
 
             regen_with_upgrade = regen_without_upgrade + 5 * times_upgraded
 
@@ -695,23 +695,33 @@ def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, 
         
         min_lost_money = min(lost_money_without_regen_upgrade_list)
 
-        #find the best nb of regen upgrades for actual nb_rounds         
-        for index in range(len(lost_money_without_regen_upgrade_list)):
-
-            if min_lost_money == lost_money_without_regen_upgrade_list[index]:
-
-                best_nb_regen_upgrades = index
-        
+        #find the best nb of regen upgrades for actual nb_rounds  
+        best_nb_regen_upgrades = lost_money_without_regen_upgrade_list.index(min_lost_money)
+      
         #calc energy won with best_nb_regen_upgrades during nb_rounds
-        money_with_best_nb_regen_upgrades = nb_rounds * (regen_without_upgrade + best_nb_regen_upgrades * 5) 
+        money_with_best_nb_regen_upgrades = nb_rounds * (regen_without_upgrade + best_nb_regen_upgrades * 5) - best_nb_regen_upgrades * cost_upgarde['cost_regen_upgrade'] 
 
         #check tanker:
         storage_without_upgrade = units_stats[team]['tanker']['max_energy']
 
-        for times_upgraded in range (4):
 
-            storage_with_upgrade = 
+        for times_upgraded in range (1,(max_upgrade['max_capacity_upgrade'] -storage_without_upgrade)/100 + 1 ):
 
+            storage_with_upgrade = storage_without_upgrade + 100 * times_upgraded
+
+            money_normal_storage = nb_rounds * regen_without_upgrade
+            money_upgraded_storage = nb_rounds * regen_with_upgrade
+
+            lost_money = money_upgraded_regen - money_normal_regen
+            lost_money_without_regen_upgrade_list.append(lost_money)
+        
+        min_lost_money = min(lost_money_without_regen_upgrade_list)
+
+        #find the best nb of regen upgrades for actual nb_rounds  
+        best_nb_regen_upgrades = lost_money_without_regen_upgrade_list.index(min_lost_money)
+      
+        #calc energy won with best_nb_regen_upgrades during nb_rounds
+        money_with_best_nb_regen_upgrades = nb_rounds * (regen_without_upgrade + best_nb_regen_upgrades * 5) - best_nb_regen_upgrades * cost_upgarde['cost_regen_upgrade'] 
 
 
 

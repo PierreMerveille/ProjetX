@@ -649,7 +649,7 @@ def create_proximity_order_full_tankers_our_hub(team, ships, units_stats):
 
     return proximity_order_full_tankers_our_hub
 
-def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, stance, favorable_peaks,cost_upgrade, max_upgrade):
+def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, stance, favorable_peaks,cost_upgrade, max_upgrade, nb_tankers_to_create_this_round):
 
     """ Decides which upgrades to use, and when to use them
 
@@ -672,7 +672,7 @@ def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, 
 
     """
     stance = stance(ships, team, ennemy_team, peaks, units_stats, AI_stats)
-    
+    favorable_peaks = peaks_on_our_map_side(team, units_stats, peaks)
     if stance == 'control':
 
         #control upgrades are tanker_capacity, regen and range
@@ -681,7 +681,7 @@ def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, 
         current_hub_energy = AI_stats[team]['virtual_energy_point']
         regen_without_upgrade = units_stats[team]['hub']['regeneration']
         lost_money_without_regen_upgrade_list = []
-        lost_money_without_storage_upgrade_list = []
+        peaks_modulo_yes = []
         
         for times_upgraded in  range (1, (max_upgrade['max_regen_upgrade'] - regen_without_upgrade)/5 + 1):
 
@@ -703,25 +703,36 @@ def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, 
 
         #check tanker:
         storage_without_upgrade = units_stats[team]['tanker']['max_energy']
-
-
-        for times_upgraded in range (1,(max_upgrade['max_capacity_upgrade'] -storage_without_upgrade)/100 + 1 ):
+        #formula for tanker creation worth 
+        #calc money_back_from_tankers = nb_tankers_to_create_this_round * units_stats[team]['tanker']['max_energy']
+        money_back_from_tankers = nb_tankers_to_create_this_round * units_stats[team]['tanker']['max_energy']
+        #calc if tanker upgrade is worth compared to the energy in peaks
+        for times_upgraded in range (0,(max_upgrade['max_capacity_upgrade'] - storage_without_upgrade)/100 + 1 ):
 
             storage_with_upgrade = storage_without_upgrade + 100 * times_upgraded
 
-            money_normal_storage = nb_rounds * regen_without_upgrade
-            money_upgraded_storage = nb_rounds * regen_with_upgrade
+            for peak in favorable_peaks:
+                #pics that have peaks[peak]['storage']%units_stats[team]['tanker']['max_energy'] = 0
+                if (peaks[peak]['storage']%(storage_with_upgrade)) == 0:
+                    peaks_modulo_yes.append(peak)
+            
+                nb_peaks_modulo = len(peaks_modulo_yes)
+            
 
-            lost_money = money_upgraded_regen - money_normal_regen
-            lost_money_without_regen_upgrade_list.append(lost_money)
+
         
-        min_lost_money = min(lost_money_without_regen_upgrade_list)
+            
+            
 
-        #find the best nb of regen upgrades for actual nb_rounds  
-        best_nb_regen_upgrades = lost_money_without_regen_upgrade_list.index(min_lost_money)
-      
-        #calc energy won with best_nb_regen_upgrades during nb_rounds
-        money_with_best_nb_regen_upgrades = nb_rounds * (regen_without_upgrade + best_nb_regen_upgrades * 5) - best_nb_regen_upgrades * cost_upgarde['cost_regen_upgrade'] 
+        
+        
+#calc next_round_hub_energy = current_hub_energy - nb_tanker_to_create_this_round * units_stats['common']['tanker']['creation_cost'] + nb_tankers_to_create_this_round * units_stats[team]['tanker']['max_energy']
+#to determine if upgrade should be done now or later, next_round_hub_energy >= tanker_creation_cost
+     
+
+            
+        
+    
 
 
 

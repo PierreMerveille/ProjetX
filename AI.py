@@ -368,6 +368,110 @@ def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
     if len(close_ennemy_hub_cruiser) > 0:
         alert_hub_cruiser = True
 
+def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name,alive_tanker,alive_cruiser) :
+    """ Identify the ideal coordinates where the tankers should go ans tore it in ships and create transfer_instruction for them 
+
+    Parameters
+    ----------
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    peaks : dictionary with informations about each peak (dict)
+    team : name of the team which is playing (str)   
+    units_states : states of each unit (dict)
+    total_peak_energy : total of energy available on the map (int)
+    grouped_peaks : dictionnary with all the peaks around each peak (example: {1:[peak_1,peak_2]; 2: [peak_3, peak_1]}) (dict)
+    peak_name : list of peaks with the corresponding to the groupe_peaks dictionnary (list)
+    alive_tanker : list with the name of the tanker of the team which are alive (list)
+    alive_cruiser : list with the name of the cruiser of the team which are alive (list)
+
+    Return :
+    --------
+    transfer_instruction : AI order for transfer (str)
+    """
+
+    #initialise the variable
+    best_profitability = 0
+    transfer_instruction = ''
+    favorable_peaks = peaks_on_our_map_side(team, units_stats, peaks)
+
+    for tanker in alive_tanker :
+        # if the tanker has drawn or given his energy
+        if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) <=1 :
+
+            #go to draw energy 
+            if ships[tanker]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 and total_peak_energy >0 : # reflechir aux conditions
+                # si le tanker a moins de 60 % , calculer combien d'énergie restant, pour voir si plus rentable d'aller au hub ou au peak puis de rmeplir avec une totalité de réserve
+
+                for index in peak_name :
+                    if peaks[peak_name[index]]['storage'] > 0 :
+                    #calculate the distance between the peak and the tanker
+                        distance = count_distance (peaks[peak_name[index]]['coordinates'], ships[tanker]['coordinates']) 
+                        #formula of profitability
+                        profitability = (peaks[peak_name[index]]['storage']/distance) * len(grouped_peaks[index]) 
+                        
+                        #select the peak if it's the most profitable
+                        if profitability >= best_profitability :
+                            best_profitability = profitability
+                            peak_coordinates = peaks[peak_name[index]]['coordinates']
+                   
+                ships[ship]['coordinates_to_go'] = peak_coordinates
+
+                    #if the new peak is in range ==> draw 
+                if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) <= 2 :
+                    transfer_instruction += str(tanker) + ':<'+ ships[tanker]['coordinates_to_go'] + ' '
+            # go to give energy 
+            else : 
+                #chnage the rate depending on the stance 
+                if stance=='control':
+                    rate = 1/5
+                elif stance == 'defense': 
+                    rate = 2/5
+                elif stance == 'attack' :
+                    rate = 1/2
+                low_fuel_cruiser = []
+                for index in alive_cruiser :
+                    if ships[alive_cruiser[index]]['energy_point'] <= rate * units_stats['common']['cruiser']['max_energy'] :
+                        low_fuel_cruiser.append()
+                #if one of the cruiser is empty
+                if len(low_fuel_cruiser)!= 0 :
+                    destination = ''
+                    for index in low_fuel_cruiser :
+                        distance = count_distance (ships[low_fuel_cruiser[index]]['coordiantes'],ships[tanker]['coordinates'])
+                        if index == 0:
+                            min_distance = distance
+                            destination = low_fuel_cruiser[index]
+                        else :
+                            if distance < min_distance :
+                                min_distance = distance 
+                                destination  = low_fuel_cruiser[index]
+                 
+                                     
+
+                    ships[tanker]['coordinates_to_go'] = ships[destination]['coordinates']
+                # else: give to hub 
+                else :
+                    destination = 'hub'
+                    ships[tanker]['coordinates_to_go'] = units_stats[team]['hub']['coordinates']
+
+                if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) <= 2:
+                
+                    transfer_instruction += str(tanker) + ':>'+ destination + ' '
+              
+        #if the tanker has not yet given or drawn energy
+        else :
+            if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) ==2 :
+                if ships[tanker]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 and total_peak_energy >0 :
+                    transfer_instruction += str(tanker) + ':<'+ ships[tanker]['coordinates_to_go'] + ' '
+                else : 
+                    for index in alive_cruiser :
+                        if ships[alive_cruiser[index]]['coordinates'] == ships[tanker]['coordinates_to_go']:
+                            cruiser_destination = alive_cruiser[index]
+                    transfer_instruction += str(tanker) + ':>'+ cruiser_destination + ' '
+
+    #delete the space at the end of transfer_instruction                
+    if len (transfer_instruction) != 0:
+        transfer_instruction = transfer_instruction[:-1]
+    return transfer_instruction
+
 
 
 
@@ -418,92 +522,6 @@ def control_is_worth (team, ennemy_team, peaks, ships, units_stats,AI_stats):
         control_is_worth = False # --> stop making tankers
 
     return control_is_worth, our_total_peak_energy, total_peak_energy, favorable_peak
-
-def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name,alive_tanker,alive_cruiser) :
-    """ fonction used in control
-    """
-
-    #initialise the variable
-    best_profitability = 0
-    transfer_instruction = ''
-    favorable_peaks = peaks_on_our_map_side(team, units_stats, peaks)
-
-    for tanker in alive_tanker :
-        # if the tanker has drawn or given his energy
-        if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) <=1 :
-
-            #go to draw energy 
-            if ships[tanker]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 and total_peak_energy >0 : # reflechir aux conditions
-                # si le tanker a moins de 60 % , calculer combien d'énergie restant, pour voir si plus rentable d'aller au hub ou au peak puis de rmeplir avec une totalité de réserve
-
-                for index in peak_name :
-                    if peaks[peak_name[index]]['storage'] > 0 :
-                    #calculate the distance between the peak and the tanker
-                        distance = count_distance (peaks[peak_name[index]]['coordinates'], ships[tanker]['coordinates']) 
-                        #formula of profitability
-                        profitability = (peaks[peak_name[index]]['storage']/distance) * len(grouped_peaks[index]) 
-                        
-                        #select the peak if it's the most profitable
-                        if profitability >= best_profitability :
-                            best_profitability = profitability
-                            peak_coordinates = peaks[peak_name[index]]['coordinates']
-                   
-                ships[ship]['coordinates_to_go'] = peak_coordinates
-
-                    #if the new peak is in range ==> draw 
-                if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) <= 2 :
-                    transfer_instruction += str(tanker) + ':<'+ ships[tanker]['coordinates_to_go'] + ' '
-            # go to give energy 
-            else : 
-                if stance=='control':
-                    empty_cruiser = []
-                    for index in alive_cruiser :
-                        if ships[alive_cruiser[index]]['energy_point'] == 0 :
-                            empty_cruiser.append()
-                    #if one of the cruiser is empty
-                    if len(empty_cruiser)!= 0 :
-                        destiantion = ''
-                        for index in empty_cruiser :
-                            distance = count_distance (ships[empty_cruiser[index]]['coordiantes'],ships[tanker]['coordinates'])
-                            if index == 0:
-                               min_distance = distance
-                               destination = empty_cruiser[index]
-                            else :
-                                if distance < min_distance :
-                                    min_distance = distance 
-                                    destination  = empty_cruiser[index]
-                                     
-
-                        ships[tanker]['coordinates_to_go'] = ships[destination]['coordinates']
-                    # else: give to hub 
-                    else :
-                        destination = 'hub'
-                        ships[tanker]['coordinates_to_go'] = units_stats[team]['hub']['coordinates']
-
-                    if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) <= 2:
-                   
-                        transfer_instruction += str(tanker) + ':>'+ destination + ' '
-                     
-
-                        
-                
-
-        #if the tanker has not yet given or drawn energy
-
-        else :
-            if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) ==2 :
-                if ships[tanker]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 and total_peak_energy >0 :
-                    transfer_instruction += str(tanker) + ':<'+ ships[tanker]['coordinates_to_go'] + ' '
-                else : 
-                    for index in alive_cruiser :
-                        if ships[alive_cruiser[index]]['coordinates'] == ships[tanker]['coordinates_to_go']:
-                            cruiser_destination = alive_cruiser[index]
-                    transfer_instruction += str(tanker) + ':>'+ cruiser_destination + ' '
-
-    #delete the space at the end of transfer_instruction                
-    if len (transfer_instruction) != 0:
-        transfer_instruction = transfer_instruction[:-1]
-    return transfer_instruction
 
 def find_grouped_peaks(team, peaks, units_stats):
     """

@@ -127,6 +127,17 @@ def coordinates_to_go (ships):
 
     for ship in ships :
         if ships[ship]['coordinates_to_go'] != ships[ship]['coordinates'] :
+
+            x = ships[ship]['coordinates'][0]
+            y = ships[ship]['coordinates'][1]
+            if x < ships[ship]['coordinates_to_go'][0] :
+                x += 1
+            elif x > ship[ship]['coordinates_to_go'][0] :
+                x -= 1 
+            if y < ships[ship]['coordinates_to_go'][1] :
+                y += 1
+            elif y > ships[ship]['coordinates_to_go'][1] :
+                y -= 1
             instructions += str(ship) + ':@'+ str(ships[ship]['coordinates_to_go']) 
 
 def count_distance (coord_1, coord_2):

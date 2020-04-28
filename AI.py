@@ -82,16 +82,16 @@ def stance(ships, team, ennemy_team, peaks, units_stats, AI_stats,alive_tanker, 
     
 
     control_is_worth, our_total_peak_energy, total_peak_energy, favorable_peaks = control_is_worth(team, peaks, ships, units_stats, AI_stats) 
-
-    if alive_ennemy_cruiser == 0 or ((AI_stats[team]['nb_cruiser'] > alive_ennemy_cruiser ) and not control_is_worth):
+  
         
-        stance = 'offensive'
-        
-    if (alive_ennemy_cruiser >0 and alive_ennemy_tanker ==0) or (alive_ennemy_cruiser > AI_stats[team]['nb_cruiser']): # rajouter close to our hub dans la condition
-
+    if alert_ennemy_close_to_our_hub(units_stats,ships,team,ennemy_team) or (alive_ennemy_cruiser > alive_cruiser and not control_is_worth): 
         stance = 'defensive'
 
-    elif (alive_ennemy_cruiser < alive_ennemy_tanker or AI_stats[team]['nb_cruiser'] > alive_ennemy_cruiser) and control_is_worth:
+    elif ((alive_cruiser> alive_ennemy_cruiser ) and not control_is_worth) or not control_is_worth :
+        
+        stance = 'offensive'
+
+    elif (alive_ennemy_cruiser < alive_ennemy_tanker or alive_cruiser > alive_ennemy_cruiser) and control_is_worth:
        
         stance = 'control'
 

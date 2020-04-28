@@ -3,6 +3,7 @@
 from colored import *
 from random import *
 import remote_play
+from AI import *
 
 
 def play (map_title, team_1, team_1_type, team_2, team_2_type):
@@ -354,7 +355,7 @@ def separate_instruction (order, ships, units_stats,board,team,peaks):
         for element in instruction :
             if element == ':' :
                 occurence += 1
-        #add to instrcution_list if there is only one ':'
+        #add to instruction_list if there is only one ':'
         if occurence == 1: 
             instruction = instruction.split (':')
             instructions_list.append(instruction)
@@ -1034,7 +1035,7 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements, long
     -------
 
     This function create boxes in a "damier" so that the players can easily see the difference between each boxes
-    The board is surrounded by a "bordure" which contains the numbers of the boxes as when you play chess 
+    The board is surrounded by a "board_strure" which contains the numbers of the boxes as when you play chess 
 
     Version 
     -------
@@ -1045,27 +1046,27 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements, long
                     Johan Rochet (v.2 03/03/20)
                     
     """
-    bord= fg(255)
+    board_str= fg(255)
     # creation of the board
     for i in range (larg+2):
         #jump for each row
-        bord += bg(0) + '\n'
+        board_str += bg(0) + '\n'
         
         if i == 0 or i == larg +1 :
             #first and last row
             for j in range (long+2):
                 #begin
                 if j == 0 :
-                    bord += bg('6')+'   ' 
+                    board_str += bg('6')+'   ' 
                 #end
                 elif j == long+1 :
-                    bord+= bg('6') +'   '
+                    board_str+= bg('6') +'   '
                 #column < 10        
                 elif j<10:
-                    bord+= bg(6)+str(j) +'  '
+                    board_str+= bg(6)+str(j) +'  '
                 #column < 100   
                 else :
-                    bord += bg(6) + str(j)+ ' '
+                    board_str += bg(6) + str(j)+ ' '
             
         else : 
             
@@ -1073,13 +1074,13 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements, long
             for j in range (long+2):
                 #begin and end
                 if j==0 or j==long+1:
-                    bord += bg('6') + str(i) 
+                    board_str += bg('6') + str(i) 
                     if i<10 : 
                         #begin
-                        bord+= '  '
+                        board_str+= '  '
                     else:
                         #end
-                        bord += ' '+ bg('0')
+                        board_str += ' '+ bg('0')
                 else :
                     #grid
                     if (i+j) % 2 == 0 :
@@ -1087,9 +1088,9 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements, long
                     else : 
                         color = bg('115')
                     # add the character and the front color of the character and reset color to white after
-                    bord += color + select_value_to_print(board, (j,i),units_stats,ships,peaks, color_team,elements)  + attr(0) + fg('255')
-    bord += bg('0')       
-    print(bord) 
+                    board_str += color + select_value_to_print(board, (j,i),units_stats,ships,peaks, color_team,elements)  + attr(0) + fg('255')
+    board_str += bg('0')       
+    print(board_str) 
         
 def display_stats (elements, color_team, ships, units_stats, peaks):
     """

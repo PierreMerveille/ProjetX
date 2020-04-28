@@ -219,12 +219,12 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cru
 
     Parameters
     ----------
-    stance : if we are defensive or offensive (string).
-    AI_stats : the dictionnary with all the stats of the AI (dictionnary).
-    ships : the dictionnary with all the ships (dictionnary).
-    units_stats : the dictionnary with the info of the hub (dictionnary).
-    team = the name of our team (string).
-    ennemy_team = the name of the ennemy team (string).
+    stance : if we are defensive or offensive (str).
+    AI_stats : the dictionnary with all the stats of the AI (dict).
+    ships : the dictionnary with all the ships (dict).
+    units_stats : the dictionnary with the info of the hub (dict).
+    team = the name of our team (str).
+    ennemy_team = the name of the ennemy team (str).
 
     Notes
     -----
@@ -379,6 +379,7 @@ def control_is_worth (team, ennemy_team, peaks, ships, units_stats,AI_stats):
     peaks : dictionary with informations about each peak (dict)
     ships : dictionary with the statistics of each ship (tanker or cruiser)(dict)
     units_stats : dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    AI_stats: dictionary of the specific information for the AI(s) (dict)
 
     Return
     ------
@@ -573,7 +574,7 @@ def find_nb_rounds(team, ships, units_stats, AI_stats):
     team : name of the team which is playing (str)   
     ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
     units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
-    AI_stats : 
+    AI_stats: dictionary of the specific information for the AI(s) (dict)
 
     Return
     ------
@@ -648,7 +649,7 @@ def create_proximity_order_full_tankers_our_hub(team, ships, units_stats):
 
     return proximity_order_full_tankers_our_hub
 
-def what_upgrade_to_use(team, AI_stats, units_stats, nb_rounds, stance, favorable_peaks):
+def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, stance, favorable_peaks):
 
     """ Decides which upgrades to use, and when to use them
 
@@ -656,7 +657,10 @@ def what_upgrade_to_use(team, AI_stats, units_stats, nb_rounds, stance, favorabl
     ----------
 
     team : name of the team which is playing (str) 
-    AI_stats :   
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    ennemy_team : name of the ennemy_team (str)
+    peaks : dictionary with all the peaks (dict)
+    AI_stats: dictionary of the specific information for the AI(s) (dict)
     units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
     nb_rounds : number of rounds to wait for THE closest FULL tanker to come back or number of rounds to wait for the TWO closest FULL tankers to come back (int)
     stance :
@@ -668,6 +672,56 @@ def what_upgrade_to_use(team, AI_stats, units_stats, nb_rounds, stance, favorabl
 
     """
     stance = stance(ships, team, ennemy_team, peaks, units_stats, AI_stats)
+    
+    if stance == 'control':
+
+        #control upgrades are tanker_capacity, regen and range
+        #check regen:    
+        tanker_cost = 1000
+        current_hub_energy = AI_stats[team]['virtual_energy_point']
+        regen_without_upgrade = units_stats[team]['hub']['regeneration']
+        lost_money_without_regen_upgrade_list = []
+        lost_money_without_storage_upgrade_list = []
+        
+        for times_upgraded in  range (6):
+
+            regen_with_upgrade = regen_without_upgrade + 5 * times_upgraded
+
+            money_normal_regen = nb_rounds * regen_without_upgrade
+            money_upgraded_regen = nb_rounds * regen_with_upgrade
+
+            lost_money = money_upgraded_regen - money_normal_regen
+            lost_money_without_regen_upgrade_list.append(lost_money)
+        
+        min_lost_money = min(lost_money_without_regen_upgrade_list)
+
+        #find the best nb of regen upgrades for actual nb_rounds         
+        for index in range(len(lost_money_without_regen_upgrade_list)):
+
+            if min_lost_money == lost_money_without_regen_upgrade_list[index]:
+
+                best_nb_regen_upgrades = index
+        
+        #calc energy won with best_nb_regen_upgrades during nb_rounds
+        money_with_best_nb_regen_upgrades = nb_rounds * (regen_without_upgrade + best_nb_regen_upgrades * 5) 
+
+        #check tanker:
+        storage_without_upgrade = units_stats[team]['tanker']['max_energy']
+
+        for times_upgraded in range (4):
+
+            storage_with_upgrade = 
+
+
+
+
+
+        
+
+            
+
+
+
 
     # peak 1 2000 peak 2 2000 peak_3 2000
 

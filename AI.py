@@ -24,6 +24,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
     specification : Johan Rochet (v.1 25/04/20)
     
     """
+    order_AI = ''
     alive_tanker, alive_cruiser = create_selected_list_from_ships(ships,team)
     alive_ennemy_tanker, alive_ennemy_cruiser = create_selected_list_from_ships(ships,ennemy_team)
     grouped_peaks, peak_name = find_grouped_peaks(team, peaks, units_stats)
@@ -34,7 +35,9 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
         
         while units_stats[team]['hub']['energy_point'] > units_stats['Common']['tanker']['creation_cost'] : 
             if AI_stats[team]['nb_tanker'] != 4 or AI_stats[team]['nb_cruiser'] >0 :
-                instruction = create_IA_ship('tanker',team,'nb_tanker',AI_stats)
+                instruction,name = create_IA_ship('tanker',team,'nb_tanker',AI_stats)
+                #transfer from the new tanker to hub 
+                order_AI += name + ':>'+ str(units_stats[team]['hub']['coordiantes'][0]) + '-' + str(units_stats[team]['hub']['coordiantes'][1])
             #create a security_cruiser
             else :
                 instruction = create_IA_ship('cruiser',team,'nb_cruiser',AI_stats)
@@ -169,10 +172,11 @@ def create_IA_ship (type, team, nb_ship,AI_stats):
     implementation : Johan Rochet (v.1 24/04/20)
 
     """
-    
-    instruction = (type + '_'+ str(team) +'_' + str(AI_stats[team][nb_ship]) + ':' + type)
+    name = type + '_'+ str(team) +'_' + str(AI_stats[team][nb_ship])
+    instruction = (name + ':' + type)
     AI_stats[team][nb_ship] += 1
-    
+
+    return instrcution, name
     
 
 
@@ -803,14 +807,3 @@ def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, 
 
         #Si ils sont plic ploc
 
-
-
-        
-    
-        
-
-
-            
-
-    
- 

@@ -511,7 +511,7 @@ def find_grouped_peaks(team, peaks, units_stats):
 
     Return
     ------
-    grouped_peaks : dictionary for the favorable grouped peaks (dict)
+    grouped_peaks : dictionary for the grouped peaks (dict)
 
     Notes
     -----
@@ -532,7 +532,7 @@ def find_grouped_peaks(team, peaks, units_stats):
     #check if there are other peaks in range of our favorable peaks, from less probable groupement (ex : 3x3) to most probable 
     #get favorable_peak coordinates
     for peak in peaks: #################### idée de changer cette fonction en récupérant tous groupes de peaks et de mettre la fonction favorable dans go-to-profitable_peaks(dans la formule)
-        peaks_coord .append(peaks[peak]['coordinates'])
+        peaks_coord.append(peaks[peak]['coordinates'])
         peak_name.append (peak)
     
     for index_1 in range(len(peaks_coord)) :
@@ -544,9 +544,9 @@ def find_grouped_peaks(team, peaks, units_stats):
             for index_2 in range (len(peaks_coord)) :
 
                 if count_distance (peaks_coord[index_1], peaks_coord[index_2]) < 4 and peaks and peaks[peak_name[index_2]]['storage']!=0 :
-                    grouped_peaks[index_1].append (peak_name[index_2])
+                    grouped_peaks[index_1].append(peak_name[index_2])
                
-    return grouped_peaks,peak_name
+    return grouped_peaks, peak_name
 
 def peaks_on_our_map_side(team, units_stats, peaks):
     """
@@ -746,6 +746,7 @@ def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, 
                     peaks_modulo_yes.append(peak)
             
                 nb_peaks_modulo = len(peaks_modulo_yes)
+            
             
 
 

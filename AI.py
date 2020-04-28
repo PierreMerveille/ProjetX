@@ -420,7 +420,7 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
     """
 
     #initialise the variable
-    most_profitable = 0
+    best_profitability = 0
     transfer_instruction = ''
     favorable_peaks = peaks_on_our_map_side(team, units_stats, peaks)
 
@@ -440,9 +440,8 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
                         profitability = (peaks[peak_name[index]]['storage']/distance) * len(grouped_peaks[index]) 
                         
                         #select the peak if it's the most profitable
-                        if profitability >= most_profitable :
-                            profitable_distance = distance
-                            most_profitable = profitability
+                        if profitability >= best_profitability :
+                            best_profitability = profitability
                             peak_coordinates = peaks[peak_name[index]]['coordinates']
                    
                 ships[ship]['coordinates_to_go'] = peak_coordinates

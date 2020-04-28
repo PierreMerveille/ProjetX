@@ -1,4 +1,4 @@
-#At game start create tanker and tranfer energy back into hub
+from math import ceil
 
 """ general function """
 
@@ -678,6 +678,36 @@ def create_proximity_order_full_tankers_our_hub(team, ships, units_stats):
 
     return proximity_order_full_tankers_our_hub
 
+def nb_hauls(storage_without_upgrade, storage_with_upgrade, team, units_stats, peaks, max_upgrade):
+    """
+    Parameters
+    ----------
+
+    team : name of the team which is playing (str)   
+    peaks : dictionary with informations about each peak (dict)
+    units_stats : dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+
+    Return
+    ------
+    average_nb_hauls : average hauls needed for a tanker to empty a peak on the map (list)
+
+    """
+    hauls_list = []
+
+    for times_upgraded in range (0,(max_upgrade['max_capacity_upgrade'] - storage_without_upgrade)/100 + 1 ):
+
+        for peak in peaks:
+
+            if peaks[peak]['storage'] % storage_with_upgrade == 0:
+
+                nb_hauls = peaks[peak]['storage']/storage_with_upgrade
+                hauls_list.append(nb_hauls)
+    
+    average_nb_hauls = ceil(sum(hauls_list)/len(hauls_list))
+
+    return average_nb_hauls
+
+
 def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, stance, favorable_peaks,cost_upgrade, max_upgrade, nb_tankers_to_create_this_round):
 
     """ Decides which upgrades to use, and when to use them
@@ -702,6 +732,7 @@ def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, 
     """
     stance = stance(ships, team, ennemy_team, peaks, units_stats, AI_stats)
     favorable_peaks = peaks_on_our_map_side(team, units_stats, peaks)
+
     if stance == 'control':
 
         #control upgrades are tanker_capacity, regen and range
@@ -711,6 +742,9 @@ def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, 
         regen_without_upgrade = units_stats[team]['hub']['regeneration']
         lost_money_without_regen_upgrade_list = []
         peaks_modulo_yes = []
+        rest_modulo_list = []
+        money_lost_tanker_creation_list = []
+        average_nb_hauls_list = []
         
         for times_upgraded in  range (1, (max_upgrade['max_regen_upgrade'] - regen_without_upgrade)/5 + 1):
 
@@ -732,60 +766,42 @@ def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, 
 
         #check tanker:
         storage_without_upgrade = units_stats[team]['tanker']['max_energy']
-        #formula for tanker creation worth 
-        #calc money_back_from_tankers = nb_tankers_to_create_this_round * units_stats[team]['tanker']['max_energy']
-        money_back_from_tankers = nb_tankers_to_create_this_round * units_stats[team]['tanker']['max_energy']
+
         #calc if tanker upgrade is worth compared to the energy in peaks
         for times_upgraded in range (0,(max_upgrade['max_capacity_upgrade'] - storage_without_upgrade)/100 + 1 ):
 
             storage_with_upgrade = storage_without_upgrade + 100 * times_upgraded
-
-            for peak in favorable_peaks:
-                #pics that have peaks[peak]['storage']%units_stats[team]['tanker']['max_energy'] = 0
-                if (peaks[peak]['storage']%(storage_with_upgrade)) == 0:
-                    peaks_modulo_yes.append(peak)
             
-                nb_peaks_modulo = len(peaks_modulo_yes)
+            #calc money_back_from_tankers = nb_tankers_to_create * units_stats[team]['tanker']['max_energy']
+            money_back_from_tankers = nb_tankers_to_create * storage_with_upgrade #tankers qui doivent encore être créés
             
+            #calc price for creating nb_tankers_to_create
+            price_to_create_nb_tankers = nb_tankers_to_create * units_stats['common']['tanker']['creation_cost'] #tankers qui doivent encore être créés
             
+            #calc money_lost_after_nb_tanker_to_create
+            money_lost_tanker_creation = price_to_create_nb_tankers - money_back_from_tankers
+            
+            #use money_lost_tanker_creation_list to calc if worth upgrading more : if money_lost_tanker_creation_list[1] - money_lost_tanker_creation_list[2] - cost_upgrade['cost_upgrade_capacity'] > 0
+            money_lost_tanker_creation_list.append(money_lost_tanker_creation)
+
+            #see what upgrade would be optimal to reduce the nb of average hauls
+            average_nb_hauls = nb_hauls(storage_without_upgrade, storage_with_upgrade, team, units_stats, peaks, max_upgrade)
+            average_nb_hauls_list.append(average_nb_hauls)
+
+        nb_upgrades_smallest_nb_hauls = average_nb_hauls_list.index(min(average_nb_hauls_list))
 
 
+        #see if upgrade is already worth it for the money during tanker creation
+        if money_lost_tanker_creation_list[1] - money_lost_tanker_creation_list[2] - cost_upgrade['cost_upgrade_capacity'] > 0:
+ 
         
-            
-            
-
-        
-        
-#calc next_round_hub_energy = current_hub_energy - nb_tanker_to_create_this_round * units_stats['common']['tanker']['creation_cost'] + nb_tankers_to_create_this_round * units_stats[team]['tanker']['max_energy']
-#to determine if upgrade should be done now or later, next_round_hub_energy >= tanker_creation_cost
+        #calc next_round_hub_energy = current_hub_energy - nb_tanker_to_create_this_round * units_stats['common']['tanker']['creation_cost'] + nb_tankers_to_create_this_round * units_stats[team]['tanker']['max_energy']
+        #to determine if upgrade should be done now or later, next_round_hub_energy >= tanker_creation_cost
      
 
-            
-        
-    
+        #deplacer tous sauf 1
 
-
-
-
-        
-
-            
-
-
-
-
-    # peak 1 2000 peak 2 2000 peak_3 2000
-
-    #don't do any tanker upgrades, take max and then go to next if peak_energy < tanker_max_energy
-    #if for more than half of the favorable peaks (len(favorable_peaks)/2) are tested positive for a tanker upgrade, do it, else don't 
-    #if for each peak, peak_energy % max_tanker_energy != 0 then check if peak_energy % max_tanker_energy + tanker_upgrade = 0 if yes do the amount of upgrades
-
-
-
-
-    #deplacer tous sauf 1
-
-    #Si ils sont plic ploc
+        #Si ils sont plic ploc
 
 
 

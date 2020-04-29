@@ -939,19 +939,25 @@ def attack_hub (stance, AI_stats, ships, units_stats, alive_cruiser, ennemy_team
     Version
     -------
     specification : Anthony Pierard (v.1 27/04/20)
+    implementation : Anthony Pierard (v.1 27/04/20)
+                     Anthony Pierard (v.2 29/04/20)
     """
     total_dammage=0
+    #calculate all the dammage of the cruiser
     for cruiser in alive_cruiser :
         total_dammage += ships[cruiser]['energy_point']/units_stats['common']['cruiser']['cost_attack']
+    #attack the hub if we have double of health of the ennemy hub because we can lose cruiser.
     if total_dammage/2 < units_stats[ennemy_team]['hub']['HP'] :
         attack_list = []
         move_list = []
         for cruiser in alive_cruiser:
             hub_coordinate = units_stats[ennemy_team]['hub']['coordinate']
             cruiser_coordinate = ships[cruiser]['coordinate']
+            #if the cruiser is in range create an attack
             if range_verification (units_stats, cruiser, ships, hub_coordinate, team):
                 instruction = cruiser + ':*' + hub_coordinate[0] + '-' + hub_coordinate[1] + '=' + ships[cruiser]['energy_point']
                 attack_list.append (instruction)
+            #else move the cruiser close to the hub and check if an other cruiser is on the nearest case. 
             else :
                 x = cruiser_coordinate[0]
                 y = cruiser_coordinate[1]

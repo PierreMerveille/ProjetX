@@ -472,6 +472,11 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
         # if the tanker has drawn or given his energy
         if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) <=1 :
 
+            low_fuel_cruiser = []
+            for cruiser in alive_cruiser :
+                if ships[cruiser]['energy_point'] <= rate * units_stats['common']['cruiser']['max_energy'] :
+                    low_fuel_cruiser.append()
+            
             #go to draw energy 
             if (ships[tanker]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 and total_peak_energy >0 ): # reflechir aux conditions
                 # si le tanker a moins de 60 % , calculer combien d'énergie restant, pour voir si plus rentable d'aller au hub ou au peak puis de rmeplir avec une totalité de réserve
@@ -494,13 +499,15 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
                     #if the new peak is in range ==> draw 
                 if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) <= 2 :
                     transfer_instruction += str(tanker) + ':<'+ ships[tanker]['coordinates_to_go'] + ' '
+
+            elif ships[tanker]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 :
+                
+                #if one of the cruiser has a low fuel
+                if len(low_fuel_cruiser)!= 0 :
+                    ships[tanker]['coordinates_to_go']= units_stats[team]['hub']['coordinates']
             # go to give energy 
             else : 
                 
-                low_fuel_cruiser = []
-                for cruiser in alive_cruiser :
-                    if ships[cruiser]['energy_point'] <= rate * units_stats['common']['cruiser']['max_energy'] :
-                        low_fuel_cruiser.append()
                 #if one of the cruiser has a low fuel
                 if len(low_fuel_cruiser)!= 0 :
                     destination = ''

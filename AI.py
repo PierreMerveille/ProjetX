@@ -829,6 +829,7 @@ def best_nb_upgrades(decided_to_attack, team, ships, ennemy_team, peaks, AI_stat
     nb_range_upgrades : optimal number of range upgrades to keep a range >= to the ennemy team (int)
     nb_storage_upgrades : optimal number of storage upgrades to reach max profitability (int)
     nb_regen_upgrades : optimal number of regen upgrades to reach max profitability (int)
+    money_lost_tanker_creation_list : list with the value of money lost after creation of nb_tanker_to_create depending on the storage upgrade (list)
 
     """
     stance = stance(ships, team, ennemy_team, peaks, units_stats, AI_stats)
@@ -903,10 +904,60 @@ def best_nb_upgrades(decided_to_attack, team, ships, ennemy_team, peaks, AI_stat
     
     return nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, money_lost_tanker_creation_list
 
-def apply_upgrades(nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, AI_stats, nb_tanker_to_create_this_round, money_lost_tanker_creation_list):          
+def nb_tankers_to_create(team, units_stats, favorable_peaks, peaks) :
+
+    """
+    Parameters
+    ---------- 
+    team : name of the team which is playing (str) 
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    peaks : dictionary with all the peaks (dict)
+    favorable_peaks : list with the name of peaks situated closer to our hub (our side of the map) (list)
+
+    Return
+    ------
+
+    nb_tankers_to_create : number of tankers to create determined from the number of energy in the peaks on our side of them map (int)
+    
+    """
+    our_total_energy = 0
+
+    for peak in favorable_peaks: 
+
+        our_total_energy += peaks[peak]['storage'] 
+    
+    nb_tankers_to_create = our_total_energy/units_stats[team]['tanker']['max_energy_point']
+
+def nb_tankers_to_create_this_round(team, AI_stats, units_stats, alive_tanker, nb_tanker_to_create, nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades):
+    
     """
     Parameters
     ----------
+    team : name of the team which is playing (str) 
+    AI_stats: dictionary of the specific information for the AI(s) (dict)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    alive_tanker : list with the name of the tanker of the team which are alive (list)
+    nb_tanker_to_create : number of tankers to create determined from the number of energy in the peaks on our side of them map (int)
+    nb_range_upgrades : optimal number of range upgrades to keep a range >= to the ennemy team (int)
+    nb_storage_upgrades : optimal number of storage upgrades to reach max profitability (int)
+    nb_regen_upgrades : optimal number of regen upgrades to reach max profitability (int)
+
+    Return
+    ------
+    nb_tankers_to_create_this_round : number of tankers to create during this round (int)
+
+    """
+    if (nb_range_upgrades == 0 and nb_storage_upgrades == 0 and nb_regen_upgrades == 0) and len(alive_tanker) < nb_tanker_to_create :
+        
+        nb_tankers_to_create_this_round = AI_stats[team]['virtual_energy_point']/units_stats['common']['tanker']['creation_cost']
+
+def do_upgrades(team, units_stats, nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, AI_stats, nb_tankers_to_create_this_round, money_lost_tanker_creation_list):          
+    
+    """
+    Parameters
+    ----------
+    team : name of the team which is playing (str) 
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
     nb_range_upgrades : optimal number of range upgrades to keep a range >= to the ennemy team (int)
     nb_storage_upgrades : optimal number of storage upgrades to reach max profitability (int)
     nb_regen_upgrades : optimal number of regen upgrades to reach max profitability (int)
@@ -919,6 +970,9 @@ def apply_upgrades(nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, AI
     instruction : instruction to make the number of the desired upgrades
 
     """      
+    #calc next_round_hub_energy = current_hub_energy - nb_tanker_to_create_this_round * units_stats['common']['tanker']['creation_cost'] + nb_tankers_to_create_this_round * units_stats[team]['tanker']['max_energy']
+    next_round_hub_energy = AI_stats[team]['virtual_energy_point'] - nb_tankers_to_create_this_round * units_stats['common']['tanker']['creation_cost'] + nb_tankers_to_create_this_round * units_stats[team]['tanker']['max_energy']
+
 def attack_hub (stance, AI_stats, ships, units_stats, alive_cruiser, ennemy_team, board):
     """ Command all the cruiser to attack the ennemy hub 
 
@@ -939,19 +993,25 @@ def attack_hub (stance, AI_stats, ships, units_stats, alive_cruiser, ennemy_team
     Version
     -------
     specification : Anthony Pierard (v.1 27/04/20)
+    implementation : Anthony Pierard (v.1 27/04/20)
+                     Anthony Pierard (v.2 29/04/20)
     """
     total_dammage=0
+    #calculate all the dammage of the cruiser
     for cruiser in alive_cruiser :
         total_dammage += ships[cruiser]['energy_point']/units_stats['common']['cruiser']['cost_attack']
+    #attack the hub if we have double of health of the ennemy hub because we can lose cruiser.
     if total_dammage/2 < units_stats[ennemy_team]['hub']['HP'] :
         attack_list = []
         move_list = []
         for cruiser in alive_cruiser:
             hub_coordinate = units_stats[ennemy_team]['hub']['coordinate']
             cruiser_coordinate = ships[cruiser]['coordinate']
+            #if the cruiser is in range create an attack
             if range_verification (units_stats, cruiser, ships, hub_coordinate, team):
                 instruction = cruiser + ':*' + hub_coordinate[0] + '-' + hub_coordinate[1] + '=' + ships[cruiser]['energy_point']
                 attack_list.append (instruction)
+            #else move the cruiser close to the hub and check if an other cruiser is on the nearest case. 
             else :
                 x = cruiser_coordinate[0]
                 y = cruiser_coordinate[1]
@@ -967,7 +1027,9 @@ def attack_hub (stance, AI_stats, ships, units_stats, alive_cruiser, ennemy_team
                 ships[cruiser]['coordinates_to_go']=(x,y)
         return attack_list 
     
-#calc next_round_hub_energy = current_hub_energy - nb_tanker_to_create_this_round * units_stats['common']['tanker']['creation_cost'] + nb_tankers_to_create_this_round * units_stats[team]['tanker']['max_energy']
+
+    
+
 #to determine if upgrade should be done now or later, next_round_hub_energy >= tanker_creation_cost
 #see if upgrade is already worth it for the money during tanker creation
 #if money_lost_tanker_creation_list[1] - money_lost_tanker_creation_list[2] - cost_upgrade['cost_upgrade_capacity'] > 0:

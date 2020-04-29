@@ -756,6 +756,43 @@ def attack_hub (stance, AI_stats, ships, units_stats, alive_cruiser, ennemy_team
                 ships[cruiser]['coordinates_to_go']=(x,y)
         return attack_list 
     
+def attack_cruiser(ships,alive_cruiser,alive_ennemy_cruiser) :
+
+    if stance == 'defensive' :
+        virtual_dead_cruiser = []
+        
+        for ally_cruiser in alive_cruiser :
+            if ships[ally_cruiser]['coordinates'] == ships[ally_cruiser]['coordinates_to_go'] :
+                target_ships =[]
+                for cruiser in alive_ennemy_cruiser :
+                    if range_verfifcation(units_stats, ally_cruiser,ships, ships[ennemy_cruiser]['coordinates'],team) :
+                        target_ships.append (cruiser) 
+                HP_list = order_ship_by_caracteristic(ship_list, 'HP')
+                energy_list = order_ship_by_caracteristic(ship_list, 'energy_point')
+
+                attack_dico ={}
+                for cruiser in target_ships :
+                    attack_dico[cruiser] = len(HP_list) - HP_list.index(cruiser) + energy_list.index(cruiser)
+                
+                key_nb = 0 
+                for cruiser in attack_dico :
+                    if key_nb == 0 :
+                        target = cruiser
+                    else :
+                        if attack_dico[cruiser]> attack_dico[target] :
+                            target = cruiser 
+                    key_nb += 1 
+
+                if target_ships!=[]:
+                    attack_instruction = str(cruiser) + ':*'+ ships[target]['coordinates'][0] + '-' + ships[target]['coordinates'][1] +'=' + min(ships[target]['energy_point'],ships[ally_cruiser]['energy_point'] )
+
+
+                    
+
+
+
+
+                
 
 """ Upgrade functions """
 
@@ -1128,7 +1165,7 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_pla
 
         
 def verif_if_ship_on_coord(coord):
-    """""""
+    
     for coordinate in coord:
         coordinate_not_empty = False
 
@@ -1143,7 +1180,7 @@ def verif_if_ship_on_coord(coord):
 
     return coord_empty
 
-def order_coord(coord, units_stats) :
+def order_coord(coord, units_stats,team) :
     """ 
     Sorting algorithm which sorts the coordinates by distance from the hub 
 
@@ -1161,13 +1198,34 @@ def order_coord(coord, units_stats) :
     specification: Johan Rochet (v.1 29/04/20)
     implementation: Johan Rochet (v.1 29/04/20)
     """
-    for coordinates in coord :
-        for other_coordinates in coord :
-            if count_distance(coordinates,units_stats[team]['hub']['coordinates']) > count_distance(other_coordinates,units_stats[team]['hub']['coordinates'])  :
-                coordinates = other_coordinates
-        order_coord.append(coordinates)
-    return order_coord
+    b= []
+    c=[]
+    if len(coord) <= 1 :
+        return coord
+    if len(coord) == 2 :
+        if count_distance(coord[0],units_stats[team]['hub']['coordinates'])> count_distance(coord[1],units_stats[team]['hub']['coordinates']) :
+            swap = coord[0]
+            coord[0]= coord[1]
+            coord[1]= swap
+        return coord
+    else :
+        index = randint (0, len(coord)-1)
+        
+        pivot= coord[index]
+        pivot_distance = count_distance(pivot,units_stats[team]['hub']['coordinates'])
+        del(coord[index])
+        for element in coord :
+            if count_distance(element,units_stats[team]['hub']['coordinates']) < pivot_distance : 
+                b.append(element)
+                
+            else :
+                c.append(element)
+        
+        return order_coord(b,units_stats,team)+ [pivot]+ order_coord(c,units_stats,team)
 
+   
+    
+    
 
 def place_ship(coord_void, cruiser_place, alive_cruiser):
     """"""
@@ -1178,7 +1236,31 @@ def place_ship(coord_void, cruiser_place, alive_cruiser):
                 ships[cruiser]['coordinate_to_go'] = coord
                 cruiser_place += cruiser
            
-
+def order_ship_by_caracteristic(ship_list, caracteristic) :
+    
+    b= []
+    c=[]
+    if len(ship_list) <= 1 :
+        return ship_list
+    if len(ship_list) == 2 :
+        if ship_list[0]> ship_list[1] :
+            swap = ship_list[0]
+            ship_list[0]= ship_list[1]
+            ship_list[1]= swap
+        return ship_list
+    else :
+        index = randint (0, len(ship_list)-1)
+        
+        pivot= ship_list[index]
+        del(ship_list[index])
+        for element in ship_list :
+            if element < ship_list : 
+                b.append(element)
+                
+            else :
+                c.append(element)
+        
+        return order_ship_by_caracteristic(b)+ [pivot]+ order_ship_by_caracteristic(c)
            
                 
 

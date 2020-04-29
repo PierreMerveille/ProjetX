@@ -39,6 +39,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
         while AI_stats[team]['virtual_energy_point'] > units_stats['Common']['tanker']['creation_cost'] : 
             if AI_stats[team]['nb_tanker'] != 4 or AI_stats[team]['nb_cruiser'] >0 :
                 instruction,name = create_IA_ship('tanker',team,'nb_tanker',AI_stats)
+                order_AI += ' ' + instruction
                 AI_stats[team]['virtual_energy_point'] -= units_stats['common']['tanker']['creation_cost']
                 #transfer from the new tanker to hub 
                 order_AI += name + ':>'+ str(units_stats[team]['hub']['coordiantes'][0]) + '-' + str(units_stats[team]['hub']['coordiantes'][1])
@@ -505,8 +506,12 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
                 #if one of the cruiser has a low fuel
                 if len(low_fuel_cruiser)!= 0 :
                     ships[tanker]['coordinates_to_go']= units_stats[team]['hub']['coordinates']
-                if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) <= 2 :
+                if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) <= 2 and AI_stats[team['virtual_energy_point']] > 0 :
                     transfer_instruction += str(tanker) + ':<'+ ships[tanker]['coordinates_to_go'] + ' '
+                    count = 0
+                    while  AI_stats[team['virtual_energy_point']] > 0 and count <(units_stats[team]['tanker']['max_energy'] - ships[tanker]['energy_point']):
+                        AI_stats[team['virtual_energy_point']]-= 1
+                        count+= 1
             # go to give energy 
             else : 
                 

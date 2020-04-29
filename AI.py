@@ -74,10 +74,9 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
 
         flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team)
 
-       
-        defense_()
+        place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser)
     
-    coordinates_to_go (ships)
+        coordinates_to_go(ships)
 
 def stance(ships, team, ennemy_team, peaks, units_stats, AI_stats,alive_tanker, alive_cruiser,alive_ennemy_tanker, alive_ennemy_cruiser):
     """Decide if the adopted stance by the AI should be defensive or offensive
@@ -1067,7 +1066,7 @@ def verif_if_ship_on_coord(coord):
 
     return coord_empty
     
- def place_ship(coord_void, cruiser_place, alive_cruiser):
+def place_ship(coord_void, cruiser_place, alive_cruiser):
     """""""
     for coord in coord_void:
         for cruiser in alive_cruiser:

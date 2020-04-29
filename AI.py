@@ -920,7 +920,54 @@ def apply_upgrades(nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, AI
     instruction : instruction to make the number of the desired upgrades
 
     """      
+def attack_hub (stance, AI_stats, ships, units_stats, alive_cruiser, ennemy_team, board):
+    """ Command all the cruiser to attack the ennemy hub 
+
+    Parameters
+    ----------
+    stance : the stance of the AI (string).
+    AI_stats : the dictionnary with all the info of the AI (dictionnary).
+    ships : the dictionnary with all the ships (dictionnary).
+    units_stats : the dictionnary with the info of the hub (dictionnary). 
+    alive_cruiser : the list of the cruiser (list).
+    ennemy_team : the name of the ennemy team (string).
+    board : dictionnary with all the case of the board (dictionnary).
+
+    Notes 
+    -----
+    if the total cruiser dammage is bigger than the health point of the ennemy hub all the cruiser attack him.
     
+    Version
+    -------
+    specification : Anthony Pierard (v.1 27/04/20)
+    """
+    if stance='offensive':
+        total_dammage=0
+        for cruiser in alive_cruiser :
+            total_dammage +=ships[cruiser]['energy_point']/units_stats['common']['cruiser']['cost_attack']
+        if total_dammage/2 < units_stats[ennemy_team]['hub']['HP'] :
+            attack_list = []
+            move_list = []
+            for cruiser in alive_cruiser:
+                hub_coordinate = units_stats[ennemy_team]['hub']['coordinate']
+                cruiser_coordinate = ships[cruiser]['coordinate']
+                if range_verification (units_stats, cruiser, ships, hub_coordinate, team):
+                    instruction = cruiser + ':*' + hub_coordinate[0] + '-' + hub_coordinate[1] + '=' + ships[cruiser]['energy_point']
+                    attack_list.append (instruction)
+                else :
+                    x = cruiser_coordinate[0]
+                    y = cruiser_coordinate[1]
+                    if x < hub_coordinate[0] and len(board[(x+1,y)]) == 0 :
+                        x += 1 
+                    elif x > hub_coordinate[0] and len(board[(x-1,y)]) == 0 :
+                        x -= 1
+                    elif y < hub_coordinate[1] and len(board[(x,y+1)]) == 0 :
+                        y += 1 
+                    elif y > hub_coordinate[1] and len(board[(x,y-1)]) == 0 :
+                        y -= 1
+                    instruction = cruiser + ':@' + str(x) + '-' + str(y) 
+                    move_list.append (instruction)
+            return attack_list, move_list    
     
 #calc next_round_hub_energy = current_hub_energy - nb_tanker_to_create_this_round * units_stats['common']['tanker']['creation_cost'] + nb_tankers_to_create_this_round * units_stats[team]['tanker']['max_energy']
 #to determine if upgrade should be done now or later, next_round_hub_energy >= tanker_creation_cost

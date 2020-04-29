@@ -3,6 +3,8 @@ from Play import *
 
 """ general function """
 
+# note : faire attention a ne pas créer un ordre d'attaque et de déplacemt pour le meme cruiser
+
 def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) : 
     """ 
     Main fonction to get the IA orders 

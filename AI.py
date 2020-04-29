@@ -287,17 +287,8 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cru
             order = cruiser_target + ':*' + tanker_target_coordinate[0] + '-' + tanker_target_coordinate[1] + '=' + ships[cruiser_target]['energy_point']/ (2 * units_stats['common']['cruiser']['cost_attack']) 
             return order
         else :
-            x = ships[cruiser_target]['coordinate'][0]
-            y = ships[cruiser_target]['coordinate'][1]
-            if x < ships[tanker_target]['coordinate'][0] :
-                x += 1
-            elif x > ships[tanker_target]['coordinate'][0] :
-                x -= 1 
-            if y < ships[tanker_target]['coordinate'][1] :
-                y += 1
-            elif y > ships[tanker_target]['coordinate'][1] :
-                y -= 1
-            order = cruiser_target +':@' + str(x) + '-' + str(y)
+            ships[cruiser_target]['coordinates_to_go'] = ships[tanker_target]['coordinate']
+            ships[cruiser_target]['target'] = tanker_target
             return order
 
 def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, ennemy_team):
@@ -432,17 +423,24 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
         if ships[tanker]['target'] in peaks :
             if peaks[ships[tanker]['target']]['storage'] == 0 :
                 ships[tanker]['coordinates_to_go'] = ships[tanker]['coordinates']
+                
         # verify if the taregt cruiser isn't full        
         elif ships[tanker]['target'] in ships :
             if ships[ships[tanker]['target']]['energy_point'] >= units_stats['common']['cruiser']['max_energy'] * rate :
                 ships[tanker]['coordinates_to_go'] = ships[tanker]['coordinates']
+
+        #verify if the target cruiser is dead 
+        elif  ships[tanker]['target'] != 'hub' :
+            ships[tanker]['coordinates_to_go'] = ships[tanker]['coordinates']
+
+
         # if the tanker has drawn or given his energy
         if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) <=1 :
 
             #go to draw energy 
             if (ships[tanker]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 and total_peak_energy >0 ): # reflechir aux conditions
                 # si le tanker a moins de 60 % , calculer combien d'énergie restant, pour voir si plus rentable d'aller au hub ou au peak puis de rmeplir avec une totalité de réserve
-
+                ###########################rajouter la différentitation en focntion des phases 
                 for index in peak_name :
                     if peaks[peak_name[index]]['storage'] > 0 :
                     #calculate the distance between the peak and the tanker

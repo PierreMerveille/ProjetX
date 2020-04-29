@@ -65,7 +65,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
 
         AI_transfer_and_destination (ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name)
 
-        attack_cruiser()
+        attack_cruiser(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,team,stance)
         
         
         ### note à l'attention de ce très cher Anthony, idée: attaquer en priorité un croiseur ayant plus d'énergie que les qutres et aussi ceux avec le moins d'HP
@@ -76,6 +76,8 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
         flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team)
 
         place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser)
+
+        attack_cruiser()
     
     coordinates_to_go(ships)
 
@@ -756,24 +758,30 @@ def attack_hub (stance, AI_stats, ships, units_stats, alive_cruiser, ennemy_team
                 ships[cruiser]['coordinates_to_go']=(x,y)
         return attack_list 
     
-def attack_cruiser(ships,alive_cruiser,alive_ennemy_cruiser) :
+def attack_cruiser(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,team) :
 
     if stance == 'defensive' :
-        virtual_dead_cruiser = []
         
+        attacked_cruiser =[]
+
         for ally_cruiser in alive_cruiser :
-            if ships[ally_cruiser]['coordinates'] == ships[ally_cruiser]['coordinates_to_go'] :
+
+            if ships[ally_cruiser]['coordinates'] == ships[ally_cruiser]['coordinates_to_go'] and ships[ally_cruiser]['energy_point'] !=0 :
                 target_ships =[]
+                #get the cruiser in range that aren't already attacked
                 for cruiser in alive_ennemy_cruiser :
-                    if range_verfifcation(units_stats, ally_cruiser,ships, ships[ennemy_cruiser]['coordinates'],team) :
+                    if range_verification(units_stats, ally_cruiser,ships, ships[cruiser]['coordinates'],team) and cruiser not in attacked_cruiser :
                         target_ships.append (cruiser) 
-                HP_list = order_ship_by_caracteristic(ship_list, 'HP')
-                energy_list = order_ship_by_caracteristic(ship_list, 'energy_point')
+
+                #order the tanker depending on their HP and energy
+                HP_list = order_ship_by_caracteristic(target_ships, 'HP')
+                energy_list = order_ship_by_caracteristic(target_ships, 'energy_point')
 
                 attack_dico ={}
                 for cruiser in target_ships :
                     attack_dico[cruiser] = len(HP_list) - HP_list.index(cruiser) + energy_list.index(cruiser)
                 
+                #select the profitbale cruiser to attack 
                 key_nb = 0 
                 for cruiser in attack_dico :
                     if key_nb == 0 :
@@ -782,7 +790,7 @@ def attack_cruiser(ships,alive_cruiser,alive_ennemy_cruiser) :
                         if attack_dico[cruiser]> attack_dico[target] :
                             target = cruiser 
                     key_nb += 1 
-
+                attacked_cruiser.append(target)
                 if target_ships!=[]:
                     attack_instruction = str(cruiser) + ':*'+ ships[target]['coordinates'][0] + '-' + ships[target]['coordinates'][1] +'=' + min(ships[target]['energy_point'],ships[ally_cruiser]['energy_point'] )
 

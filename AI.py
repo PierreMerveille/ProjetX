@@ -979,7 +979,107 @@ def attack_hub (stance, AI_stats, ships, units_stats, alive_cruiser, ennemy_team
 
 #Si ils sont plic ploc
 
+def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser):
+     """"""
+    ally_hub = units_stats[team]['hub']['coordinates']
+    ennemy_hub = units_stats[ennemy_team]['hub']['coordinates']
+    nbr_cruiser = AI_stats[team]['nb_cruiser']
 
+    if ally_hub[0] - ennemy_hub[0] >= 0:
+        column_str = 'left'
+        
+    else:
+        column_str = 'right'
+
+    if ally_hub[1] - ennemy_hub[1] >= 0:
+        row_str = 'up'
+        
+    else:
+        row_str = 'down'
+        
+
+    if nbr_cruiser != 0 :
+        if row_str = 'up'
+            coord = ((ally_hub[0] - 1, ally_hub[1] - 1) , (ally_hub[0], ally_hub[1] - 1), (ally_hub[0] + 1, ally_hub[1] - 1))
+        else:
+            coord = ((ally_hub[0] - 1, ally_hub[1] + 1) , (ally_hub[0], ally_hub[1] + 1), (ally_hub[0] + 1, ally_hub[1] + 1))
+
+        coord_void = verif_if_ship_on_coord(coord, alive_cruiser):
+        cruiser_place = place_ship(coord_void, cruiser_place, alive_cruiser)
+
+        if column_str == 'left':
+            coord = ((ally_hub[0] - 1, ally_hub[1] - 1) , (ally_hub[0] - 1, ally_hub[1]), (ally_hub[0] - 1, ally_hub[1] + 1))
+        else:
+            coord = ((ally_hub[0] + 1, ally_hub[1] - 1) , (ally_hub[0] + 1, ally_hub[1]), (ally_hub[0] + 1, ally_hub[1] + 1))
+
+        coord_void += verif_if_ship_on_coord(coord, alive_cruiser)
+        cruiser_place = place_ship(coord_void, cruiser_place, alive_cruiser)
+
+        if nbr_cruiser < 5:
+            if row_str = 'up'
+                coord = ((ally_hub[0] - 2, ally_hub[1] - 2), ally_hub[0] - 1, ally_hub[1] - 2) , (ally_hub[0], ally_hub[1] - 2), (ally_hub[0] + 1, ally_hub[1] - 2), (ally_hub[0] + 2, ally_hub[1] - 2))
+            else:
+                coord = ((ally_hub[0] - 2, ally_hub[1] + 2), ally_hub[0] - 1, ally_hub[1] + 2) , (ally_hub[0], ally_hub[1] + 2), (ally_hub[0] + 1, ally_hub[1] + 2), (ally_hub[0] + 2, ally_hub[1] + 2))
+
+            coord_void = verif_if_ship_on_coord(coord, alive_cruiser):
+            cruiser_place = place_ship(coord_void, cruiser_place, alive_cruiser)
+
+            if column_str == 'left':
+                coord = ((ally_hub[0] - 2, ally_hub[1] - 2), ally_hub[0] - 2, ally_hub[1] - 1) , (ally_hub[0] - 2 , ally_hub[1]), (ally_hub[0] - 2, ally_hub[1] + 1), (ally_hub[0] - 2, ally_hub[1] + 2))
+            else:
+                coord = ((ally_hub[0] + 2, ally_hub[1] - 2), ally_hub[0] + 2, ally_hub[1] - 1) , (ally_hub[0] + 2 , ally_hub[1]), (ally_hub[0] + 2, ally_hub[1] + 1), (ally_hub[0] + 2, ally_hub[1] + 2))
+
+            coord_void += verif_if_ship_on_coord(coord, alive_cruiser)
+            cruiser_place = place_ship(coord_void, cruiser_place, alive_cruiser)
+
+            if nbr_cruiser < 13:
+                if row_str = 'up'
+                coord = ((ally_hub[0] - 3, ally_hub[1] - 3), (ally_hub[0] - 2, ally_hub[1] - 3)  , (ally_hub[0] - 1, ally_hub[1] - 3) , (ally_hub[0], ally_hub[1] - 3), (ally_hub[0] + 1, ally_hub[1] - 3), (ally_hub[0] + 2, ally_hub[1] - 3), (ally_hub[0] + 3, ally_hub[1] - 3))
+                    else:
+                coord = ((ally_hub[0] - 3, ally_hub[1] + 3), (ally_hub[0] - 2, ally_hub[1] + 3)  , (ally_hub[0] - 1, ally_hub[1] + 3) , (ally_hub[0], ally_hub[1] + 3), (ally_hub[0] + 1, ally_hub[1] + 3), (ally_hub[0] + 2, ally_hub[1] + 3), (ally_hub[0] + 3, ally_hub[1] + 3))
+
+                coord_void = verif_if_ship_on_coord(coord, alive_cruiser):
+                cruiser_place = place_ship(coord_void, cruiser_place, alive_cruiser)
+
+                if column_str == 'left':
+                    coord = coord = ((ally_hub[0] - 3, ally_hub[1] - 3), (ally_hub[0] - 3, ally_hub[1] - 2)  , (ally_hub[0] - 3, ally_hub[1] - 1) , (ally_hub[0] - 3, ally_hub[1]), (ally_hub[0] - 3, ally_hub[1] + 1), (ally_hub[0] - 3, ally_hub[1] + 2), (ally_hub[0] - 3, ally_hub[1] + 3))
+                else:
+                    coord = coord = ((ally_hub[0] + 3, ally_hub[1] - 3), (ally_hub[0] + 3, ally_hub[1] - 2)  , (ally_hub[0] + 3, ally_hub[1] - 1) , (ally_hub[0] + 3, ally_hub[1]), (ally_hub[0] + 3, ally_hub[1] + 1), (ally_hub[0] + 3, ally_hub[1] + 2), (ally_hub[0] + 3, ally_hub[1] + 3))
+
+                coord_void += verif_if_ship_on_coord(coord, alive_cruiser)
+                cruiser_place = place_ship(coord_void, cruiser_place, alive_cruiser)
+
+
+        
+def verif_if_ship_on_coord(coord):
+    """""""
+    for coordinate in coord:
+        coordinate_not_empty = False
+
+        for cruiser in alive_cruiser
+            if ships[cruiser]['coordinate_to_go'] == coordinate:
+                coordinate_not_empty = True
+        
+            if coordinate_not_empty:
+
+            else:
+                coord_empty += coordinate
+
+    return coord_empty
+    
+ def place_ship(coord_void, cruiser_place, alive_cruiser):
+    """""""
+    for coord in coord_void:
+        for cruiser in alive_cruiser:
+            busy = false
+            for cruiser_busy in cruiser_place:
+
+                if cruiser == cruiser_busy:
+                    busy = true
+
+            if not busy:
+                ships[cruiser]['coordinate_to_go'] = coord
+                cruiser_busy += cruiser
 
         
     

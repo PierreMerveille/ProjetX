@@ -701,6 +701,62 @@ def peaks_on_our_map_side(team, units_stats, peaks):
 
 """ offensive function"""
 
+def attack_hub (stance, AI_stats, ships, units_stats, alive_cruiser, ennemy_team, board, team):
+    """ Command all the cruiser to attack the ennemy hub 
+
+    Parameters
+    ----------
+    team : name of the team which is playing (str) 
+    stance : the stance of the AI (string).
+    AI_stats : the dictionnary with all the info of the AI (dictionnary).
+    ships : the dictionnary with all the ships (dictionnary).
+    units_stats : the dictionnary with the info of the hub (dictionnary). 
+    alive_cruiser : the list of the cruiser (list).
+    ennemy_team : the name of the ennemy team (string).
+    board : dictionnary with all the case of the board (dictionnary).
+
+    Notes 
+    -----
+    if the total cruiser dammage is bigger than the health point of the ennemy hub all the cruiser attack him.
+    
+    Version
+    -------
+    specification : Anthony Pierard (v.1 27/04/20)
+    implementation : Anthony Pierard (v.1 27/04/20)
+                     Anthony Pierard (v.2 29/04/20)
+    """
+    total_dammage=0
+    #calculate all the dammage of the cruiser
+    for cruiser in alive_cruiser :
+        total_dammage += ships[cruiser]['energy_point']/units_stats['common']['cruiser']['cost_attack']
+    #attack the hub if we have double of health of the ennemy hub because we can lose cruiser.
+    if total_dammage/2 < units_stats[ennemy_team]['hub']['HP'] :
+        attack_list = []
+        move_list = []
+        for cruiser in alive_cruiser:
+            hub_coordinate = units_stats[ennemy_team]['hub']['coordinate']
+            cruiser_coordinate = ships[cruiser]['coordinate']
+            #if the cruiser is in range create an attack
+            if range_verification (units_stats, cruiser, ships, hub_coordinate, team):
+                instruction = cruiser + ':*' + hub_coordinate[0] + '-' + hub_coordinate[1] + '=' + ships[cruiser]['energy_point']
+                attack_list.append (instruction)
+            #else move the cruiser close to the hub and check if an other cruiser is on the nearest case. 
+            else :
+                x = cruiser_coordinate[0]
+                y = cruiser_coordinate[1]
+                if x < hub_coordinate[0] and ((x+1,y) in move_list) :
+                    x += 1 
+                elif x > hub_coordinate[0] and ((x-1,y) in move_list) :
+                    x -= 1
+                if y < hub_coordinate[1] and ((x,y+1) in move_list) :
+                    y += 1 
+                elif y > hub_coordinate[1] and ((x,y-1) in move_list) :
+                    y -= 1
+                move_list.append ((x,y))
+                ships[cruiser]['coordinates_to_go']=(x,y)
+        return attack_list 
+    
+
 """ Upgrade functions """
 
 def find_nb_rounds(team, ships, units_stats, AI_stats):
@@ -1019,61 +1075,7 @@ def do_upgrades(team, units_stats, nb_range_upgrades, nb_storage_upgrades, nb_re
         for nb in nb_regen_upgrades:
             instruction += 'upgrade:' + str(upgrade) + ' '    
 
-def attack_hub (stance, AI_stats, ships, units_stats, alive_cruiser, ennemy_team, board, team):
-    """ Command all the cruiser to attack the ennemy hub 
 
-    Parameters
-    ----------
-    team : name of the team which is playing (str) 
-    stance : the stance of the AI (string).
-    AI_stats : the dictionnary with all the info of the AI (dictionnary).
-    ships : the dictionnary with all the ships (dictionnary).
-    units_stats : the dictionnary with the info of the hub (dictionnary). 
-    alive_cruiser : the list of the cruiser (list).
-    ennemy_team : the name of the ennemy team (string).
-    board : dictionnary with all the case of the board (dictionnary).
-
-    Notes 
-    -----
-    if the total cruiser dammage is bigger than the health point of the ennemy hub all the cruiser attack him.
-    
-    Version
-    -------
-    specification : Anthony Pierard (v.1 27/04/20)
-    implementation : Anthony Pierard (v.1 27/04/20)
-                     Anthony Pierard (v.2 29/04/20)
-    """
-    total_dammage=0
-    #calculate all the dammage of the cruiser
-    for cruiser in alive_cruiser :
-        total_dammage += ships[cruiser]['energy_point']/units_stats['common']['cruiser']['cost_attack']
-    #attack the hub if we have double of health of the ennemy hub because we can lose cruiser.
-    if total_dammage/2 < units_stats[ennemy_team]['hub']['HP'] :
-        attack_list = []
-        move_list = []
-        for cruiser in alive_cruiser:
-            hub_coordinate = units_stats[ennemy_team]['hub']['coordinate']
-            cruiser_coordinate = ships[cruiser]['coordinate']
-            #if the cruiser is in range create an attack
-            if range_verification (units_stats, cruiser, ships, hub_coordinate, team):
-                instruction = cruiser + ':*' + hub_coordinate[0] + '-' + hub_coordinate[1] + '=' + ships[cruiser]['energy_point']
-                attack_list.append (instruction)
-            #else move the cruiser close to the hub and check if an other cruiser is on the nearest case. 
-            else :
-                x = cruiser_coordinate[0]
-                y = cruiser_coordinate[1]
-                if x < hub_coordinate[0] and ((x+1,y) in move_list) :
-                    x += 1 
-                elif x > hub_coordinate[0] and ((x-1,y) in move_list) :
-                    x -= 1
-                if y < hub_coordinate[1] and ((x,y+1) in move_list) :
-                    y += 1 
-                elif y > hub_coordinate[1] and ((x,y-1) in move_list) :
-                    y -= 1
-                move_list.append ((x,y))
-                ships[cruiser]['coordinates_to_go']=(x,y)
-        return attack_list 
-    
 
     
 
@@ -1142,7 +1144,23 @@ def verif_if_ship_on_coord(coord):
     return coord_empty
 
 def order_coord(coord, units_stats) :
+    """ 
+    Sorting algorithm which sorts the coordinates by distance from the hub 
 
+    Parameters
+    ----------
+    coord : list with the coordinates to order  (list)
+    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+
+    Return:
+    -------
+    order_coord : list with the ordered coordinates depending on the proximity from the ally hub (list)
+
+    Version :
+    ---------
+    specification: Johan Rochet (v.1 29/04/20)
+    implementation: Johan Rochet (v.1 29/04/20)
+    """
     for coordinates in coord :
         for other_coordinates in coord :
             if count_distance(coordinates,units_stats[team]['hub']['coordinates']) > count_distance(other_coordinates,units_stats[team]['hub']['coordinates'])  :

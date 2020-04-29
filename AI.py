@@ -416,7 +416,7 @@ def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
     if len(close_ennemy_hub_cruiser) > 0:
         alert_hub_cruiser = True
 
-def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name,alive_tanker,alive_cruiser) :
+def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name,alive_tanker,alive_cruiser,AI_stats) :
     """ Identify the ideal coordinates where the tankers should go ans tore it in ships and create transfer_instruction for them 
 
     Parameters

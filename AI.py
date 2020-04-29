@@ -251,7 +251,7 @@ def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, en
                     y = 0
                 ships[tanker]['coordinates_to_go'] = (ships[tanker]['coordinates'][0] + x, ships[tanker]['coordinates'][1] + y)
 
-def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cruiser,dangerous_ennemy_tanker):
+def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cruiser,alive_ennemy_tanker,dangerous_ennemy_tanker):
     """Command to a cruiser to attack the first tanker's ennemy if the AI is offensive.
 
     Parameters
@@ -722,7 +722,7 @@ def find_nb_rounds(team, ships, units_stats, AI_stats):
         tanker = proximity_order_full_tankers_our_hub[1]
     
     #nb_rounds = calc distance between FIRST closest full tanker and hub OR SECOND closest full tanker and hub. Depending on if condition before the operation.
-    nb_rounds = count_dist(ships[tanker]['coordinates'], units_stats[team]['hub']['coordinates'])   
+    nb_rounds = count_distance(ships[tanker]['coordinates'], units_stats[team]['hub']['coordinates'])   
 
     return nb_rounds     
 

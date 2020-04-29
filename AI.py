@@ -527,8 +527,7 @@ def AI_attack_and_destination () :
 
 
 
-
-""" control function"""
+ """ control function"""
 
 def control_is_worth (team, ennemy_team, peaks, ships, units_stats,AI_stats):
     """
@@ -865,7 +864,7 @@ def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, 
 
         #see if upgrade is already worth it for the money during tanker creation
         if money_lost_tanker_creation_list[1] - money_lost_tanker_creation_list[2] - cost_upgrade['cost_upgrade_capacity'] > 0:
- 
+            
         
         #calc next_round_hub_energy = current_hub_energy - nb_tanker_to_create_this_round * units_stats['common']['tanker']['creation_cost'] + nb_tankers_to_create_this_round * units_stats[team]['tanker']['max_energy']
         #to determine if upgrade should be done now or later, next_round_hub_energy >= tanker_creation_cost
@@ -873,4 +872,4 @@ def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, 
 
         #deplacer tous sauf 1
 
-        #Si ils sont plic ploc
+        #Si ils sont plic-ploc

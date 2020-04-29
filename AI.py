@@ -1,4 +1,5 @@
 from math import ceil
+from Play import * 
 
 """ general function """
 
@@ -283,11 +284,11 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cru
                         distance_min = count_distance (ships[cruiser]['coordinates'], ships[tanker]['coordinates'])
                 nbr_ship+=1
 
-        if range_verification (units_stats,cruiser_target,ships,tanker_target_coordinate,team):
-            order = cruiser_target + ':*' + tanker_target_coordinate[0] + '-' + tanker_target_coordinate[1] + '=' + ships[cruiser_target]['energy_point']/ (2 * units_stats['common']['cruiser']['cost_attack']) 
+        if range_verification (units_stats,cruiser_target,ships,ships[tanker_target]['coordinates'],team):
+            order = cruiser_target + ':*' + ships[tanker_target]['coordinates'][0] + '-' + ships[tanker_target]['coordinates'][1] + '=' + ships[cruiser_target]['energy_point']/ (2 * units_stats['common']['cruiser']['cost_attack']) 
             return order
         else :
-            ships[cruiser_target]['coordinates_to_go'] = ships[tanker_target]['coordinate']
+            ships[cruiser_target]['coordinates_to_go'] = ships[tanker_target]['coordinates']
             ships[cruiser_target]['target'] = tanker_target
             return order
 
@@ -423,7 +424,7 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
         if ships[tanker]['target'] in peaks :
             if peaks[ships[tanker]['target']]['storage'] == 0 :
                 ships[tanker]['coordinates_to_go'] = ships[tanker]['coordinates']
-                
+
         # verify if the taregt cruiser isn't full        
         elif ships[tanker]['target'] in ships :
             if ships[ships[tanker]['target']]['energy_point'] >= units_stats['common']['cruiser']['max_energy'] * rate :

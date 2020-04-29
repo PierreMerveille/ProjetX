@@ -210,7 +210,7 @@ def create_IA_ship (type, team, nb_ship,AI_stats):
     instruction = (name + ':' + type)
     AI_stats[team][nb_ship] += 1
 
-    return instrcution, name
+    return instruction, name
     
 
 
@@ -552,7 +552,7 @@ def AI_attack_and_destination () :
 
 
 
- """ control function"""
+""" control function"""
 
 def control_is_worth (team, ennemy_team, peaks, ships, units_stats,AI_stats):
     """
@@ -898,7 +898,7 @@ def best_nb_upgrades(decided_to_attack, team, ships, ennemy_team, peaks, AI_stat
         
             nb_range_upgrades += 1 
 
-        if units_stats[ennemy_team]['cruiser']['range'] > units_stats[team]['cruiser']['range']:
+        if units_stats[ennemy_team]['cruiser']['range'] >= units_stats[team]['cruiser']['range']:
 
             nb_range_upgrades += units_stats[ennemy_team]['cruiser']['range'] - units_stats[team]['cruiser']['range'] #si >= à la condition au dessus alors + 1
     
@@ -920,7 +920,8 @@ def apply_upgrades(nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, AI
     instruction : instruction to make the number of the desired upgrades
 
     """      
-        
+    
+    
 #calc next_round_hub_energy = current_hub_energy - nb_tanker_to_create_this_round * units_stats['common']['tanker']['creation_cost'] + nb_tankers_to_create_this_round * units_stats[team]['tanker']['max_energy']
 #to determine if upgrade should be done now or later, next_round_hub_energy >= tanker_creation_cost
 #see if upgrade is already worth it for the money during tanker creation

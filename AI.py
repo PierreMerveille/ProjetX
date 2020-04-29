@@ -252,7 +252,7 @@ def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, en
                     y = 0
                 ships[tanker]['coordinates_to_go'] = (ships[tanker]['coordinates'][0] + x, ships[tanker]['coordinates'][1] + y)
 
-def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cruiser,alive_ennemy_tanker):
+def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cruiser,dangerous_ennemy_tanker):
     """Command to a cruiser to attack the first tanker's ennemy if the AI is offensive.
 
     Parameters
@@ -275,7 +275,28 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cru
     """
     #verify if the ennemy is a defensive
     ############" rajouter d'abord attaquer les plus proches et puis les plus éloignés en paramètre"
-    if stance=="offensive":
+    if stance == 'control': 
+        for index_1 in dangerous_ennemy_tanker : 
+            for index_2 in alive_cruiser :
+                if ships[alive_cruiser[index_2]]['coordinates'] == ships[alive_cruiser[index_2]]['coordinates_to_go'] :
+                    if index_2 == 0 :
+                        attacking_cruiser = alive_cruiser[index_2]
+                        target_tanker = dangerous_ennemy_tanker[index_1]
+                        distance = count_distance(ships[attacking_cruiser]['coordinates'],ships[dangerous_ennemy_tanker[index_1]]['coordinates'] )
+                    elif count_distance(ships[attacking_cruiser]['coordinates'],ships[dangerous_ennemy_tanker[index_1]]['coordinates'] ) < distance :
+                        attacking_cruiser = alive_cruiser[index_2]
+                        target_tanker = dangerous_ennemy_tanker[index_1]
+                        distance = count_distance(ships[attacking_cruiser]['coordinates'],ships[dangerous_ennemy_tanker[index_1]]['coordinates'] )
+
+            if range_verification (units_stats,attacking_cruiser,ships,ships[target_tanker]['coordinates'],team):
+                order = attacking_cruiser + ':*' + ships[target_tanker]['coordinates'][0] + '-' + ships[target_tanker]['coordinates'][1] + '=' + ships[attacking_cruiser]['energy_point']/ (2 * units_stats['common']['cruiser']['cost_attack']) 
+                return order
+            else :
+                ships[cruiser_target]['coordinates_to_go'] = ships[target_tanker]['coordinates']
+                ships[cruiser_target]['target'] = target_tanker
+                return order
+
+    elif stance=="offensive":
         
         nbr_ship=1
                
@@ -525,6 +546,9 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
     return transfer_instruction
 
 def AI_attack_and_destination () :
+
+    if stance == 'control':
+        attack_tanker 
 
 
 

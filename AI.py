@@ -501,10 +501,12 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
                     transfer_instruction += str(tanker) + ':<'+ ships[tanker]['coordinates_to_go'] + ' '
 
             elif ships[tanker]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 :
-                
+
                 #if one of the cruiser has a low fuel
                 if len(low_fuel_cruiser)!= 0 :
                     ships[tanker]['coordinates_to_go']= units_stats[team]['hub']['coordinates']
+                if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) <= 2 :
+                    transfer_instruction += str(tanker) + ':<'+ ships[tanker]['coordinates_to_go'] + ' '
             # go to give energy 
             else : 
                 

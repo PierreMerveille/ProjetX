@@ -435,7 +435,7 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
     transfer_instruction : AI order for transfer (str)
     no_movement : list with the name of the ships which musn't move (list)
     """
-
+    #######################rajouter puiser dans le hub pour offensif et défensif 
     #initialise the variable
     best_profitability = 0
     transfer_instruction = ''
@@ -802,7 +802,6 @@ def nb_hauls(storage_without_upgrade, storage_with_upgrade, team, units_stats, p
     average_nb_hauls = ceil(sum(hauls_list)/len(hauls_list))
 
     return average_nb_hauls
-
 
 def best_nb_upgrades(decided_to_attack, team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, stance, favorable_peaks, cost_upgrade, max_upgrade, nb_tankers_to_create_this_round):
 

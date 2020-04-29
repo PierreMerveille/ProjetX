@@ -1,4 +1,4 @@
-from math import ceil
+from math import *
 from Play import * 
 
 """ general function """
@@ -785,7 +785,7 @@ def nb_hauls(storage_without_upgrade, storage_with_upgrade, team, units_stats, p
 
     Return
     ------
-    average_nb_hauls : average hauls needed for a tanker to empty a peak on the map (list)
+    average_nb_hauls : average hauls needed for a tanker to empty a peak on the map depending on the actual upgrade (list)
 
     """
     hauls_list = []
@@ -803,9 +803,10 @@ def nb_hauls(storage_without_upgrade, storage_with_upgrade, team, units_stats, p
 
     return average_nb_hauls
 
-def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, stance, favorable_peaks,cost_upgrade, max_upgrade, nb_tankers_to_create_this_round):
 
-    """ Decides which upgrades to use, and when to use them
+def best_nb_upgrades(decided_to_attack, team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, stance, favorable_peaks,cost_upgrade, max_upgrade, nb_tankers_to_create_this_round):
+
+    """ Calculates best nb of upgrades
 
     Parameters
     ----------
@@ -822,7 +823,9 @@ def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, 
 
     Return
     ------
-    instruction : instruction to make the selected upgrade 
+    nb_range_upgrades : optimal number of range upgrades to keep a range >= to the ennemy team (int)
+    nb_storage_upgrades : optimal number of storage upgrades to reach max profitability (int)
+    nb_regen_upgrades : optimal number of regen upgrades to reach max profitability (int)
 
     """
     stance = stance(ships, team, ennemy_team, peaks, units_stats, AI_stats)
@@ -830,9 +833,8 @@ def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, 
 
     if stance == 'control':
 
-        #control upgrades are tanker_capacity, regen and range
-        #check regen:    
-        
+        #control upgrades are tanker_capacity, regen and range   
+        nb_range_upgrades = 0
         current_hub_energy = AI_stats[team]['virtual_energy_point']
         regen_without_upgrade = units_stats[team]['hub']['regeneration']
         lost_money_without_regen_upgrade_list = []
@@ -840,7 +842,8 @@ def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, 
         rest_modulo_list = []
         money_lost_tanker_creation_list = []
         average_nb_hauls_list = []
-        
+
+        ######################check regen###################### 
         for times_upgraded in  range (1, (max_upgrade['max_regen_upgrade'] - regen_without_upgrade)/5 + 1):
 
             regen_with_upgrade = regen_without_upgrade + 5 * times_upgraded
@@ -854,12 +857,9 @@ def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, 
         min_lost_money = min(lost_money_without_regen_upgrade_list)
 
         #find the best nb of regen upgrades for actual nb_rounds  
-        best_nb_regen_upgrades = lost_money_without_regen_upgrade_list.index(min_lost_money)
-      
-        #calc energy won with best_nb_regen_upgrades during nb_rounds
-        money_with_best_nb_regen_upgrades = nb_rounds * (regen_without_upgrade + best_nb_regen_upgrades * 5) - best_nb_regen_upgrades * cost_upgarde['cost_regen_upgrade'] 
+        nb_regen_upgrades = lost_money_without_regen_upgrade_list.index(min_lost_money)
 
-        #check tanker:
+        ###########check storage################
         storage_without_upgrade = units_stats[team]['tanker']['max_energy']
 
         #calc if tanker upgrade is worth compared to the energy in peaks
@@ -883,17 +883,48 @@ def what_upgrade_to_use(team, ships, ennemy_team, peaks, AI_stats, units_stats, 
             average_nb_hauls = nb_hauls(storage_without_upgrade, storage_with_upgrade, team, units_stats, peaks, max_upgrade)
             average_nb_hauls_list.append(average_nb_hauls)
 
-        nb_upgrades_smallest_nb_hauls = average_nb_hauls_list.index(min(average_nb_hauls_list))
-
-
-        #see if upgrade is already worth it for the money during tanker creation
-        if money_lost_tanker_creation_list[1] - money_lost_tanker_creation_list[2] - cost_upgrade['cost_upgrade_capacity'] > 0:
-            
+        nb_storage_upgrades = average_nb_hauls_list.index(min(average_nb_hauls_list))
+          
+    ##################check range########################### indépendant de la stance
+    #bool a mettre en paramètre et qui vient d'une fonction qui calcule si on attaque #check if their cruisers have a better range than ours  
+    
+    if decided_to_attack == True : 
         
-        #calc next_round_hub_energy = current_hub_energy - nb_tanker_to_create_this_round * units_stats['common']['tanker']['creation_cost'] + nb_tankers_to_create_this_round * units_stats[team]['tanker']['max_energy']
-        #to determine if upgrade should be done now or later, next_round_hub_energy >= tanker_creation_cost
-     
+        if units_stats[team]['cruiser']['range'] == 1 :  
+        
+            nb_range_upgrades += 1 
 
-        #deplacer tous sauf 1
+        if units_stats[ennemy_team]['cruiser']['range'] > units_stats[team]['cruiser']['range']:
 
-        #Si ils sont plic-ploc
+            nb_range_upgrades += units_stats[ennemy_team]['cruiser']['range'] - units_stats[team]['cruiser']['range'] #si >= à la condition au dessus alors + 1
+    
+    return nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades
+
+def apply_upgrades(nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, AI_stats, nb_tanker_to_create_this_round, money_with_nb_regen_upgrades, money_lost_tanker_creation_list):          
+    
+        
+
+
+        
+        
+#calc next_round_hub_energy = current_hub_energy - nb_tanker_to_create_this_round * units_stats['common']['tanker']['creation_cost'] + nb_tankers_to_create_this_round * units_stats[team]['tanker']['max_energy']
+#to determine if upgrade should be done now or later, next_round_hub_energy >= tanker_creation_cost
+#see if upgrade is already worth it for the money during tanker creation
+#if money_lost_tanker_creation_list[1] - money_lost_tanker_creation_list[2] - cost_upgrade['cost_upgrade_capacity'] > 0:
+#calc energy won with best_nb_regen_upgrades during nb_rounds
+#money_with_best_nb_regen_upgrades = nb_rounds * (regen_without_upgrade + best_nb_regen_upgrades * 5) - best_nb_regen_upgrades * cost_upgarde['cost_regen_upgrade'] 
+#deplacer tous sauf 1
+
+#Si ils sont plic ploc
+
+
+
+        
+    
+        
+
+
+            
+
+    
+ 

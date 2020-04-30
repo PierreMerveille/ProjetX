@@ -66,9 +66,13 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
 
         AI_transfer_and_destination (ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name)
 
-        attack_cruiser(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,team,stance)
-        
         flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team,alive_cruiser)
+
+        attack_cruiser_control(alive_cruiser,close_ennemy_cruiser,ships,units_stats, team)
+
+        attack_tanker(stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cruiser,alive_ennemy_tanker,dangerous_ennemy_tanker)
+        
+        
         ### note à l'attention de ce très cher Anthony, idée: attaquer en priorité un croiseur ayant plus d'énergie que les qutres et aussi ceux avec le moins d'HP
     elif stance == 'defensive' :
         # rajouter list de non flee si puisement
@@ -219,7 +223,7 @@ def create_IA_ship (type, team, nb_ship,AI_stats):
 
     return instruction
 
-def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name,alive_tanker,alive_cruiser,AI_stats) :
+def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name,alive_tanker,alive_cruiser,AI_stats,stance) :
     """ Identify the ideal coordinates where the tankers should go ans tore it in ships and create transfer_instruction for them 
 
     Parameters
@@ -260,7 +264,7 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
             if peaks[ships[tanker]['target']]['storage'] == 0 :
                 ships[tanker]['coordinates_to_go'] = ships[tanker]['coordinates']
 
-        # verify if the taregt cruiser isn't full        
+        # verify if the target cruiser isn't full        
         elif ships[tanker]['target'] in ships :
             if ships[ships[tanker]['target']]['energy_point'] >= units_stats['common']['cruiser']['max_energy'] * rate :
                 ships[tanker]['coordinates_to_go'] = ships[tanker]['coordinates']
@@ -306,8 +310,9 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
 
             elif ships[tanker]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 :
 
-                #if one of the cruiser has a low fuel
+                # if one of the cruiser has a low fuel
                 if len(low_fuel_cruiser)!= 0 :
+                    # draw in the hub 
                     ships[tanker]['coordinates_to_go']= units_stats[team]['hub']['coordinates']
                 if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) <= 2 and AI_stats[team['virtual_energy_point']] > 0 :
                     transfer_instruction += str(tanker) + ':<'+ ships[tanker]['coordinates_to_go'] + ' '
@@ -343,8 +348,8 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
 
                 if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) <= 2:
                 
-                    transfer_instruction += str(tanker) + ':>'+ destination + ' '
-                    no_movement.append(destination)
+                    transfer_instruction += str(tanker) + ':>'+ ships[tanker]['target'] + ' '
+                    no_movement.append(ships[tanker]['target'])
         #if the tanker has not yet given or drawn energy
         else :
             if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) ==2 :
@@ -360,15 +365,6 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
     if len (transfer_instruction) != 0:
         transfer_instruction = transfer_instruction[:-1]
     return transfer_instruction
-
-def AI_attack_and_destination () :
-    attack_instruction = ''
-    if stance == 'control':
-        attack_instruction += attack_cruiser_control(alive_cruiser,close_ennemy_cruiser,ships,units_stats, team)
-        attack_instruction += attack_tanker(stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cruiser,alive_ennemy_tanker,dangerous_ennemy_tanker)
-    elif stance == 'defensive' :
-        attack_instruction += attack_cruiser_defense(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,team)
-    else : 
 
 
 """ control function"""
@@ -528,7 +524,7 @@ def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, en
     """
     for tanker in alive_tanker :
 
-        if ships[tanker]['target'] not in alive_cruiser :
+        if ships[tanker]['target'] not in alive_cruiser and ships[tanker]['target'] != 'hub' :
 
             for ennemy_cruiser in alive_ennemy_cruiser:
                 

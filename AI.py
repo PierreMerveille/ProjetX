@@ -532,15 +532,15 @@ def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, en
 
                 if distance <= (units_stats[ennemy_team]['cruiser']['range'] + 1): 
 
-                    if ships[tanker]['coordinates'][0] < ships[ennemy_cruiser]['coordinates'][0] :
+                    if ships[tanker]['coordinates'][0] < ships[ennemy_cruiser]['coordinates'][0] and ships[tanker]['coordinates'][0] !=0 :
                         x = -1
-                    elif ships[tanker]['coordinates'][0] > ships[ennemy_cruiser]['coordinates'][0] :
+                    elif ships[tanker]['coordinates'][0] > ships[ennemy_cruiser]['coordinates'][0] and ships[tanker]['coordinates'][0]!= long:
                         x = 1
                     else : 
                         x = 0 
-                    if ships[tanker]['coordinates'][1] < ships[ennemy_cruiser]['coordinates'][1] :
+                    if ships[tanker]['coordinates'][1] < ships[ennemy_cruiser]['coordinates'][1] and ships[tanker]['coordinates'][1] != 0:
                         y = -1
-                    elif ships[tanker]['coordinates'][1] < ships[ennemy_cruiser]['coordinates'][1] :
+                    elif ships[tanker]['coordinates'][1] < ships[ennemy_cruiser]['coordinates'][1] and ships[tanker]['coordinates'][0] != larg :
                         y = 1
                     else : 
                         y = 0

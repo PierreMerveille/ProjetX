@@ -1192,6 +1192,7 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_pla
         
 def verif_if_ship_on_coord(alive_cruiser, ships, coord):
     
+    coord_empty = []
     for coordinate in coord:
         coordinate_not_empty = False
 
@@ -1200,7 +1201,7 @@ def verif_if_ship_on_coord(alive_cruiser, ships, coord):
                 coordinate_not_empty = True
         
             if not coordinate_not_empty:
-                coord_empty += coordinate
+                coord_empty.append(coordinate) 
 
     return coord_empty
 
@@ -1246,10 +1247,7 @@ def order_coord(coord, units_stats,team) :
             else :
                 c.append(element)
         
-        return order_coord(b,units_stats,team)+ [pivot]+ order_coord(c,units_stats,team)
-
- 
-    
+        return order_coord(b,units_stats,team)+ [pivot]+ order_coord(c,units_stats,team)  
     
 
 def place_ship(coord_void, cruiser_place, alive_cruiser):

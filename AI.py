@@ -59,7 +59,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
             attack_cruiser ()
 
         elif alert_tanker == True :
-            attack_tanker(stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cruiser,close_ennemy_tanker)
+            attack_tanker(stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cruiser, alive_ennemy_tanker, close_ennemy_tanker)
               
 
     elif stance == 'offensive':

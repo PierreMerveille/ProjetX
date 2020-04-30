@@ -56,7 +56,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
         close_ennemy_cruiser,close_ennemy_tanker, alert_cruiser,alert_tanker = alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, ennemy_team)         
         
         if alert_cruiser == True :
-            attack_cruiser ()
+            attack_cruiser_control (alive_cruiser,close_ennemy_cruiser,ships,units_stats, team)
 
         elif alert_tanker == True :
             attack_tanker(stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cruiser, alive_ennemy_tanker, close_ennemy_tanker)
@@ -371,7 +371,6 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
 
 
 """ control function"""
-
 
 
 def control_is_worth (team, ennemy_team, peaks, ships, units_stats,AI_stats):
@@ -827,17 +826,6 @@ def target_to_shoot (alive_cruiser, ships, units_stats, team) :
                 ships[cruiser]['coordinates_to_go'] = ships[cruiser]['coordinates']
     
                 
-        
-
-                    
-
-
-                    
-
-
-
-
-                
 
 """ Upgrade functions """
 
@@ -1247,8 +1235,12 @@ def order_coord(coord, units_stats,team) :
             else :
                 c.append(element)
         
+<<<<<<< HEAD
+        return order_coord(b,units_stats,team)+ [pivot]+ order_coord(c,units_stats,team)
+=======
         return order_coord(b,units_stats,team)+ [pivot]+ order_coord(c,units_stats,team)  
     
+>>>>>>> 96855912c5df1908b0e160b6009a0f49684e6093
 
 def place_ship(coord_void, cruiser_place, alive_cruiser):
     """"""

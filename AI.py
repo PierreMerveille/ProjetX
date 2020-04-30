@@ -55,12 +55,12 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
 
         flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team)
 
-        close_ennemy_cruiser,close_ennemy_tanker, alert_cruiser,alert_tanker = alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, ennemy_team)         
-        
-        if alert_cruiser == True :
-            attack_cruiser ()
+        close_ennemy_cruiser,close_ennemy_tanker = alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, ennemy_team)         
+        #if ships in list then alert
+        if len(close_ennemy_cruiser) > 0 :
+            attack_cruiser_control ()
 
-        elif alert_tanker == True :
+        if len(close_ennemy_tanker) > 0 :
             attack_tanker(stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cruiser,close_ennemy_tanker)
               
 
@@ -615,8 +615,6 @@ def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
     nb_hub_tankers : number of tankers for the alert (int)
 
     """
-    alert_hub_tanker = False
-    alert_hub_cruiser = False
     close_ennemy_hub_tanker = []
     close_ennemy_hub_cruiser = []
 
@@ -632,12 +630,10 @@ def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
 
                 elif ships[ship]['type'] == 'cruiser'  :
                     close_ennemy_hub_cruiser.append(ship)
-    #if ships in list then alert
-    if len(close_ennemy_hub_tanker) > 0: 
-        alert_hub_tanker = True
 
-    if len(close_ennemy_hub_cruiser) > 0:
-        alert_hub_cruiser = True
+    return close_ennemy_hub_tanker,close_ennemy_hub_cruiser
+    
+   
 
 """ offensive function"""
 
@@ -1247,11 +1243,10 @@ def place_ship(coord_empty, cruiser_place, alive_cruiser):
     for coord in coord_empty:
         full = True
         for cruiser in alive_cruiser:
-            if full == True:
-                if cruiser not in cruiser_place :
-                    ships[cruiser]['coordinate_to_go'] = coord
-                    cruiser_place.append(cruiser)
-                    full = False
+            if cruiser not in cruiser_place and  full :
+                ships[cruiser]['coordinate_to_go'] = coord
+                cruiser_place.append(cruiser)
+                full = False
             
 
     return cruiser_place

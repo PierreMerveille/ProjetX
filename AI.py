@@ -59,7 +59,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
             attack_cruiser_control (alive_cruiser,close_ennemy_cruiser,ships,units_stats, team)
 
         elif alert_tanker == True :
-            attack_tanker(stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cruiser, alive_ennemy_tanker, close_ennemy_tanker)
+            attack_tanker(stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cruiser,close_ennemy_tanker)
               
 
     elif stance == 'offensive':
@@ -1235,12 +1235,8 @@ def order_coord(coord, units_stats,team) :
             else :
                 c.append(element)
         
-<<<<<<< HEAD
-        return order_coord(b,units_stats,team)+ [pivot]+ order_coord(c,units_stats,team)
-=======
         return order_coord(b,units_stats,team)+ [pivot]+ order_coord(c,units_stats,team)  
     
->>>>>>> 96855912c5df1908b0e160b6009a0f49684e6093
 
 def place_ship(coord_void, cruiser_place, alive_cruiser):
     """"""

@@ -510,7 +510,7 @@ def peaks_on_our_map_side(team, units_stats, peaks):
 
 
 
-def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team):
+def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team,alive_cruiser):
     """
     Parameters
     ----------
@@ -526,25 +526,28 @@ def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, en
     
     """
     for tanker in alive_tanker :
-        for ennemy_cruiser in alive_ennemy_cruiser:
-            
-            distance = count_distance(ships[tanker]['coordinates'], ships[ennemy_cruiser]['coordinates'])
 
-            if distance <= (units_stats[ennemy_team]['cruiser']['range'] + 1): 
+        if ships[tanker]['target'] not in alive_cruiser :
 
-                if ships[tanker]['coordinates'][0] < ships[ennemy_cruiser]['coordinates'][0] :
-                    x = -1
-                elif ships[tanker]['coordinates'][0] > ships[ennemy_cruiser]['coordinates'][0] :
-                    x = 1
-                else : 
-                    x = 0 
-                if ships[tanker]['coordinates'][1] < ships[ennemy_cruiser]['coordinates'][1] :
-                    y = -1
-                elif ships[tanker]['coordinates'][1] < ships[ennemy_cruiser]['coordinates'][1] :
-                    y = 1
-                else : 
-                    y = 0
-                ships[tanker]['coordinates_to_go'] = (ships[tanker]['coordinates'][0] + x, ships[tanker]['coordinates'][1] + y)
+            for ennemy_cruiser in alive_ennemy_cruiser:
+                
+                distance = count_distance(ships[tanker]['coordinates'], ships[ennemy_cruiser]['coordinates'])
+
+                if distance <= (units_stats[ennemy_team]['cruiser']['range'] + 1): 
+
+                    if ships[tanker]['coordinates'][0] < ships[ennemy_cruiser]['coordinates'][0] :
+                        x = -1
+                    elif ships[tanker]['coordinates'][0] > ships[ennemy_cruiser]['coordinates'][0] :
+                        x = 1
+                    else : 
+                        x = 0 
+                    if ships[tanker]['coordinates'][1] < ships[ennemy_cruiser]['coordinates'][1] :
+                        y = -1
+                    elif ships[tanker]['coordinates'][1] < ships[ennemy_cruiser]['coordinates'][1] :
+                        y = 1
+                    else : 
+                        y = 0
+                    ships[tanker]['coordinates_to_go'] = (ships[tanker]['coordinates'][0] + x, ships[tanker]['coordinates'][1] + y)
 
 def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, ennemy_team):
 

@@ -172,7 +172,10 @@ def coordinates_to_go (ships,no_movement):
                 y += 1
             elif y > ships[ship]['coordinates_to_go'][1] :
                 y -= 1
-            instructions += str(ship) + ':@'+ str(ships[ship]['coordinates_to_go']) 
+            instructions += str(ship) + ':@'+ str(ships[ship]['coordinates_to_go']) + ' '
+    if instructions != '':
+        instructions= instructions[:-1]
+    return instructions
 
 def count_distance (coord_1, coord_2):
     """

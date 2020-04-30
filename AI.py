@@ -80,7 +80,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
 
         flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team,alive_cruiser)
 
-        place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser)
+        place_cruiser_def(ships, team, ennemy_team, alive_cruiser)
 
         attack_cruiser_defense(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,team)
 
@@ -1179,7 +1179,7 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_pla
 
         
 def verif_if_ship_on_coord(alive_cruiser, ships, coord):
-    
+
     coord_empty = []
     for coordinate in coord:
         coordinate_not_empty = False

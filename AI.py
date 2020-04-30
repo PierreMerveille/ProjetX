@@ -717,27 +717,28 @@ def attack_cruiser_defense(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,
                 for cruiser in alive_ennemy_cruiser :
                     if range_verification(units_stats, ally_cruiser,ships, ships[cruiser]['coordinates'],team) and cruiser not in attacked_cruiser :
                         target_ships.append (cruiser) 
+                if target_ships != [] : 
+                    #order the tanker depending on their HP and energy
+                    HP_list = order_ship_by_caracteristic(target_ships, 'HP')
+                    energy_list = order_ship_by_caracteristic(target_ships, 'energy_point')
 
-                #order the tanker depending on their HP and energy
-                HP_list = order_ship_by_caracteristic(target_ships, 'HP')
-                energy_list = order_ship_by_caracteristic(target_ships, 'energy_point')
+                    attack_dico ={}
+                    for cruiser in target_ships :
+                        attack_dico[cruiser] = len(HP_list) - HP_list.index(cruiser) + energy_list.index(cruiser)
+                    
+                    #select the profitbale cruiser to attack 
+                    key_nb = 0 
+                    for cruiser in attack_dico :
+                        if key_nb == 0 :
+                            target = cruiser
+                        else :
+                            if attack_dico[cruiser]> attack_dico[target] :
+                                target = cruiser 
+                        key_nb += 1 
+                    attacked_cruiser.append(target)
 
-                attack_dico ={}
-                for cruiser in target_ships :
-                    attack_dico[cruiser] = len(HP_list) - HP_list.index(cruiser) + energy_list.index(cruiser)
-                
-                #select the profitbale cruiser to attack 
-                key_nb = 0 
-                for cruiser in attack_dico :
-                    if key_nb == 0 :
-                        target = cruiser
-                    else :
-                        if attack_dico[cruiser]> attack_dico[target] :
-                            target = cruiser 
-                    key_nb += 1 
-                attacked_cruiser.append(target)
-                if target_ships!=[]:
-                    attack_instruction = str(ally_cruiser) + ':*'+ ships[target]['coordinates'][0] + '-' + ships[target]['coordinates'][1] +'=' + min(ships[target]['energy_point'],ships[ally_cruiser]['energy_point'] ) /units_stats[team]['cruiser']['move']
+                    ships[ally_cruiser]['target'] = target
+
                 
 
 def attack_cruiser_control (alive_cruiser,close_ennemy_cruiser,ships,units_stats, team):
@@ -762,18 +763,12 @@ def attack_cruiser_control (alive_cruiser,close_ennemy_cruiser,ships,units_stats
                     energy += ships[ally_cruiser]['energy_point'] - count_distance(ships[ally_cruiser]['coordinates'], ships[ennemy]['coordiantes']) * units_stats[team]['cruiser']['move']
                     ships[ally_cruiser]['coordinates_to_go'] = ships[ennemy]['coordinates']
                     ships[ally_cruiser]['target'] = ennemy 
-                if range_verification(units_stats,ally_cruiser,ships,ships[ennemy]['coordinates'],team) :
-                    attack_instruction = str(ally_cruiser) + ':*'+ ships[ennemy]['coordinates'][0] + '-' + ships[ennemy]['coordinates'][1] +'=' + min(ships[ennemy]['energy_point'],ships[ally_cruiser]['energy_point'] ) /units_stats[team]['cruiser']['move']
+                
         else :
             for ally_cruiser in ally_attacker :
-                #attack the ennemy if in range
-                if range_verification(units_stats,ally_cruiser,ships,ships[ennemy]['coordinates'],team) :
-                    attack_instruction = str(ally_cruiser) + ':*'+ ships[ennemy]['coordinates'][0] + '-' + ships[ennemy]['coordinates'][1] +'=' + min(ships[ennemy]['energy_point'],ships[ally_cruiser]['energy_point'] )/units_stats[team]['cruiser']['move']
-                    # discard the targetting 
-                    ships[ally_cruiser]['coordinates_to_go'] = ships[ally_cruiser]['coordinates']
-                    ships[ally_cruiser]['target'] = ''
+                
                 # if ennemy has move, change the coordinates_to_go
-                elif ships[ally_cruiser]['coordinates_to_go'] != ships[ennemy]['coordinates']:
+                if ships[ally_cruiser]['coordinates_to_go'] != ships[ennemy]['coordinates']:
                     ships[ally_cruiser]['coordinates_to_go'] = ships[ennemy]['coordinates']
 
 def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cruiser,alive_ennemy_tanker,dangerous_ennemy_tanker):
@@ -821,18 +816,15 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cru
                         attacking_cruiser = cruiser
                         target_tanker = tanker
                         distance = count_distance(ships[attacking_cruiser]['coordinates'],ships[tanker]['coordinates'] )
-
-            # Attack if tnaker in range
-            if range_verification (units_stats,attacking_cruiser,ships,ships[target_tanker]['coordinates'],team):
-                order = attacking_cruiser + ':*' + ships[target_tanker]['coordinates'][0] + '-' + ships[target_tanker]['coordinates'][1] + '=' + ships[attacking_cruiser]['energy_point']/ (2 * units_stats['common']['cruiser']['cost_attack']) 
-                ships[attacking_cruiser_cruiser]['coordinates_to_go'] = ships[attacking_cruiser_cruiser]['coordinates']
-                ships[attacking_cruiser_cruiser]['target'] = ''
-                return order
-            # else cahnge the coordinates_to_go if the tanker has moved
-            else :
-                ships[cruiser_target]['coordinates_to_go'] = ships[target_tanker]['coordinates']
-                ships[cruiser_target]['target'] = target_tanker
-                return order
+                        
+            ships[cruiser_target]['coordinates_to_go'] = ships[target_tanker]['coordinates']
+            ships[cruiser_target]['target'] = target_tanker
+        else :
+            for cruiser in ally_attacker :
+                
+                # if ennemy has move, change the coordinates_to_go
+                if ships[cruiser]['coordinates_to_go'] != ships[tanker]['coordinates']:
+                    ships[ally_cruiser]['coordinates_to_go'] = ships[tanker]['coordinates']    
 
     
                 
@@ -1309,7 +1301,7 @@ def target_to_shoot (alive_cruiser, ships, units_stats) :
                 order = cruiser + ':*' + target_coord[0] + '-' + target_coord[1] + '=' + ships[cruiser]['energy_point']/ (2 * units_stats['common']['cruiser']['cost_attack'])      
                 ships[cruiser]['target'] = ''
                 ships[cruiser]['coordinates_to_go'] = ships[cruiser]['coordinates']
-                
+
         
     
         

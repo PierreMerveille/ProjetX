@@ -1237,7 +1237,6 @@ def order_coord(coord, units_stats,team) :
         
         return order_coord(b,units_stats,team)+ [pivot]+ order_coord(c,units_stats,team)  
     
-
 def place_ship(coord_void, cruiser_place, alive_cruiser):
     """"""
     for coord in coord_void:

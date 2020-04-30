@@ -82,9 +82,12 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
 
         place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser)
 
+        attack_cruiser_defense(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,team)
+
         attack_cruiser()
     
     coordinates_to_go(ships)
+    target_to_shoot(alive_cruiser, ships, units_stats)
 
 def stance(ships, team, ennemy_team, peaks, units_stats, AI_stats,alive_tanker, alive_cruiser,alive_ennemy_tanker, alive_ennemy_cruiser):
     """Decide if the adopted stance by the AI should be defensive or offensive

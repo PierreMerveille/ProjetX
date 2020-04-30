@@ -850,7 +850,7 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cru
 
 """ Upgrade functions """
 
-def find_nb_rounds(team, ships, units_stats, AI_stats):
+def find_nb_rounds(team, ships, units_stats, AI_stats, alive_tanker):
     
     """Finds the number of rounds you'd have to wait until you can create a new tanker (without taking into account the hub regeneration)
 
@@ -868,26 +868,26 @@ def find_nb_rounds(team, ships, units_stats, AI_stats):
     nb_rounds : number of rounds to wait for THE closest FULL tanker to come back or number of rounds to wait for the TWO closest FULL tankers to come back (int)
     
     """
-    proximity_order_full_tankers_our_hub = create_proximity_order_full_tankers_our_hub(team, ships, units_stats)
+    order_tanker = order_full_tanker(team, ships, units_stats, alive_tanker)
 
     #nb_rounds = number of rounds to wait for the closest FULL tanker to come back #current energy + 1 tanker haul          
-    if AI_stats[team]['virtual_energy_point'] + units_stats[team]['tanker']['max_energy'] >= 1000:
+    if AI_stats[team]['virtual_energy_point'] + (units_stats[team]['tanker']['max_energy']*60/100) >= 1000:
 
-        #take the closest from proximity_order_full_tankers_our_hub list
-        tanker = proximity_order_full_tankers_our_hub[0]
+        #take the closest from order_tanker list
+        tanker = order_tanker[0]
         
     #nb_rounds = number of rounds to wait for the two closest FULL tankers to come back #current energy + 2 tanker hauls
     else :
         
-        #take the second closest from proximity_order_full_tankers_our_hub list
-        tanker = proximity_order_full_tankers_our_hub[1]
+        #take the second closest order_tanker list
+        tanker = order_tanker[1]
     
     #nb_rounds = calc distance between FIRST closest full tanker and hub OR SECOND closest full tanker and hub. Depending on if condition before the operation.
     nb_rounds = count_distance(ships[tanker]['coordinates'], units_stats[team]['hub']['coordinates'])   
 
     return nb_rounds     
 
-def order_full_tanker(team, ships, units_stats,alive_tanker):
+def order_full_tanker(team, ships, units_stats, alive_tanker):
 
     """ Creates a list of full tankers ordered from closest to furthest away from hub
 
@@ -908,7 +908,6 @@ def order_full_tanker(team, ships, units_stats,alive_tanker):
     distance_list = []
     proximity_order_full_tankers_our_hub = []
     tanker_number = 0
-
     
     for ship in alive_tanker: 
 
@@ -919,6 +918,7 @@ def order_full_tanker(team, ships, units_stats,alive_tanker):
     coord = []
     for ship in full_tankers:
         coord.append(ships[ship]['coordinates']) 
+    
     order_coord = order_coord(coord,units_stats,team)
 
     order_tanker = []
@@ -950,9 +950,9 @@ def nb_hauls(storage_without_upgrade, storage_with_upgrade, team, units_stats, p
 
         for peak in peaks:
 
-            if peaks[peak]['storage'] % storage_with_upgrade == 0:
+            if peaks[peak]['storage'] % (storage_with_upgrade*60/100) == 0:
 
-                nb_hauls = peaks[peak]['storage']/storage_with_upgrade
+                nb_hauls = peaks[peak]['storage']/(storage_with_upgrade*60/100)
                 hauls_list.append(nb_hauls)
     
     average_nb_hauls = ceil(sum(hauls_list)/len(hauls_list))
@@ -1138,7 +1138,7 @@ def do_upgrades(team, units_stats, nb_range_upgrades, nb_storage_upgrades, nb_re
     """      
     instruction = ''
     #calc next_round_hub_energy = current_hub_energy - nb_tanker_to_create_this_round * units_stats['common']['tanker']['creation_cost'] + nb_tankers_to_create_this_round * units_stats[team]['tanker']['max_energy']
-    next_round_hub_energy = AI_stats[team]['virtual_energy_point'] - nb_tankers_to_create_this_round * units_stats['common']['tanker']['creation_cost'] + nb_tankers_to_create_this_round * units_stats[team]['tanker']['max_energy']
+    # utilie ???? next_round_hub_energy = AI_stats[team]['virtual_energy_point'] - nb_tankers_to_create_this_round * units_stats['common']['tanker']['creation_cost'] + nb_tankers_to_create_this_round * units_stats[team]['tanker']['max_energy']
 
     if nb_range_upgrades > 0:
         upgrade = 'range'
@@ -1146,7 +1146,6 @@ def do_upgrades(team, units_stats, nb_range_upgrades, nb_storage_upgrades, nb_re
         for nb in nb_range_upgrades:
             instruction += 'upgrade:' + str(upgrade) + ' ' 
 
-    #more profitable between regen and storage
     #if storage more profitable than regen:
     if storage_or_regen == 'storage' :
         upgrade = 'storage'

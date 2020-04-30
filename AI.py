@@ -504,11 +504,7 @@ def peaks_on_our_map_side(team, units_stats, peaks):
     #favorable_peaks = [peak_1, peak_2]
 
 
-
-
 """defense function"""
-
-
 
 def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team,alive_cruiser):
     """
@@ -641,10 +637,6 @@ def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
 
     if len(close_ennemy_hub_cruiser) > 0:
         alert_hub_cruiser = True
-
-
-
-
 
 """ offensive function"""
 
@@ -1196,9 +1188,8 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_pla
     coord = order_coord(coord,units_stats)
     coord_void = verif_if_ship_on_coord(coord, alive_cruiser)
     cruiser_place = place_ship(coord_void, cruiser_place, alive_cruiser)
-
-        
-def verif_if_ship_on_coord(coord):
+      
+def verif_if_ship_on_coord(coord,alive_cruiser):
     
     for coordinate in coord:
         coordinate_not_empty = False
@@ -1207,9 +1198,7 @@ def verif_if_ship_on_coord(coord):
             if ships[cruiser]['coordinate_to_go'] == coordinate:
                 coordinate_not_empty = True
         
-            if coordinate_not_empty:
-
-            else:
+            if not coordinate_not_empty:
                 coord_empty += coordinate
 
     return coord_empty

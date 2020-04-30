@@ -1124,8 +1124,6 @@ def do_upgrades(team, units_stats, nb_range_upgrades, nb_storage_upgrades, nb_re
 
     """      
     instruction = ''
-    #calc next_round_hub_energy = current_hub_energy - nb_tanker_to_create_this_round * units_stats['common']['tanker']['creation_cost'] + nb_tankers_to_create_this_round * units_stats[team]['tanker']['max_energy']
-    # utilie ???? next_round_hub_energy = AI_stats[team]['virtual_energy_point'] - nb_tankers_to_create_this_round * units_stats['common']['tanker']['creation_cost'] + nb_tankers_to_create_this_round * units_stats[team]['tanker']['max_energy']
 
     if nb_range_upgrades > 0:
         upgrade = 'range'

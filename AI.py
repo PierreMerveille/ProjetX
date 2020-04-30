@@ -1169,16 +1169,16 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_pla
     
     for y in range (1, (nb_line+1)*column_shift, column_shift) :
         for x in range(-abs(y),abs(y)+1) :
-            coord += (ally_hub[0] + x, ally_hub[1]+ y )
+            coord.append((ally_hub[0] + x, ally_hub[1]+ y ))
 
     for x in range (1, (nb_line+1)*row_shift, row_shift) :
         for y in range(-abs(x),abs(x)+1) :
-            coord += (ally_hub[0] + x, ally_hub[1]+ y )
+            coord.append((ally_hub[0] + x, ally_hub[1]+ y ))
 
 
     coord = order_coord(coord,units_stats)
-    coord_void = verif_if_ship_on_coord(coord, alive_cruiser)
-    cruiser_place = place_ship(coord_void, cruiser_place, alive_cruiser)
+    coord_empty = verif_if_ship_on_coord(coord, alive_cruiser)
+    cruiser_place = place_ship(coord_empty, cruiser_place, alive_cruiser)
       
 def verif_if_ship_on_coord(coord,alive_cruiser):
     
@@ -1190,7 +1190,7 @@ def verif_if_ship_on_coord(coord,alive_cruiser):
                 coordinate_not_empty = True
         
             if not coordinate_not_empty:
-                coord_empty += coordinate
+                coord_empty.append(coordinate)
 
     return coord_empty
 
@@ -1239,14 +1239,17 @@ def order_coord(coord, units_stats,team) :
         return order_coord(b,units_stats,team)+ [pivot]+ order_coord(c,units_stats,team)
     
 
-def place_ship(coord_void, cruiser_place, alive_cruiser):
+def place_ship(coord_empty, cruiser_place, alive_cruiser):
     """"""
-    for coord in coord_void:
+    for coord in coord_empty:
+        full = True
         for cruiser in alive_cruiser:
+            if full == True:
+                if cruiser not in cruiser_place :
+                    ships[cruiser]['coordinate_to_go'] = coord
+                    cruiser_place.append(cruiser)
+                    full = False
             
-            if cruiser not in cruiser_place :
-                ships[cruiser]['coordinate_to_go'] = coord
-                cruiser_place.append(cruiser)
 
     return cruiser_place
            

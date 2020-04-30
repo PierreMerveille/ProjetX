@@ -821,6 +821,15 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cru
                 if ships[cruiser]['coordinates_to_go'] != ships[tanker]['coordinates']:
                     ships[ally_cruiser]['coordinates_to_go'] = ships[tanker]['coordinates']    
 
+def target_to_shoot (alive_cruiser, ships, units_stats) :
+
+    for cruiser in alive_cruiser :
+        if ships[cruiser]['target'] != '' :
+            target_coord = ships[cruiser]['coordinates_to_go']
+            if range_verification(units_stats,cruiser,target_coord,team) :
+                order = cruiser + ':*' + target_coord[0] + '-' + target_coord[1] + '=' + ships[cruiser]['energy_point']/ (2 * units_stats['common']['cruiser']['cost_attack'])      
+                ships[cruiser]['target'] = ''
+                ships[cruiser]['coordinates_to_go'] = ships[cruiser]['coordinates']
     
                 
         
@@ -1287,15 +1296,7 @@ def order_ship_by_caracteristic(ship_list, caracteristic,ships) :
         
         return order_ship_by_caracteristic(b)+ [pivot]+ order_ship_by_caracteristic(c)
            
-def target_to_shoot (alive_cruiser, ships, units_stats) :
 
-    for cruiser in alive_cruiser :
-        if ships[cruiser]['target'] != '' :
-            target_coord = ships[cruiser]['coordinates_to_go']
-            if range_verification(units_stats,cruiser,target_coord,team) :
-                order = cruiser + ':*' + target_coord[0] + '-' + target_coord[1] + '=' + ships[cruiser]['energy_point']/ (2 * units_stats['common']['cruiser']['cost_attack'])      
-                ships[cruiser]['target'] = ''
-                ships[cruiser]['coordinates_to_go'] = ships[cruiser]['coordinates']
 
         
     

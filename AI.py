@@ -33,6 +33,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
     grouped_peaks, peak_name = find_grouped_peaks(team, peaks, units_stats)
     stance,total_peak_energy,our_total_peak_energy, favorable_peaks= stance (ships)
     AI_stats[team]['virtual_energy_point'] = units_stats[team]['hub']['energy_point']
+    nb_tankers_to_create(team, units_stats, favorable_peaks, peaks)
     
     if stance == 'control' :
         
@@ -67,13 +68,13 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
 
         attack_cruiser(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,team,stance)
         
-        
+        flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team,alive_cruiser)
         ### note à l'attention de ce très cher Anthony, idée: attaquer en priorité un croiseur ayant plus d'énergie que les qutres et aussi ceux avec le moins d'HP
     elif stance == 'defensive' :
-
+        # rajouter list de non flee si puisement
         AI_transfer_and_destination (ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name)
 
-        flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team)
+        flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team,alive_cruiser)
 
         place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser)
 
@@ -1091,9 +1092,9 @@ def nb_tankers_to_create(team, units_stats, favorable_peaks, peaks) :
 
         our_total_energy += peaks[peak]['storage'] 
     
-        nb_tankers_to_create = our_total_energy/units_stats[team]['tanker']['max_energy_point']
+        nb_tankers_to_create = int(our_total_energy/(units_stats[team]['tanker']['max_energy_point'])*units_stats)
 
-def nb_tankers_to_create_this_round(team, AI_stats, units_stats, alive_tanker, nb_tanker_to_create, nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades):
+def tankers_this_round(team, AI_stats, units_stats, alive_tanker, nb_tanker_to_create, nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades):
     
     """
     Parameters
@@ -1300,8 +1301,16 @@ def order_ship_by_caracteristic(ship_list, caracteristic,ships) :
         
         return order_ship_by_caracteristic(b)+ [pivot]+ order_ship_by_caracteristic(c)
            
-                
+def target_to_shoot (alive_cruiser, ships, units_stats) :
 
+    for cruiser in alive_cruiser :
+        if ships[cruiser]['target'] != '' :
+            target_coord = ships[ships[cruiser]['target']]['coordinates']
+            if range_verification(units_stats,cruiser,target_coord,team)  :
+                order = cruiser + ':*' + target_coord[0] + '-' + target_coord[1] + '=' + ships[cruiser]['energy_point']/ (2 * units_stats['common']['cruiser']['cost_attack'])      
+                ships[cruiser]['target'] = ''
+                ships[cruiser]['coordinates_to_go'] = ships[cruiser]['coordinates']
+                
         
     
         

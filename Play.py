@@ -420,7 +420,7 @@ def separate_instruction (order, ships, units_stats,board,team,peaks):
 
     return upgrade_list , create_list, move_list, attack_list, transfer_list
     
-def create_units (create_list, ships, team, board, units_stats, peaks) :
+def create_units (create_list, ships, team, board, units_stats, peaks,teams) :
     
     """ Creates new units in the team either a tanker or a cruiser and place it on the board
     
@@ -432,6 +432,7 @@ def create_units (create_list, ships, team, board, units_stats, peaks) :
     board : dictionary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
     units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
     peaks : the dictionary with all the peaks (dict)
+    teams : dictionary with the teams and their type (remote,...) (dico)
     
         
     Returns :
@@ -476,7 +477,9 @@ def create_units (create_list, ships, team, board, units_stats, peaks) :
             ships[instruction[0]]= {'coordinates': coordinates , 'HP': max_HP, 'energy_point' : energy_point, 'type' : instruction[1], 'team' : team, 'coordinates_to_go' : coordinates}
             board[coordinates]['list_entity'].append(instruction[0])
             change_value('hub',ships, peaks,-units_stats['common'][instruction[1]]['creation_cost'],'energy_point',units_stats,team)
-
+            if teams[team] == 'AI': 
+                ships[ship]['coordinates_to_go'] = ships[ship]['coordinates']
+                ships[ship]['target'] = ''
     return ships,board,units_stats
     
 def upgrade (upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade):

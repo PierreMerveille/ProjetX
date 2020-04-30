@@ -758,17 +758,16 @@ def attack_hub (stance, AI_stats, ships, units_stats, alive_cruiser, ennemy_team
                 ships[cruiser]['coordinates_to_go']=(x,y)
         return attack_list 
     
-def attack_cruiser(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,team) :
+def attack_cruiser_defense(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,team) :
 
-    if stance == 'defensive' :
-        
+            
         attacked_cruiser =[]
 
         for ally_cruiser in alive_cruiser :
 
             if ships[ally_cruiser]['coordinates'] == ships[ally_cruiser]['coordinates_to_go'] and ships[ally_cruiser]['energy_point'] !=0 :
                 target_ships =[]
-                #get the cruiser in range that aren't already attacked
+                #get the cruisers in range that aren't already attacked
                 for cruiser in alive_ennemy_cruiser :
                     if range_verification(units_stats, ally_cruiser,ships, ships[cruiser]['coordinates'],team) and cruiser not in attacked_cruiser :
                         target_ships.append (cruiser) 
@@ -792,7 +791,47 @@ def attack_cruiser(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,team) :
                     key_nb += 1 
                 attacked_cruiser.append(target)
                 if target_ships!=[]:
-                    attack_instruction = str(cruiser) + ':*'+ ships[target]['coordinates'][0] + '-' + ships[target]['coordinates'][1] +'=' + min(ships[target]['energy_point'],ships[ally_cruiser]['energy_point'] )
+                    attack_instruction = str(ally_cruiser) + ':*'+ ships[target]['coordinates'][0] + '-' + ships[target]['coordinates'][1] +'=' + min(ships[target]['energy_point'],ships[ally_cruiser]['energy_point'] ) /units_stats[team]['cruiser']['move']
+
+def attack_cruiser_control (alive_cruiser,close_ennemy_cruiser,ships,units_stats, team):
+
+    for ennemy in close_ennemy_cruiser :
+        not_already_targeted =[]
+        ally_attacker =[]
+
+        #select the cruiser which has not yet been targeted by an alive_cruiser
+        for ally_cruiser in alive_cruiser :
+            if ennemy not in ships[ally_cruiser]['target'] :
+                not_already_targeted.append(ennemy)
+                ally_attacker.append(ally_cruiser)
+        
+        # selecct cruiser(s) to attack the cruiser
+        if ennemy in not_already_targeted :
+            energy = 0
+            energy_to_kill = ships[ennemy]['HP'] *10 
+            for ally_cruiser in alive_cruiser :
+                if ships[ally_cruiser]['coordinates'] == ships[ally_cruiser]['coordinates_to_go'] and ships[ally_cruiser]['energy_point'] !=0 and energy < energy_to_kill :
+                    
+                    energy += ships[ally_cruiser]['energy_point'] - count_distance(ships[ally_cruiser]['coordinates'], ships[ennemy]['coordiantes']) * units_stats[team]['cruiser']['move']
+                    ships[ally_cruiser]['coordinates_to_go'] = ships[ennemy]['coordinates']
+                    ships[ally_cruiser]['target'] = ennemy 
+                if range_verification(units_stats,ally_cruiser,ships,ships[ennemy]['coordinates'],team) :
+                    attack_instruction = str(ally_cruiser) + ':*'+ ships[ennemy]['coordinates'][0] + '-' + ships[ennemy]['coordinates'][1] +'=' + min(ships[ennemy]['energy_point'],ships[ally_cruiser]['energy_point'] ) /units_stats[team]['cruiser']['move']
+        else :
+            for ally_cruiser in ally_attacker :
+                #attack the ennemy if in range
+                if range_verification(units_stats,ally_cruiser,ships,ships[ennemy]['coordinates'],team) :
+                    attack_instruction = str(ally_cruiser) + ':*'+ ships[ennemy]['coordinates'][0] + '-' + ships[ennemy]['coordinates'][1] +'=' + min(ships[ennemy]['energy_point'],ships[ally_cruiser]['energy_point'] )/units_stats[team]['cruiser']['move']
+                    # discard the targetting 
+                    ships[ally_cruiser]['coordinates_to_go'] = ships[ennemy]['coordinates']
+                    ships[ally_cruiser]['target'] = ''
+                # if ennemy has move, change the coordinates_to_go
+                elif ships[ally_cruiser]['coordinates_to_go'] != ships[ennemy]['coordinates']:
+                    ships[ally_cruiser]['coordinates_to_go'] = ships[ennemy]['coordinates']
+                
+        
+
+                    
 
 
                     

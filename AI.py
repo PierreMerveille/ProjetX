@@ -734,9 +734,8 @@ def attack_cruiser_defense(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,
                 attacked_cruiser.append(target)
                 if target_ships!=[]:
                     attack_instruction = str(ally_cruiser) + ':*'+ ships[target]['coordinates'][0] + '-' + ships[target]['coordinates'][1] +'=' + min(ships[target]['energy_point'],ships[ally_cruiser]['energy_point'] ) /units_stats[team]['cruiser']['move']
-                ships[ally_cruiser]['coordinates_to_go'] = ships[ally_cruiser]['coordinates']
-                ships[ally_cruiser]['target'] = ''
-                    
+                
+
 def attack_cruiser_control (alive_cruiser,close_ennemy_cruiser,ships,units_stats, team):
 
     for ennemy in close_ennemy_cruiser :
@@ -749,10 +748,10 @@ def attack_cruiser_control (alive_cruiser,close_ennemy_cruiser,ships,units_stats
                 not_already_targeted.append(ennemy)
                 ally_attacker.append(ally_cruiser)
         
-        # selecct cruiser(s) to attack the cruiser
+        # select cruiser(s) to attack the cruiser
         if ennemy in not_already_targeted :
             energy = 0
-            energy_to_kill = ships[ennemy]['HP'] *10 
+            energy_to_kill = ships[ennemy]['HP'] * units_stats['common']['cruiser']['cost_attack']
             for ally_cruiser in alive_cruiser :
                 if ships[ally_cruiser]['coordinates'] == ships[ally_cruiser]['coordinates_to_go'] and ships[ally_cruiser]['energy_point'] !=0 and energy < energy_to_kill :
                     
@@ -884,7 +883,7 @@ def find_nb_rounds(team, ships, units_stats, AI_stats):
 
     return nb_rounds     
 
-def create_proximity_order_full_tankers_our_hub(team, ships, units_stats):
+def order_full_tanker(team, ships, units_stats,alive_tanker):
 
     """ Creates a list of full tankers ordered from closest to furthest away from hub
 
@@ -898,7 +897,7 @@ def create_proximity_order_full_tankers_our_hub(team, ships, units_stats):
     Return
     ------
 
-    proximity_order_full_tankers_our_hub : list with full tankers in proximity order to our hub (list)
+    order_tanker : list with full tankers in proximity order to our hub (list)
 
     """
     full_tankers = []
@@ -906,31 +905,26 @@ def create_proximity_order_full_tankers_our_hub(team, ships, units_stats):
     proximity_order_full_tankers_our_hub = []
     tanker_number = 0
 
-    for ship in ships: 
+    
+    for ship in alive_tanker: 
 
-        if (ships[ship]['team'] == team) and (ships[ship]['type'] == 'tanker') and (ships[ship]['energy_point'] == units_stats[team]['tanker']['max_energy']):
+        if (ships[ship]['energy_point'] >= units_stats[team]['tanker']['max_energy']*60/100) and ships[ship]['target'] == 'hub':
         
             full_tankers.append(ship)
 
+    coord = []
     for ship in full_tankers:
+        coord.append(ships[ship]['coordinates']) 
+    order_coord = order_coord(coord,units_stats,team)
 
-            distance = count_distance(ships[ship]['coordinates'], units_stats[team]['hub']['coordinates'])
-            distance_list.append(distance) #distance_list = [5, 10, 4]
-        
-    #make a list in order of closest tankers
+    order_tanker = []
     
-    for distance in distance_list:
+    for coord in order_coord :
+        for ship in full_tankers :
+            if ships[ship]['coordinates'] == coord and ship not in order_tanker :
+                order_tanker.append(ship)
 
-        closest_distance = min(distance_list)
-        tanker_number += 1  #tanker_number = 1...2...3
-
-        if distance == closest_distance: 
-            
-            proximity_order_full_tankers_our_hub.append(full_tankers[tanker_number]) # add tanker_3 to proximity list
-        
-            distance_list.delete(distance)
-
-    return proximity_order_full_tankers_our_hub
+    return order_tanker
 
 def nb_hauls(storage_without_upgrade, storage_with_upgrade, team, units_stats, peaks, max_upgrade):
     """
@@ -960,7 +954,6 @@ def nb_hauls(storage_without_upgrade, storage_with_upgrade, team, units_stats, p
     average_nb_hauls = ceil(sum(hauls_list)/len(hauls_list))
 
     return average_nb_hauls
-
 
 def best_nb_upgrades(decided_to_attack, team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, favorable_peaks, cost_upgrade, max_upgrade, nb_tankers_to_create_this_round, alive_tanker):
 
@@ -1232,6 +1225,7 @@ def verif_if_ship_on_coord(coord):
     return coord_empty
 
 def order_coord(coord, units_stats,team) :
+
     """ 
     Sorting algorithm which sorts the coordinates by distance from the hub 
 
@@ -1287,14 +1281,14 @@ def place_ship(coord_void, cruiser_place, alive_cruiser):
                 ships[cruiser]['coordinate_to_go'] = coord
                 cruiser_place += cruiser
            
-def order_ship_by_caracteristic(ship_list, caracteristic) :
+def order_ship_by_caracteristic(ship_list, caracteristic,ships) :
     
     b= []
     c=[]
     if len(ship_list) <= 1 :
         return ship_list
     if len(ship_list) == 2 :
-        if ship_list[0]> ship_list[1] :
+        if ships[ship_list[0]]['caracteristic']> ships[ship_list[1]]['caracteristic'] :
             swap = ship_list[0]
             ship_list[0]= ship_list[1]
             ship_list[1]= swap
@@ -1305,7 +1299,7 @@ def order_ship_by_caracteristic(ship_list, caracteristic) :
         pivot= ship_list[index]
         del(ship_list[index])
         for element in ship_list :
-            if element < ship_list : 
+            if ships[element]['caracteristic'] < ships[ship_list]['caracteristic'] :  
                 b.append(element)
                 
             else :

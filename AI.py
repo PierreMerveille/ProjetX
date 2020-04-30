@@ -1138,15 +1138,20 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_pla
     """"""
     ally_hub = units_stats[team]['hub']['coordinates']
     ennemy_hub = units_stats[ennemy_team]['hub']['coordinates']
-    nbr_cruiser = AI_stats[team]['nb_cruiser']
+    nb_cruiser = len(alive_cruiser)
     coord = []
-    if nbr_cruiser != 0 : 
-        nb_line = 1 
-        
-        if nbr_cruiser > 5: 
-            nb_line+= 1 
-            if nbr_cruiser > 14 :
-                nb_line+= 1
+
+    nb_line = 1
+    go_on = True
+    result = 0
+    while go_on  :
+        result += nb_line *4 + 1 
+        if result <nb_cruiser :
+            
+           nb_line += 1 
+        else : 
+            go_on = False 
+    
 
     if ally_hub[0] - ennemy_hub[0] >= 0:
         column_shift = -1

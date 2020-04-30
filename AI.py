@@ -738,8 +738,7 @@ def attack_cruiser_defense(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,
                     attacked_cruiser.append(target)
 
                     ships[ally_cruiser]['target'] = target
-
-                
+               
 
 def attack_cruiser_control (alive_cruiser,close_ennemy_cruiser,ships,units_stats, team):
 
@@ -1296,8 +1295,8 @@ def target_to_shoot (alive_cruiser, ships, units_stats) :
 
     for cruiser in alive_cruiser :
         if ships[cruiser]['target'] != '' :
-            target_coord = ships[ships[cruiser]['target']]['coordinates']
-            if range_verification(units_stats,cruiser,target_coord,team)  :
+            target_coord = ships[cruiser]['coordinates_to_go']
+            if range_verification(units_stats,cruiser,target_coord,team) :
                 order = cruiser + ':*' + target_coord[0] + '-' + target_coord[1] + '=' + ships[cruiser]['energy_point']/ (2 * units_stats['common']['cruiser']['cost_attack'])      
                 ships[cruiser]['target'] = ''
                 ships[cruiser]['coordinates_to_go'] = ships[cruiser]['coordinates']

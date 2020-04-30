@@ -821,7 +821,7 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cru
                 if ships[cruiser]['coordinates_to_go'] != ships[tanker]['coordinates']:
                     ships[ally_cruiser]['coordinates_to_go'] = ships[tanker]['coordinates']    
 
-def target_to_shoot (alive_cruiser, ships, units_stats) :
+def target_to_shoot (alive_cruiser, ships, units_stats, team) :
 
     for cruiser in alive_cruiser :
         if ships[cruiser]['target'] != '' :
@@ -1195,7 +1195,7 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_pla
     cruiser_place = place_ship(coord_void, cruiser_place, alive_cruiser)
 
         
-def verif_if_ship_on_coord(coord):
+def verif_if_ship_on_coord(alive_cruiser, ships, coord):
     
     for coordinate in coord:
         coordinate_not_empty = False
@@ -1255,7 +1255,7 @@ def order_coord(coord, units_stats,team) :
         
         return order_coord(b,units_stats,team)+ [pivot]+ order_coord(c,units_stats,team)
 
-   
+ 
     
     
 

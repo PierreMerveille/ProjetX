@@ -38,7 +38,9 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
     if stance == 'control' :
         
         while AI_stats[team]['virtual_energy_point'] > units_stats['Common']['tanker']['creation_cost'] : 
+
             if AI_stats[team]['nb_tanker'] != 4 or AI_stats[team]['nb_cruiser'] >0 :
+
                 instruction,name = create_IA_ship('tanker',team,'nb_tanker',AI_stats)
                 order_AI += ' ' + instruction
                 AI_stats[team]['virtual_energy_point'] -= units_stats['common']['tanker']['creation_cost']
@@ -56,7 +58,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
         close_ennemy_cruiser,close_ennemy_tanker, alert_cruiser,alert_tanker = alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, ennemy_team)         
         
         if alert_cruiser == True :
-            attack_cruiser_control (alive_cruiser,close_ennemy_cruiser,ships,units_stats, team)
+            attack_cruiser ()
 
         elif alert_tanker == True :
             attack_tanker(stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cruiser,close_ennemy_tanker)
@@ -64,7 +66,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
 
     elif stance == 'offensive':
 
-        AI_transfer_and_destination (ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name)
+        AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name)
 
         flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team,alive_cruiser)
 
@@ -80,7 +82,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
 
         flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team,alive_cruiser)
 
-        place_cruiser_def(ships, team, ennemy_team, alive_cruiser)
+        place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser)
 
         attack_cruiser_defense(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,team)
 
@@ -222,10 +224,6 @@ def create_IA_ship (type, team, nb_ship,AI_stats):
 
     return instruction, name
     
-
-
-    return instruction
-
 def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name,alive_tanker,alive_cruiser,AI_stats,stance) :
     """ Identify the ideal coordinates where the tankers should go ans tore it in ships and create transfer_instruction for them 
 
@@ -371,6 +369,7 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
 
 
 """ control function"""
+
 
 
 def control_is_worth (team, ennemy_team, peaks, ships, units_stats,AI_stats):
@@ -815,7 +814,7 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cru
                 if ships[cruiser]['coordinates_to_go'] != ships[tanker]['coordinates']:
                     ships[ally_cruiser]['coordinates_to_go'] = ships[tanker]['coordinates']    
 
-def target_to_shoot (alive_cruiser, ships, units_stats, team) :
+def target_to_shoot (alive_cruiser, ships, units_stats) :
 
     for cruiser in alive_cruiser :
         if ships[cruiser]['target'] != '' :
@@ -824,8 +823,7 @@ def target_to_shoot (alive_cruiser, ships, units_stats, team) :
                 order = cruiser + ':*' + target_coord[0] + '-' + target_coord[1] + '=' + ships[cruiser]['energy_point']/ (2 * units_stats['common']['cruiser']['cost_attack'])      
                 ships[cruiser]['target'] = ''
                 ships[cruiser]['coordinates_to_go'] = ships[cruiser]['coordinates']
-    
-                
+             
 
 """ Upgrade functions """
 
@@ -1039,7 +1037,7 @@ def best_nb_upgrades(decided_to_attack, team, ships, ennemy_team, peaks, AI_stat
 
     if decided_to_attack == True : 
         
-        if units_stats[team]['cruiser']['range'] == 1 :  
+        if units_stats[team]['cruiser']['range'] == 1 : 
         
             nb_range_upgrades += 1 
 
@@ -1176,11 +1174,9 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_pla
     coord = order_coord(coord,units_stats)
     coord_void = verif_if_ship_on_coord(coord, alive_cruiser)
     cruiser_place = place_ship(coord_void, cruiser_place, alive_cruiser)
-
-        
-def verif_if_ship_on_coord(alive_cruiser, ships, coord):
-
-    coord_empty = []
+      
+def verif_if_ship_on_coord(coord,alive_cruiser):
+    
     for coordinate in coord:
         coordinate_not_empty = False
 
@@ -1189,7 +1185,7 @@ def verif_if_ship_on_coord(alive_cruiser, ships, coord):
                 coordinate_not_empty = True
         
             if not coordinate_not_empty:
-                coord_empty.append(coordinate) 
+                coord_empty += coordinate
 
     return coord_empty
 
@@ -1235,8 +1231,9 @@ def order_coord(coord, units_stats,team) :
             else :
                 c.append(element)
         
-        return order_coord(b,units_stats,team)+ [pivot]+ order_coord(c,units_stats,team)  
+        return order_coord(b,units_stats,team)+ [pivot]+ order_coord(c,units_stats,team)
     
+
 def place_ship(coord_void, cruiser_place, alive_cruiser):
     """"""
     for coord in coord_void:
@@ -1244,7 +1241,9 @@ def place_ship(coord_void, cruiser_place, alive_cruiser):
             
             if cruiser not in cruiser_place :
                 ships[cruiser]['coordinate_to_go'] = coord
-                cruiser_place += cruiser
+                cruiser_place.append(cruiser)
+
+    return cruiser_place
            
 def order_ship_by_caracteristic(ship_list, caracteristic,ships) :
     
@@ -1271,8 +1270,6 @@ def order_ship_by_caracteristic(ship_list, caracteristic,ships) :
                 c.append(element)
         
         return order_ship_by_caracteristic(b)+ [pivot]+ order_ship_by_caracteristic(c)
-           
-
 
         
     

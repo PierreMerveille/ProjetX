@@ -1052,7 +1052,7 @@ def nb_tankers_to_create(team, units_stats, favorable_peaks, peaks) :
 
         our_total_energy += peaks[peak]['storage'] 
     
-    nb_tankers_to_create = our_total_energy/units_stats[team]['tanker']['max_energy_point']
+        nb_tankers_to_create = our_total_energy/units_stats[team]['tanker']['max_energy_point']
 
 def nb_tankers_to_create_this_round(team, AI_stats, units_stats, alive_tanker, nb_tanker_to_create, nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades):
     
@@ -1075,7 +1075,7 @@ def nb_tankers_to_create_this_round(team, AI_stats, units_stats, alive_tanker, n
     """
     if (nb_range_upgrades == 0 and nb_storage_upgrades == 0 and nb_regen_upgrades == 0) and len(alive_tanker) < nb_tanker_to_create :
         
-        nb_tankers_to_create_this_round = AI_stats[team]['virtual_energy_point']/units_stats['common']['tanker']['creation_cost']
+        nb_tankers_to_create_this_round = int(AI_stats[team]['virtual_energy_point']/units_stats['common']['tanker']['creation_cost'])
 
 def do_upgrades(team, units_stats, nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, AI_stats, nb_tankers_to_create_this_round, storage_or_regen):          
     
@@ -1119,16 +1119,6 @@ def do_upgrades(team, units_stats, nb_range_upgrades, nb_storage_upgrades, nb_re
 
         for nb in nb_regen_upgrades:
             instruction += 'upgrade:' + str(upgrade) + ' '    
-
-
-
-    
-
-#calc energy won with best_nb_regen_upgrades during nb_rounds
-#money_with_nb_regen_upgrades = nb_rounds * (units_stats[team]['tanker']['max_energy'] + nb_regen_upgrades * 5) - nb_regen_upgrades * cost_upgarde['cost_regen_upgrade'] 
-#deplacer tous sauf 1
-
-#Si ils sont plic ploc
 
 def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_place,units_stats,AI_stats):
     """"""

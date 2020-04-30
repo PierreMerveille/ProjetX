@@ -815,7 +815,7 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cru
                 if ships[cruiser]['coordinates_to_go'] != ships[tanker]['coordinates']:
                     ships[ally_cruiser]['coordinates_to_go'] = ships[tanker]['coordinates']    
 
-def target_to_shoot (alive_cruiser, ships, units_stats) :
+def target_to_shoot (alive_cruiser, ships, units_stats, team) :
 
     for cruiser in alive_cruiser :
         if ships[cruiser]['target'] != '' :
@@ -1176,9 +1176,11 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_pla
     coord = order_coord(coord,units_stats)
     coord_void = verif_if_ship_on_coord(coord, alive_cruiser)
     cruiser_place = place_ship(coord_void, cruiser_place, alive_cruiser)
-      
-def verif_if_ship_on_coord(coord,alive_cruiser):
+
+        
+def verif_if_ship_on_coord(alive_cruiser, ships, coord):
     
+    coord_empty = []
     for coordinate in coord:
         coordinate_not_empty = False
 
@@ -1187,7 +1189,7 @@ def verif_if_ship_on_coord(coord,alive_cruiser):
                 coordinate_not_empty = True
         
             if not coordinate_not_empty:
-                coord_empty += coordinate
+                coord_empty.append(coordinate) 
 
     return coord_empty
 
@@ -1233,7 +1235,12 @@ def order_coord(coord, units_stats,team) :
             else :
                 c.append(element)
         
+<<<<<<< HEAD
         return order_coord(b,units_stats,team)+ [pivot]+ order_coord(c,units_stats,team)
+=======
+        return order_coord(b,units_stats,team)+ [pivot]+ order_coord(c,units_stats,team)  
+    
+>>>>>>> 96855912c5df1908b0e160b6009a0f49684e6093
 
 def place_ship(coord_void, cruiser_place, alive_cruiser):
     """"""

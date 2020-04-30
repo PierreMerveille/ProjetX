@@ -581,7 +581,7 @@ def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, e
 
                     distance = count_distance (peaks[peak]['coordinates'], ships[ship]['coordinates'])  
                 
-                    if distance <= 10  : # reflechir a une formule adequate 
+                    if distance <= units_stats[ennemy_team][cruiser]['range']*1.5  : # reflechir a une formule adequate 
 
                         if ships[ship]['type'] == 'tanker' : 
                             close_ennemy_tanker.append(ship)

@@ -1305,8 +1305,7 @@ def create_control_ship (AI_stats,team,units_stats,alive_tanker,alive_cruiser) :
             instruction,name = create_IA_ship('cruiser',team,'nb_cruiser',AI_stats)
             instructions.append(instruction)
             AI_stats[team]['virtual_energy_point'] -= units_stats['common']['cruiser']['creation_cost']
-
-        
+       
     
 def new_cruiser_group (alive_cruiser,ships,grouped_peaks,team):
     nb_group = 0
@@ -1324,13 +1323,18 @@ def new_cruiser_group (alive_cruiser,ships,grouped_peaks,team):
                         if index == 0 :
                             grouped_peaks[team][index]['nb_cruiser'] += 1
                             ships[cruiser]['group'] = index 
+                            
                             placed = True
 
                         elif grouped_peaks[team][index]['nb_cruiser'] <  grouped_peaks[team][index -1]['nb_cruiser'] :
+
                             grouped_peaks[team][index]['nb_cruiser'] += 1
-                            ships[cruiser]['group'] = index 
+                            ships[cruiser]['group'] = index
+                             
                             placed = True
-                    
+
+def go_to_group_coordinates () :
+    for cruiser in alive_cruiser                     
 
                    
                 
@@ -1338,7 +1342,4 @@ def new_cruiser_group (alive_cruiser,ships,grouped_peaks,team):
 
             
 
-# lors de la création de cruiser ==> assigné numéro de group de peak à défendre 
-# premier tour ==> 2 au hub
-#on remplit équitablemùent les autres jusqu'à 2 
-# puis remplissage simultanee de tout (group + hub)
+#une fonction qui en fonction du groupe la met sur la coord et quand il est placé ==> attack_cruiser in range

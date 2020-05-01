@@ -27,7 +27,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
     specification : Johan Rochet (v.1 25/04/20)
     
     """
-    order_AI = ''
+    order_AI = ' '
     alive_tanker, alive_cruiser = create_ships_lists(ships,team)
     alive_ennemy_tanker, alive_ennemy_cruiser = create_ships_lists(ships,ennemy_team)
     grouped_peaks, peak_name = find_grouped_peaks(team, peaks, units_stats)
@@ -45,7 +45,8 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
                 order_AI += ' ' + instruction
                 AI_stats[team]['virtual_energy_point'] -= units_stats['common']['tanker']['creation_cost']
                 #transfer from the new tanker to hub 
-                order_AI += name + ':>'+ str(units_stats[team]['hub']['coordiantes'][0]) + '-' + str(units_stats[team]['hub']['coordiantes'][1])
+                
+                order_AI += '%s:>%d-%d ' % (name,units_stats[team]['hub']['coordiantes'][0],units_stats[team]['hub']['coordiantes'][1] )
             #create a security_cruiser
             else :
                 instruction = create_IA_ship('cruiser',team,'nb_cruiser',AI_stats)
@@ -903,7 +904,8 @@ def target_to_shoot (alive_cruiser, ships, units_stats) :
                 order = cruiser + ':*' + target_coord[0] + '-' + target_coord[1] + '=' + ships[cruiser]['energy_point']/ (2 * units_stats['common']['cruiser']['cost_attack'])      
                 ships[cruiser]['target'] = ''
                 ships[cruiser]['coordinates_to_go'] = ships[cruiser]['coordinates']
-             
+            else :
+                conflict = True 
 
 """ Upgrade functions """
 
@@ -926,15 +928,21 @@ def find_nb_rounds(team, ships, units_stats, AI_stats, alive_tanker):
     
     """
     order_tanker = order_full_tanker(team, ships, units_stats, alive_tanker)
-    virtual_hub_energy = AI_stats[team]['virtual_energy_point']
-    
-    for tanker in order_tanker:
-        if virtual_hub_energy < 1000:
-            virtual_hub_energy + (units_stats[team]['tanker']['max_energy']*60/100)
-            ship = tanker 
 
+    #nb_rounds = number of rounds to wait for the closest FULL tanker to come back #current energy + 1 tanker haul          
+    if AI_stats[team]['virtual_energy_point'] + (units_stats[team]['tanker']['max_energy']*60/100) >= 1000:
+
+        #take the closest from order_tanker list
+        tanker = order_tanker[0]
+        
+    #nb_rounds = number of rounds to wait for the two closest FULL tankers to come back #current energy + 2 tanker hauls
+    else :
+        
+        #take the second closest order_tanker list
+        tanker = order_tanker[1]
+    
     #nb_rounds = calc distance between FIRST closest full tanker and hub OR SECOND closest full tanker and hub. Depending on if condition before the operation.
-    nb_rounds = count_distance(ships[ship]['coordinates'], units_stats[team]['hub']['coordinates'])   
+    nb_rounds = count_distance(ships[tanker]['coordinates'], units_stats[team]['hub']['coordinates'])   
 
     return nb_rounds     
 
@@ -1168,7 +1176,7 @@ def tankers_this_round(team, AI_stats, units_stats, alive_tanker, nb_tanker_to_c
         
         nb_tankers_to_create_this_round = int(AI_stats[team]['virtual_energy_point']/units_stats['common']['tanker']['creation_cost'])
 
-def do_upgrades(team, units_stats, nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, AI_stats, nb_tankers_to_create_this_round, storage_or_regen, cost_upgrade):          
+def do_upgrades(team, units_stats, nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, AI_stats, nb_tankers_to_create_this_round, storage_or_regen):          
     
     """
     Parameters
@@ -1189,27 +1197,24 @@ def do_upgrades(team, units_stats, nb_range_upgrades, nb_storage_upgrades, nb_re
     """      
     instruction = ''
 
-    if nb_range_upgrades > 0 and AI_stats[team]['virtual_energy_point'] >= cost_upgrade['cost_range_upgrade']:
+    if nb_range_upgrades > 0:
         upgrade = 'range'
        
-        for nb in range(nb_range_upgrades):
+        for nb in nb_range_upgrades:
             instruction += 'upgrade:' + str(upgrade) + ' ' 
-            AI_stats[team]['virtual_energy_point'] -= cost_upgrade['cost_range_upgrade']
 
     #if storage more profitable than regen:
-    if storage_or_regen == 'storage' and AI_stats[team]['virtual_energy_point'] >= cost_upgrade['cost_upgrade_capacity']:
+    if storage_or_regen == 'storage' :
         upgrade = 'storage'
 
-        for nb in range(nb_storage_upgrades):
+        for nb in nb_storage_upgrades:
             instruction += 'upgrade:' + str(upgrade) + ' '
-            AI_stats[team]['virtual_energy_point'] -= cost_upgrade['cost_upgrade_capacity']
 
-    elif storage_or_regen == 'regen' and AI_stats[team]['virtual_energy_point'] >= cost_upgrade['cost_regen_upgrade']:
+    else :
         upgrade = 'regeneration'
 
-        for nb in range(nb_regen_upgrades):
-            instruction += 'upgrade:' + str(upgrade) + ' '
-            AI_stats[team]['virtual_energy_point'] -= cost_upgrade['cost_regen_upgrade']    
+        for nb in nb_regen_upgrades:
+            instruction += 'upgrade:' + str(upgrade) + ' '    
 
 def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_place,units_stats,AI_stats):
     """"""

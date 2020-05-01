@@ -37,7 +37,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
     
     if stance == 'control' :
         
-        while AI_stats[team]['virtual_energy_point'] > units_stats['Common']['tanker']['creation_cost'] : 
+        while AI_stats[team]['virtual_energy_point'] > units_stats['common']['tanker']['creation_cost'] : 
 
             if AI_stats[team]['nb_tanker'] != 4 or AI_stats[team]['nb_cruiser'] >0 :
 
@@ -746,11 +746,15 @@ def attack_cruiser_control (alive_cruiser,close_ennemy_cruiser,ships,units_stats
             energy = 0
             energy_to_kill = ships[ennemy]['HP'] * units_stats['common']['cruiser']['cost_attack']
             
-            order_coord = order_coord (coord,units_stats,team)
-            
+            order_coord = order_coord (coord, ships[ennemy]['coordinates'])
+            order_cruiser =[]
+            for coord in order_coord :
+                for ally_cruiser in alive_cruiser :
+                    if ships[ally_cruiser]['coordinates'] == coord and ally_cruiser not in order_cruiser :
+                        order_cruiser.append (ally_cruiser)
 
 
-            for ally_cruiser in alive_cruiser :
+            for ally_cruiser in order_cruiser :
                 if ships[ally_cruiser]['coordinates'] == ships[ally_cruiser]['coordinates_to_go'] and ships[ally_cruiser]['energy_point'] !=0 and energy < energy_to_kill :
                     
                     energy += ships[ally_cruiser]['energy_point'] - count_distance(ships[ally_cruiser]['coordinates'], ships[ennemy]['coordiantes']) * units_stats[team]['cruiser']['move']
@@ -901,7 +905,7 @@ def order_full_tanker(team, ships, units_stats, alive_tanker):
     for ship in full_tankers:
         coord.append(ships[ship]['coordinates']) 
     
-    order_coord = order_coord(coord,units_stats,team)
+    order_coord = order_coord(coord,units_stats[team]['hub']['coordinates'])
 
     order_tanker = []
     
@@ -1181,7 +1185,7 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_pla
             coord.append((ally_hub[0] + x, ally_hub[1]+ y ))
 
 
-    coord = order_coord(coord,units_stats)
+    coord = order_coord(coord,units_stats[team]['hub']['coordinates'])
     coord_empty = verif_if_ship_on_coord(coord, alive_cruiser)
     cruiser_place = place_ship(coord_empty, cruiser_place, alive_cruiser)
       

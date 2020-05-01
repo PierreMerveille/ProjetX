@@ -474,7 +474,7 @@ def create_units (create_list, ships, team, board, units_stats, peaks,teams) :
 
             #Get the other stat of the ship and create it and put it on the board
             max_HP = units_stats['common'][instruction[1]]['max_HP'] 
-            ships[instruction[0]]= {'coordinates': coordinates , 'HP': max_HP, 'energy_point' : energy_point, 'type' : instruction[1], 'team' : team, 'coordinates_to_go' : coordinates}
+            ships[instruction[0]]= {'coordinates': coordinates , 'HP': max_HP, 'energy_point' : energy_point, 'type' : instruction[1], 'team' : team, 'coordinates_to_go' : coordinates, 'squad' : ''}
             board[coordinates]['list_entity'].append(instruction[0])
             change_value('hub',ships, peaks,-units_stats['common'][instruction[1]]['creation_cost'],'energy_point',units_stats,team)
             if teams[team] == 'AI': 
@@ -621,8 +621,10 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                     coordinates= coord_attack[0].split ('-')
                     #coordinates = tuple (x,y)
                     coordinates = (int(coordinates[0]),int(coordinates[1]))
+                    #calculate the distance between 2 ships
+                    distance = count_distance(coordinates, coord_attack[1])
                     #verify in another function if we have the range
-                    hithin_range = range_verification (units_stats, instruction[0], ships, coordinates, team)
+                    hithin_range = range_verification (units_stats, distance, ships, team)
                     
                     
                     
@@ -1273,16 +1275,15 @@ def display_stats (elements, color_team, ships, units_stats, peaks):
 
     print(fg(255))   
     
-def range_verification (units_stats, ship_name, ships, coordinates, team):
+def range_verification (units_stats, distance, ships, team):
 
     """  Verify if the ship can attend the box 
 
     Parameters
     ----------
     units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
-    ship_name : name of the ship (str)
+    distance : the distance between 2 coordinates (integer).
     ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
-    coordinates : coordinates of the box to attend (tuple)
     team : name of the team which is playing (str)   
 
     Return 
@@ -1301,7 +1302,7 @@ def range_verification (units_stats, ship_name, ships, coordinates, team):
     """
 
     #Verify the range
-    if max (abs(coordinates[0]-ships[ship_name]['coordinates'][0]), abs(coordinates[1]-ships[ship_name]['coordinates'][1])) <= units_stats[team]['cruiser']['range'] :
+    if distance <= units_stats[team]['cruiser']['range'] :
         
         return True
     else :

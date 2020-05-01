@@ -848,21 +848,15 @@ def find_nb_rounds(team, ships, units_stats, AI_stats, alive_tanker):
     
     """
     order_tanker = order_full_tanker(team, ships, units_stats, alive_tanker)
-
-    #nb_rounds = number of rounds to wait for the closest FULL tanker to come back #current energy + 1 tanker haul          
-    if AI_stats[team]['virtual_energy_point'] + (units_stats[team]['tanker']['max_energy']*60/100) >= 1000:
-
-        #take the closest from order_tanker list
-        tanker = order_tanker[0]
-        
-    #nb_rounds = number of rounds to wait for the two closest FULL tankers to come back #current energy + 2 tanker hauls
-    else :
-        
-        #take the second closest order_tanker list
-        tanker = order_tanker[1]
+    virtual_hub_energy = AI_stats[team]['virtual_energy_point']
     
+    for tanker in order_tanker:
+        if virtual_hub_energy < 1000:
+            virtual_hub_energy + (units_stats[team]['tanker']['max_energy']*60/100)
+            ship = tanker 
+
     #nb_rounds = calc distance between FIRST closest full tanker and hub OR SECOND closest full tanker and hub. Depending on if condition before the operation.
-    nb_rounds = count_distance(ships[tanker]['coordinates'], units_stats[team]['hub']['coordinates'])   
+    nb_rounds = count_distance(ships[ship]['coordinates'], units_stats[team]['hub']['coordinates'])   
 
     return nb_rounds     
 

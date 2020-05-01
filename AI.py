@@ -733,17 +733,23 @@ def attack_cruiser_control (alive_cruiser,close_ennemy_cruiser,ships,units_stats
     for ennemy in close_ennemy_cruiser :
         not_already_targeted =[]
         ally_attacker =[]
+        coord =[]
 
         #select the cruiser which has not yet been targeted by an alive_cruiser
         for ally_cruiser in alive_cruiser :
             if ennemy not in ships[ally_cruiser]['target'] :
                 not_already_targeted.append(ennemy)
                 ally_attacker.append(ally_cruiser)
-        
+                coord.append(ships[ally_cruiser]['coordinates'])
         # select cruiser(s) to attack the cruiser
         if ennemy in not_already_targeted :
             energy = 0
             energy_to_kill = ships[ennemy]['HP'] * units_stats['common']['cruiser']['cost_attack']
+            
+            order_coord = order_coord (coord,units_stats,team)
+            
+
+
             for ally_cruiser in alive_cruiser :
                 if ships[ally_cruiser]['coordinates'] == ships[ally_cruiser]['coordinates_to_go'] and ships[ally_cruiser]['energy_point'] !=0 and energy < energy_to_kill :
                     
@@ -1193,7 +1199,7 @@ def verif_if_ship_on_coord(coord,alive_cruiser):
 
     return coord_empty
 
-def order_coord(coord, units_stats,team) :
+def order_coord(coord,destination) :
 
     """ 
     Sorting algorithm which sorts the coordinates by distance from the hub 
@@ -1217,7 +1223,7 @@ def order_coord(coord, units_stats,team) :
     if len(coord) <= 1 :
         return coord
     if len(coord) == 2 :
-        if count_distance(coord[0],units_stats[team]['hub']['coordinates'])> count_distance(coord[1],units_stats[team]['hub']['coordinates']) :
+        if count_distance(coord[0],destination)> count_distance(coord[1],destination) :
             swap = coord[0]
             coord[0]= coord[1]
             coord[1]= swap
@@ -1226,16 +1232,16 @@ def order_coord(coord, units_stats,team) :
         index = randint (0, len(coord)-1)
         
         pivot= coord[index]
-        pivot_distance = count_distance(pivot,units_stats[team]['hub']['coordinates'])
+        pivot_distance = count_distance(pivot,destination)
         del(coord[index])
         for element in coord :
-            if count_distance(element,units_stats[team]['hub']['coordinates']) < pivot_distance : 
+            if count_distance(element,destination) < pivot_distance : 
                 b.append(element)
                 
             else :
                 c.append(element)
         
-        return order_coord(b,units_stats,team)+ [pivot]+ order_coord(c,units_stats,team)
+        return order_coord(b,destination)+ [pivot]+ order_coord(c,destination)
     
 
 def place_ship(coord_empty, cruiser_place, alive_cruiser):

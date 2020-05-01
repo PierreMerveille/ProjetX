@@ -27,7 +27,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
     specification : Johan Rochet (v.1 25/04/20)
     
     """
-    order_AI = ' '
+    order_AI = []
     alive_tanker, alive_cruiser = create_ships_lists(ships,team)
     alive_ennemy_tanker, alive_ennemy_cruiser = create_ships_lists(ships,ennemy_team)
     grouped_peaks, peak_name = find_grouped_peaks(team, peaks, units_stats)
@@ -36,23 +36,10 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
     nb_tankers_to_create(team, units_stats, favorable_peaks, peaks)
     
     if stance == 'control' :
-        
-        while AI_stats[team]['virtual_energy_point'] > units_stats['common']['tanker']['creation_cost'] : 
 
-            if AI_stats[team]['nb_tanker'] != 4 or AI_stats[team]['nb_cruiser'] >0 :
-
-                instruction,name = create_IA_ship('tanker',team,'nb_tanker',AI_stats)
-                order_AI += ' ' + instruction
-                AI_stats[team]['virtual_energy_point'] -= units_stats['common']['tanker']['creation_cost']
-                #transfer from the new tanker to hub 
-                
-                order_AI += '%s:>%d-%d ' % (name,units_stats[team]['hub']['coordiantes'][0],units_stats[team]['hub']['coordiantes'][1] )
-            #create a security_cruiser
-            else :
-                instruction = create_IA_ship('cruiser',team,'nb_cruiser',AI_stats)
-                AI_stats[team]['virtual_energy_point'] -= units_stats['common']['cruiser']['creation_cost']
+        create_control_ship (AI_stats,team,units_stats,alive_tanker,alive_cruiser)
         
-        transfer_instruction = AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name)
+        order_AI += AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name)
 
         flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team)
 
@@ -67,27 +54,26 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
 
     elif stance == 'offensive':
 
-        AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name)
+        order_AI += AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name)
 
         flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team,alive_cruiser)
 
-        attack_cruiser_control(alive_cruiser,close_ennemy_cruiser,ships,units_stats, team)
-
+        offensive_attack()
         
         
         
         ### note à l'attention de ce très cher Anthony, idée: attaquer en priorité un croiseur ayant plus d'énergie que les qutres et aussi ceux avec le moins d'HP
     elif stance == 'defensive' :
         # rajouter list de non flee si puisement
-        AI_transfer_and_destination (ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name)
+        order_AI += AI_transfer_and_destination (ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name)
 
         flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team,alive_cruiser)
 
         place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser)
 
-        attack_cruiser_defense(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,team)
+        attack_cruiser_in_range(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,team)
 
-        attack_cruiser()
+
     
     coordinates_to_go(ships)
     target_to_shoot(alive_cruiser, ships, units_stats)
@@ -508,7 +494,7 @@ def peaks_on_our_map_side(team, units_stats, peaks):
 
 """defense function"""
 
-def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team, alive_cruiser):
+def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team, alive_cruiser,long,larg):
     """
     Parameters
     ----------
@@ -662,40 +648,21 @@ def attack_hub (stance, AI_stats, ships, units_stats, alive_cruiser, ennemy_team
     implementation : Anthony Pierard (v.1 27/04/20)
                      Anthony Pierard (v.2 29/04/20)
     """
-    total_dammage=0
-    #calculate all the dammage of the cruiser
-    for cruiser in alive_cruiser :
-        total_dammage += ships[cruiser]['energy_point']/units_stats['common']['cruiser']['cost_attack']
-    #attack the hub if we have double of health of the ennemy hub because we can lose cruiser.
-    if total_dammage/2 < units_stats[ennemy_team]['hub']['HP'] :
-        attack_list = []
-        move_list = []
-        for cruiser in alive_cruiser:
-            hub_coordinate = units_stats[ennemy_team]['hub']['coordinate']
-            cruiser_coordinate = ships[cruiser]['coordinate']
-            distance = count_distance(cruiser_coordinate,hub_coordinate)
-            #if the cruiser is in range to attack the hub create an attack
-            if range_verification (units_stats, distance, ships, team):
-                ships[cruiser]['target'] = 'hub'
-                ships[cruiser]['coordinate_to_go'] = hub_coordinate
-            #else move the cruiser close to the hub and check if an other cruiser is on the nearest case. 
-            else :
-                instruction = attack_cruiser_offensive (cruiser,alive_ennemy_cruiser, ships)
-                if not(instruction) : 
-                    x = cruiser_coordinate[0]
-                    y = cruiser_coordinate[1]
-                    if x < hub_coordinate[0] and ((x+1,y) in move_list) :
-                        x += 1 
-                    elif x > hub_coordinate[0] and ((x-1,y) in move_list) :
-                        x -= 1
-                    if y < hub_coordinate[1] and ((x,y+1) in move_list) :
-                        y += 1 
-                    elif y > hub_coordinate[1] and ((x,y-1) in move_list) :
-                        y -= 1
-                    move_list.append ((x,y))
-                    ships[cruiser]['coordinates_to_go']=(x,y)
-        target_to_shoot(alive_cruiser, ships, units_stats)
-        return attack_list 
+
+    
+    move_list = []
+    hub_coordinate = units_stats[ennemy_team]['hub']['coordinate']
+    for cruiser in alive_cruiser:
+        
+        cruiser_coordinate = ships[cruiser]['coordinate']
+        distance = count_distance(cruiser_coordinate,hub_coordinate)
+                
+        ships[cruiser]['target'] = 'hub'
+        ships[cruiser]['coordinates_to_go'] = hub_coordinate
+       
+    
+    
+        
     
 def attack_cruiser_in_range(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,team) :
 
@@ -732,57 +699,53 @@ def attack_cruiser_in_range(ships,alive_cruiser,alive_ennemy_cruiser,units_stats
 
                     ships[ally_cruiser]['target'] = target
                
+def attack_cruisers (alive_cruiser,alive_ennemy_cruiser,ships,units_stats, team):
 
-def attack_cruiser_control (alive_cruiser,close_ennemy_cruiser,ships,units_stats, team):
+    targeted_cruiser = []
+    ally_attacker =[]
+    coord =[]
+    #select cruiser which don't have yet targeted a ennemy and the ennemy_cruiser which hadn't yet been targeted
+    for ally_cruiser in alive_cruiser:
+        if ships[ally_cruiser]['target'] != [] :
+            #store the ennemy which has already been targeted
+            targeted_cruiser.append (ships[ally_cruiser]['target'])
+        else :
+            #store the name and coord of the cruiser which don't have a target
+            ally_attacker.append(ally_cruiser)
+            coord.append(ships[ally_cruiser]['coordinates']) 
 
-    for ennemy in close_ennemy_cruiser :
-        not_already_targeted =[]
-        ally_attacker =[]
-        coord =[]
+    for ennemy in alive_ennemy_cruiser :
 
-        #select the cruiser which has not yet been targeted by an alive_cruiser
-        for ally_cruiser in alive_cruiser :
-            if ennemy not in ships[ally_cruiser]['target'] :
-                not_already_targeted.append(ennemy)
-                ally_attacker.append(ally_cruiser)
-                coord.append(ships[ally_cruiser]['coordinates'])
-        # select cruiser(s) to attack the cruiser
-        if ennemy in not_already_targeted :
+        if ennemy not in targeted_cruiser :
+
             energy = 0
             energy_to_kill = ships[ennemy]['HP'] * units_stats['common']['cruiser']['cost_attack']
-            
+            #sort the coordinates
             order_coord = order_coord (coord, ships[ennemy]['coordinates'])
             order_cruiser =[]
+            #associate the cooridnates with their cruiser
             for coord in order_coord :
-                for ally_cruiser in alive_cruiser :
+                for ally_cruiser in ally_attacker :
                     if ships[ally_cruiser]['coordinates'] == coord and ally_cruiser not in order_cruiser :
                         order_cruiser.append (ally_cruiser)
-
-
+            # add a target to the cruisers while energy> energy_to_kill
             for ally_cruiser in order_cruiser :
-                if ships[ally_cruiser]['coordinates'] == ships[ally_cruiser]['coordinates_to_go'] and ships[ally_cruiser]['energy_point'] !=0 and energy < energy_to_kill :
+                if ships[ally_cruiser]['energy_point'] !=0 and energy < energy_to_kill :
                     
                     energy += ships[ally_cruiser]['energy_point'] - count_distance(ships[ally_cruiser]['coordinates'], ships[ennemy]['coordiantes']) * units_stats[team]['cruiser']['move']
                     ships[ally_cruiser]['coordinates_to_go'] = ships[ennemy]['coordinates']
                     ships[ally_cruiser]['target'] = ennemy 
-                
-        else :
-            for ally_cruiser in ally_attacker :
-                
-                # if ennemy has move, change the coordinates_to_go
-                if ships[ally_cruiser]['coordinates_to_go'] != ships[ennemy]['coordinates']:
-                    ships[ally_cruiser]['coordinates_to_go'] = ships[ennemy]['coordinates']
 
-def cruiser_squad (alive_cruiser,ships,cruiser,team):
+def cruiser_squad (ships,cruiser,team,nb_squad):
     """
     Define a squad to a new cruiser
 
     Parameters
     ----------
-    alive_cruiser : the list with all our cruiser (list).
     ships : ths dictionnary with all the ship (dictionnary).
     cruiser : the cruiser to place in a squad (string)
     team : the name of the team (string).
+    nb_squad : the different squad with the name of the cruiser in (dictionnary).
 
     Notes
     -----
@@ -795,50 +758,18 @@ def cruiser_squad (alive_cruiser,ships,cruiser,team):
     Specification : Anthony Pierard (v.1 01/05/2020)
     Implementation : Anthony Pierard (v.1 01/05/2020)
     """
-    #get the index of the cruiser
-    index_cruiser = alive_cruiser.index(cruiser)
-    #if its' the first or the second the cruiser is a scout
-    if index_cruiser <=2 :
-        ships[cruiser]['squad'] = 'scout'
-    #else it's a cruiser in a squad
+    if len(nb_squad['scout'])<2 : 
+        nb_squad['scout'].append(cruiser)
     else :
-        squad = 'squad_' + (index_cruiser-2)//3
-        ships[cruiser]['squad'] = squad
-
-def attack_cruiser_offensive (units_stats, cruiser, alive_ennemy_cruiser, ships, team):
-    """
-    Parameter 
-    ---------
-    cruiser : the cruiser to verify (string).
-    alive_ennemy_cruiser : the list with all the ennemy cruiser (list).
-    ships : the dictionnary with all the ship (dictionnary).
-
-    Return
-    ------
-    instruction : if the cruiser do an instruction (bool)
-
-    Notes
-    -----
-    Attack all the cruiser between our cruiser and the ennemy hub
-
-    Version
-    -------
-    Specification : Anthony Pierard (v.1 01/05/2020)
-    Implementation : Anthony Pierard (v.1 01/05/2020)
-    """
-    #initialise a variable for don't have 2 attack from the same cruiser
-    instruction = False
-    coord_ally = ships[cruiser]['coordinate']
-    #a loop verify which ennemy_cruiser the ally cruiser can attack
-    for ennemy_cruiser in alive_ennemy_cruiser and instruction:
-        coord_ennemy = ships[ennemy_cruiser]['coordinate']
-        distance = count_distance(coord_ally,coord_ennemy)
-        #if a ennemy cruiser is in the range attack him
-        if range_verification (units_stats, distance, ships, team):
-            ships[cruiser]['target'] = ennemy_cruiser
-            ships[cruiser]['coordinate_to_go'] = coord_ennemy
-            instruction = True
-    return instruction
+        place = True
+        for squad in nb_squad :
+            if squad != 'scout' and len(nb_squad[squad])<3 and place:
+                nb_squad[squad].append(cruiser)
+                place = False
+            else :
+                new_squad = 'squad_' + nb_squad['nb_squad']
+                nb_squad[new_squad] = [cruiser]
+                nb_squad['nb_squad'] +=1
 
 def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cruiser,alive_ennemy_tanker,dangerous_ennemy_tanker):
     """Command to a cruiser to attack the first tanker's ennemy if the AI is offensive.
@@ -1224,11 +1155,13 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_pla
     
     for y in range (1, (nb_line+1)*column_shift, column_shift) :
         for x in range(-abs(y),abs(y)+1) :
-            coord.append((ally_hub[0] + x, ally_hub[1]+ y ))
+            if (ally_hub[0] + x, ally_hub[1]+ y ) in board :
+                coord.append((ally_hub[0] + x, ally_hub[1]+ y ))
 
     for x in range (1, (nb_line+1)*row_shift, row_shift) :
         for y in range(-abs(x),abs(x)+1) :
-            coord.append((ally_hub[0] + x, ally_hub[1]+ y ))
+            if (ally_hub[0] + x, ally_hub[1]+ y ) in board :
+                coord.append((ally_hub[0] + x, ally_hub[1]+ y ))
 
 
     coord = order_coord(coord,units_stats[team]['hub']['coordinates'])
@@ -1335,9 +1268,46 @@ def order_ship_by_caracteristic(ship_list, caracteristic,ships) :
         return order_ship_by_caracteristic(b)+ [pivot]+ order_ship_by_caracteristic(c)
 
         
-    
-        
+def offensive_attack()  :
 
+    
+
+    total_dammage=0
+    #calculate all the dammage of the cruiser
+    for cruiser in alive_cruiser :
+        total_dammage += ships[cruiser]['energy_point']/units_stats['common']['cruiser']['cost_attack']
+    #attack the hub if we have double of health of the ennemy hub because we can lose cruiser.
+    if total_dammage/2 < units_stats[ennemy_team]['hub']['HP'] or len(alive_ennemy_cruiser) == 0 : 
+        attack_hub()
+        attack_cruiser_in_range ()
+    else : 
+        attack_cruisers()
+
+def create_control_ship (AI_stats,team,units_stats,alive_tanker,alive_cruiser) :
+    instructions =[]
+    while AI_stats[team]['virtual_energy_point'] > units_stats['common']['tanker']['creation_cost'] :
+
+        if alive_tanker <= 2* alive_cruiser and alive_tanker < nb_tankers_to_create :
+
+            instruction,name = create_IA_ship('tanker',team,'nb_tanker',AI_stats)
+            instructions.append(instruction)
+            
+            AI_stats[team]['virtual_energy_point'] -= units_stats['common']['tanker']['creation_cost']
+            #transfer from the new tanker to hub 
+            instructions.append('%s:>%d-%d' % (name,units_stats[team]['hub']['coordiantes'][0],units_stats[team]['hub']['coordiantes'][1] ))
+        #create a security_cruiser
+        else :
+            instruction,name = create_IA_ship('cruiser',team,'nb_cruiser',AI_stats)
+            instructions.append(instruction)
+            AI_stats[team]['virtual_energy_point'] -= units_stats['common']['cruiser']['creation_cost']
+        
+def find_famous_peak (alive_tanker,ships,peaks) :
+    famous_peak ={}
+    for peak in peaks :
+        for tanker in alive_tanker :
+            if ships[tanker]['target'] == peak :
+                famous_peak[peak] += 1
+    
 
             
 

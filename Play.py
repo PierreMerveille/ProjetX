@@ -41,6 +41,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     link = False
     connection = 'NO'
     AI_stats ={}
+    nb_squad ={'nb_squad' : 0,'scout' : []}
     #Make a connection if there is one remote player
     for number in range(2):
         if teams[team_id[number]] == 'remote':
@@ -480,7 +481,6 @@ def create_units (create_list, ships, team, board, units_stats, peaks,teams) :
             if teams[team] == 'AI': 
                 ships[ship]['coordinates_to_go'] = ships[ship]['coordinates']
                 ships[ship]['target'] = ''
-                ships[ship]['squad'] = cruiser_squad(alive_cruiser,ships,,team)
     return ships,board,units_stats
     
 def upgrade (upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade):

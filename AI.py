@@ -772,16 +772,16 @@ def attack_cruiser_control (alive_cruiser,close_ennemy_cruiser,ships,units_stats
                 if ships[ally_cruiser]['coordinates_to_go'] != ships[ennemy]['coordinates']:
                     ships[ally_cruiser]['coordinates_to_go'] = ships[ennemy]['coordinates']
 
-def cruiser_squad (alive_cruiser,ships,cruiser,team):
+def cruiser_squad (ships,cruiser,team,nb_squad):
     """
     Define a squad to a new cruiser
 
     Parameters
     ----------
-    alive_cruiser : the list with all our cruiser (list).
     ships : ths dictionnary with all the ship (dictionnary).
     cruiser : the cruiser to place in a squad (string)
     team : the name of the team (string).
+    nb_squad : the different squad with the name of the cruiser in (dictionnary).
 
     Notes
     -----
@@ -794,15 +794,18 @@ def cruiser_squad (alive_cruiser,ships,cruiser,team):
     Specification : Anthony Pierard (v.1 01/05/2020)
     Implementation : Anthony Pierard (v.1 01/05/2020)
     """
-    #get the index of the cruiser
-    index_cruiser = alive_cruiser.index(cruiser)
-    #if its' the first or the second the cruiser is a scout
-    if index_cruiser <=2 :
-        ships[cruiser]['squad'] = 'scout'
-    #else it's a cruiser in a squad
+    if len(nb_squad['scout'])<2 : 
+        nb_squad['scout'].append(cruiser)
     else :
-        squad = 'squad_' + (index_cruiser-2)//3
-        ships[cruiser]['squad'] = squad
+        place = True
+        for squad in nb_squad :
+            if squad != 'scout' and len(nb_squad[squad])<3 and place:
+                nb_squad[squad].append(cruiser)
+                place = False
+            else :
+                new_squad = 'squad_' + nb_squad['nb_squad']
+                nb_squad[new_squad] = [cruiser]
+                nb_squad['nb_squad'] +=1
 
 def attack_cruiser_offensive (cruiser, alive_ennemy_cruiser,ships):
     """

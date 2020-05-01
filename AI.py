@@ -508,7 +508,7 @@ def peaks_on_our_map_side(team, units_stats, peaks):
 
 """defense function"""
 
-def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team,alive_cruiser):
+def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team, alive_cruiser):
     """
     Parameters
     ----------
@@ -638,7 +638,7 @@ def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
 
 """ offensive function"""
 
-def attack_hub (stance, AI_stats, ships, units_stats, alive_cruiser, ennemy_team, board, team):
+def attack_hub (stance, AI_stats, ships, units_stats, alive_cruiser, ennemy_team, board, team, alive_ennemy_cruiser):
     """ Command all the cruiser to attack the ennemy hub 
 
     Parameters
@@ -769,21 +769,16 @@ def attack_offensive (alive_cruiser,alive_ennemy_cruiser,ships,units_stats, team
                     ships[ally_cruiser]['coordinates_to_go'] = ships[ennemy]['coordinates']
                     ships[ally_cruiser]['target'] = ennemy 
 
-
-
-    
-               
-       
-def cruiser_squad (alive_cruiser,ships,cruiser,team):
+def cruiser_squad (ships,cruiser,team,nb_squad):
     """
     Define a squad to a new cruiser
 
     Parameters
     ----------
-    alive_cruiser : the list with all our cruiser (list).
     ships : ths dictionnary with all the ship (dictionnary).
     cruiser : the cruiser to place in a squad (string)
     team : the name of the team (string).
+    nb_squad : the different squad with the name of the cruiser in (dictionnary).
 
     Notes
     -----
@@ -796,17 +791,20 @@ def cruiser_squad (alive_cruiser,ships,cruiser,team):
     Specification : Anthony Pierard (v.1 01/05/2020)
     Implementation : Anthony Pierard (v.1 01/05/2020)
     """
-    #get the index of the cruiser
-    index_cruiser = alive_cruiser.index(cruiser)
-    #if its' the first or the second the cruiser is a scout
-    if index_cruiser <=2 :
-        ships[cruiser]['squad'] = 'scout'
-    #else it's a cruiser in a squad
+    if len(nb_squad['scout'])<2 : 
+        nb_squad['scout'].append(cruiser)
     else :
-        squad = 'squad_' + (index_cruiser-2)//3
-        ships[cruiser]['squad'] = squad
+        place = True
+        for squad in nb_squad :
+            if squad != 'scout' and len(nb_squad[squad])<3 and place:
+                nb_squad[squad].append(cruiser)
+                place = False
+            else :
+                new_squad = 'squad_' + nb_squad['nb_squad']
+                nb_squad[new_squad] = [cruiser]
+                nb_squad['nb_squad'] +=1
 
-def attack_cruiser_offensive (cruiser, alive_ennemy_cruiser,ships):
+def attack_cruiser_offensive (units_stats, cruiser, alive_ennemy_cruiser, ships, team):
     """
     Parameter 
     ---------
@@ -896,7 +894,7 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cru
                 if ships[cruiser]['coordinates_to_go'] != ships[tanker]['coordinates']:
                     ships[ally_cruiser]['coordinates_to_go'] = ships[tanker]['coordinates']    
 
-def target_to_shoot (alive_cruiser, ships, units_stats) :
+def target_to_shoot (alive_cruiser, ships, units_stats,team) :
 
     for cruiser in alive_cruiser :
         if ships[cruiser]['target'] != '' :
@@ -1019,13 +1017,13 @@ def nb_hauls(storage_without_upgrade, storage_with_upgrade, team, units_stats, p
 
     return average_nb_hauls
 
-def best_nb_upgrades(decided_to_attack, team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, favorable_peaks, cost_upgrade, max_upgrade, nb_tankers_to_create_this_round, alive_tanker):
+def best_nb_upgrades(conflict, team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, favorable_peaks, cost_upgrade, max_upgrade, nb_tankers_to_create_this_round, alive_tanker):
 
     """ Calculates best nb of upgrades
 
     Parameters
     ----------
-
+    conflict : determines if conflict is incomming (bool)
     team : name of the team which is playing (str) 
     ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
     ennemy_team : name of the ennemy_team (str)
@@ -1118,7 +1116,7 @@ def best_nb_upgrades(decided_to_attack, team, ships, ennemy_team, peaks, AI_stat
     ##################check range########################### indépendant de la stance
     #bool a mettre en paramètre et qui vient d'une fonction qui calcule si on attaque #check if their cruisers have a better range than ours  
 
-    if decided_to_attack == True : 
+    if conflict == True : 
         
         if units_stats[team]['cruiser']['range'] == 1 : 
         
@@ -1263,8 +1261,9 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_pla
     coord_empty = verif_if_ship_on_coord(coord, alive_cruiser)
     cruiser_place = place_ship(coord_empty, cruiser_place, alive_cruiser)
       
-def verif_if_ship_on_coord(coord,alive_cruiser):
+def verif_if_ship_on_coord(coord,alive_cruiser, ships):
     
+    coord_empty = []
     for coordinate in coord:
         coordinate_not_empty = False
 

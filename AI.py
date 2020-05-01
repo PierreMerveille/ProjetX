@@ -1099,26 +1099,26 @@ def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peak
     nb_tankers_to_create = nb_tankers_to_create(team, units_stats, favorable_peaks, peaks)
     nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, storage_or_regen = best_nb_upgrades(conflict, team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, favorable_peaks, cost_upgrade, max_upgrade, alive_tanker)
 
-    instruction = ''
+    instruction = []
 
     if nb_range_upgrades > 0:
         upgrade = 'range'
        
         for nb in nb_range_upgrades:
-            instruction += 'upgrade:' + str(upgrade) + ' ' 
+            instruction.append('upgrade:' + str(upgrade))
 
     #if storage more profitable than regen:
     if storage_or_regen == 'storage' :
         upgrade = 'storage'
 
         for nb in nb_storage_upgrades:
-            instruction += 'upgrade:' + str(upgrade) + ' '
+            instruction.append('upgrade:' + str(upgrade))
 
     else :
         upgrade = 'regeneration'
 
         for nb in nb_regen_upgrades:
-            instruction += 'upgrade:' + str(upgrade) + ' '    
+            instruction.append('upgrade:' + str(upgrade))   
 
 def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_place,units_stats,AI_stats):
     """"""

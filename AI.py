@@ -43,13 +43,10 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
 
         flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team)
 
-        close_ennemy_cruiser,close_ennemy_tanker = alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, ennemy_team)         
-        #if ships in list then alert
-        if len(close_ennemy_cruiser) > 0 :
-            attack_cruiser_control ()
+        go_to_group_coordinates()
 
-        if len(close_ennemy_tanker) > 0 :
-            attack_tanker(stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cruiser,close_ennemy_tanker)
+        attack_cruiser_in_range(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,team)
+
               
 
     elif stance == 'offensive':
@@ -1272,7 +1269,6 @@ def order_ship_by_caracteristic(ship_list, caracteristic,ships) :
         
         return order_ship_by_caracteristic(b)+ [pivot]+ order_ship_by_caracteristic(c)
 
-        
 def offensive_attack()  :
 
     
@@ -1305,8 +1301,7 @@ def create_control_ship (AI_stats,team,units_stats,alive_tanker,alive_cruiser) :
             instruction,name = create_IA_ship('cruiser',team,'nb_cruiser',AI_stats)
             instructions.append(instruction)
             AI_stats[team]['virtual_energy_point'] -= units_stats['common']['cruiser']['creation_cost']
-       
-    
+        
 def new_cruiser_group (alive_cruiser,ships,grouped_peaks,team):
     nb_group = 0
     for group in grouped_peaks[team]: 

@@ -928,20 +928,13 @@ def find_nb_rounds(team, ships, units_stats, AI_stats, alive_tanker):
     
     """
     order_tanker = order_full_tanker(team, ships, units_stats, alive_tanker)
+    hub_energy = AI_stats[team]['virtual_energy_point']
 
-    #nb_rounds = number of rounds to wait for the closest FULL tanker to come back #current energy + 1 tanker haul          
-    if AI_stats[team]['virtual_energy_point'] + (units_stats[team]['tanker']['max_energy']*60/100) >= 1000:
-
-        #take the closest from order_tanker list
-        tanker = order_tanker[0]
-        
-    #nb_rounds = number of rounds to wait for the two closest FULL tankers to come back #current energy + 2 tanker hauls
-    else :
-        
-        #take the second closest order_tanker list
-        tanker = order_tanker[1]
-    
-    #nb_rounds = calc distance between FIRST closest full tanker and hub OR SECOND closest full tanker and hub. Depending on if condition before the operation.
+    for tanker in order_tanker:
+        if hub_energy < units_stats['common']['tanker']['creation_cost']:
+                     
+            hub_energy += ships[tanker]['storage'] 
+ 
     nb_rounds = count_distance(ships[tanker]['coordinates'], units_stats[team]['hub']['coordinates'])   
 
     return nb_rounds     
@@ -1018,7 +1011,7 @@ def nb_hauls(storage_without_upgrade, storage_with_upgrade, team, units_stats, p
 
     return average_nb_hauls
 
-def best_nb_upgrades(conflict, team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, favorable_peaks, cost_upgrade, max_upgrade, nb_tankers_to_create_this_round, alive_tanker):
+def best_nb_upgrades(conflict, team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, favorable_peaks, cost_upgrade, max_upgrade, alive_tanker):
 
     """ Calculates best nb of upgrades
 
@@ -1153,30 +1146,7 @@ def nb_tankers_to_create(team, units_stats, favorable_peaks, peaks) :
     
         nb_tankers_to_create = int(our_total_energy/(units_stats[team]['tanker']['max_energy_point'])*units_stats)
 
-def tankers_this_round(team, AI_stats, units_stats, alive_tanker, nb_tanker_to_create, nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades):
-    
-    """
-    Parameters
-    ----------
-    team : name of the team which is playing (str) 
-    AI_stats: dictionary of the specific information for the AI(s) (dict)
-    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
-    alive_tanker : list with the name of the tanker of the team which are alive (list)
-    nb_tanker_to_create : number of tankers to create determined from the number of energy in the peaks on our side of them map (int)
-    nb_range_upgrades : optimal number of range upgrades to keep a range >= to the ennemy team (int)
-    nb_storage_upgrades : optimal number of storage upgrades to reach max profitability (int)
-    nb_regen_upgrades : optimal number of regen upgrades to reach max profitability (int)
-
-    Return
-    ------
-    nb_tankers_to_create_this_round : number of tankers to create during this round (int)
-
-    """
-    if (nb_range_upgrades == 0 and nb_storage_upgrades == 0 and nb_regen_upgrades == 0) and len(alive_tanker) < nb_tanker_to_create :
-        
-        nb_tankers_to_create_this_round = int(AI_stats[team]['virtual_energy_point']/units_stats['common']['tanker']['creation_cost'])
-
-def do_upgrades(team, units_stats, nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, AI_stats, nb_tankers_to_create_this_round, storage_or_regen):          
+def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peaks, peaks, conflict, ennemy_team, cost_upgrade, max_upgrade):          
     
     """
     Parameters
@@ -1187,7 +1157,6 @@ def do_upgrades(team, units_stats, nb_range_upgrades, nb_storage_upgrades, nb_re
     nb_storage_upgrades : optimal number of storage upgrades to reach max profitability (int)
     nb_regen_upgrades : optimal number of regen upgrades to reach max profitability (int)
     AI_stats: dictionary of the specific information for the AI(s) (dict)
-    nb_tanker_to_create_this_round : nb of tankers the AI should create during this round (int)
     storage_or_regen : name of the upgrade that is currently worth more (str)
 
     Return
@@ -1195,6 +1164,10 @@ def do_upgrades(team, units_stats, nb_range_upgrades, nb_storage_upgrades, nb_re
     instruction : instruction to make the number of the desired upgrades
 
     """      
+    nb_rounds = find_nb_rounds(team, ships, units_stats, AI_stats, alive_tanker)
+    nb_tankers_to_create = nb_tankers_to_create(team, units_stats, favorable_peaks, peaks)
+    nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, storage_or_regen = best_nb_upgrades(conflict, team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, favorable_peaks, cost_upgrade, max_upgrade, alive_tanker)
+
     instruction = ''
 
     if nb_range_upgrades > 0:

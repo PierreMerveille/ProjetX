@@ -73,7 +73,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
 
         attack_cruiser_control(alive_cruiser,close_ennemy_cruiser,ships,units_stats, team)
 
-        attack_tanker(stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cruiser,alive_ennemy_tanker,dangerous_ennemy_tanker)
+        
         
         
         ### note à l'attention de ce très cher Anthony, idée: attaquer en priorité un croiseur ayant plus d'énergie que les qutres et aussi ceux avec le moins d'HP
@@ -697,14 +697,14 @@ def attack_hub (stance, AI_stats, ships, units_stats, alive_cruiser, ennemy_team
         target_to_shoot(alive_cruiser, ships, units_stats)
         return attack_list 
     
-def attack_cruiser_defense(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,team) :
+def attack_cruiser_in_range(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,team) :
 
             
         attacked_cruiser =[]
 
         for ally_cruiser in alive_cruiser :
 
-            if ships[ally_cruiser]['coordinates'] == ships[ally_cruiser]['coordinates_to_go'] and ships[ally_cruiser]['energy_point'] !=0 :
+            if ships[ally_cruiser]['coordinates'] == ships[ally_cruiser]['coordinates_to_go'] or ships[ally_cruiser]['target'] == 'hub' and ships[ally_cruiser]['energy_point'] !=0 :
                 target_ships =[]
                 #get the cruisers in range that aren't already attacked
                 for cruiser in alive_ennemy_cruiser :

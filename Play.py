@@ -53,11 +53,11 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     
     if team_1_type == 'AI' :
         AI_stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_1]['hub']['energy_point']}
-        grouped_peaks[team] ={}
+        grouped_peaks[team] = {0:{'name':[] ,'coord' : units_stats[team_1]['hub']['coordinates'] , 'nb_cruiser' : 0}}
         find_grouped_peaks(team_1,peaks,units_stats)
     if team_2_type == 'AI' :
         AI_stats[team_2]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_2]['hub']['energy_point'] }
-        grouped_peaks[team] ={}
+        grouped_peaks[team] ={0:{'name':[] ,'coord' : units_stats[team_2]['hub']['coordinates'] , 'nb_cruiser' : 0}}
         find_grouped_peaks(team_2,peaks,units_stats)
     #Start the game
     while end == False:
@@ -484,8 +484,11 @@ def create_units (create_list, ships, team, board, units_stats, peaks,teams) :
             board[coordinates]['list_entity'].append(instruction[0])
             change_value('hub',ships, peaks,-units_stats['common'][instruction[1]]['creation_cost'],'energy_point',units_stats,team)
             if teams[team] == 'AI': 
-                ships[ship]['coordinates_to_go'] = ships[ship]['coordinates']
-                ships[ship]['target'] = ''
+                ships[instruction[0]]['coordinates_to_go'] = ships[ship]['coordinates']
+                ships[instruction[0]]['target'] = ''
+                if ships[instruction[0]]['type'] == 'cruiser' :
+                    ships[instruction[0]]['group'] = -1
+
     return ships,board,units_stats
     
 def upgrade (upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade):

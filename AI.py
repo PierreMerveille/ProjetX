@@ -436,7 +436,7 @@ def find_grouped_peaks(team, peaks, units_stats,grouped_peaks):
         if peaks[peak]['strorage'] != 0 :
             group_nb = 1 
             if grouped_peaks[team] == {} :
-                grouped_peaks[team] = {group_nb :{'name' : [peak], 'coord' : (), 'assigned_cruiser' : 0}} 
+                grouped_peaks[team] = {group_nb :{'name' : [peak], 'coord' : (), 'nb_cruiser' : 0}} 
             else :
                 value = False
                 for group_peaks in grouped_peaks : 
@@ -447,7 +447,7 @@ def find_grouped_peaks(team, peaks, units_stats,grouped_peaks):
                 if not value :
 
                     group_nb += 1
-                    grouped_peaks[team] = {group_nb :{'name' : [peak], 'coord' : (), 'assigned_cruiser' : 0}}
+                    grouped_peaks[team] = {group_nb :{'name' : [peak], 'coord' : (), 'nb_cruiser' : 0}}
                     
     for group_peaks in grouped_peaks : 
         coord = []
@@ -1305,16 +1305,40 @@ def create_control_ship (AI_stats,team,units_stats,alive_tanker,alive_cruiser) :
             instruction,name = create_IA_ship('cruiser',team,'nb_cruiser',AI_stats)
             instructions.append(instruction)
             AI_stats[team]['virtual_energy_point'] -= units_stats['common']['cruiser']['creation_cost']
+
         
-def find_famous_peak (alive_tanker,ships,peaks) :
-    famous_peak ={}
-    for peak in peaks :
-        for tanker in alive_tanker :
-            if ships[tanker]['target'] == peak :
-                famous_peak[peak] += 1
     
+def new_cruiser_group (alive_cruiser,ships,grouped_peaks,team):
+    nb_group = 0
+    for group in grouped_peaks[team]: 
+        nb_group += 1
+
+
+    for cruiser in alive_cruiser :
+        
+        if ships[cruiser]['group'] == -1 :
+                placed = False
+                for index in range(nb_group-1, -1, -1) :
+                    if not placed :
+
+                        if index == 0 :
+                            grouped_peaks[team][index]['nb_cruiser'] += 1
+                            ships[cruiser]['group'] = index 
+                            placed = True
+
+                        elif grouped_peaks[team][index]['nb_cruiser'] <  grouped_peaks[team][index -1]['nb_cruiser'] :
+                            grouped_peaks[team][index]['nb_cruiser'] += 1
+                            ships[cruiser]['group'] = index 
+                            placed = True
+                    
+
+                   
+                
+           
 
             
 
-    
- 
+# lors de la création de cruiser ==> assigné numéro de group de peak à défendre 
+# premier tour ==> 2 au hub
+#on remplit équitablemùent les autres jusqu'à 2 
+# puis remplissage simultanee de tout (group + hub)

@@ -41,19 +41,24 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     link = False
     connection = 'NO'
     AI_stats ={}
+    grouped_peaks = {}
+
+
     nb_squad ={'nb_squad' : 0,'scout' : []}
     #Make a connection if there is one remote player
     for number in range(2):
         if teams[team_id[number]] == 'remote':
             connection = remote_play.create_connection(team_id[number], team_id[number-1], verbose=True)
             link=True
-
+    
     if team_1_type == 'AI' :
         AI_stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_1]['hub']['energy_point']}
-    
+        grouped_peaks[team] ={}
+        find_grouped_peaks(team_1,peaks,units_stats)
     if team_2_type == 'AI' :
         AI_stats[team_2]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_2]['hub']['energy_point'] }
-    
+        grouped_peaks[team] ={}
+        find_grouped_peaks(team_2,peaks,units_stats)
     #Start the game
     while end == False:
         
@@ -100,10 +105,6 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             index = board[ships[ship]['coordinates']]['list_entity'].index(ship)
             del (board[ships[ship]['coordinates']]['list_entity'][index])
             del ships[ship] 
-            for squad in nb_squad :
-                if ship in nb_squad[squad]:
-                    index2 = nb_squad[squad].index(ship)
-                    del (nb_squad[squad][index2])
         for team in color_team :
             #Move phase
             board, ships = move(order_dico[team]['move'], ships, team, board, units_stats, peaks,attacking_list)
@@ -425,7 +426,7 @@ def separate_instruction (order, ships, units_stats,board,team,peaks):
 
     return upgrade_list , create_list, move_list, attack_list, transfer_list
     
-def create_units (create_list, ships, team, board, units_stats, peaks,teams,nb_squad) :
+def create_units (create_list, ships, team, board, units_stats, peaks,teams) :
     
     """ Creates new units in the team either a tanker or a cruiser and place it on the board
     
@@ -438,7 +439,6 @@ def create_units (create_list, ships, team, board, units_stats, peaks,teams,nb_s
     units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
     peaks : the dictionary with all the peaks (dict)
     teams : dictionary with the teams and their type (remote,...) (dico)
-    nb_squad : the dictionnary with all the squad (dictionnary)
     
         
     Returns :
@@ -486,8 +486,6 @@ def create_units (create_list, ships, team, board, units_stats, peaks,teams,nb_s
             if teams[team] == 'AI': 
                 ships[ship]['coordinates_to_go'] = ships[ship]['coordinates']
                 ships[ship]['target'] = ''
-                if instruction[1]==cruiser :
-                    cruiser_squad(ships,instruction[0],team,nb_squad)
     return ships,board,units_stats
     
 def upgrade (upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade):
@@ -633,6 +631,8 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                     distance = count_distance(coordinates, coord_attack[1])
                     #verify in another function if we have the range
                     hithin_range = range_verification (units_stats, distance, ships, team)
+                    
+                    
                     
                     #create a variable verify if something is hit
                     hit=0

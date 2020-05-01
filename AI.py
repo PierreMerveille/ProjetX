@@ -34,6 +34,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
     stance,total_peak_energy,our_total_peak_energy, favorable_peaks= stance (ships)
     AI_stats[team]['virtual_energy_point'] = units_stats[team]['hub']['energy_point']
     nb_tankers_to_create(team, units_stats, favorable_peaks, peaks)
+    order_AI += do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peaks, peaks, conflict, ennemy_team, cost_upgrade, max_upgrade)
     
     if stance == 'control' :
 
@@ -408,7 +409,7 @@ def control_is_worth (team, ennemy_team, peaks, ships, units_stats,AI_stats):
 
     return control_is_worth, our_total_peak_energy, total_peak_energy, favorable_peak
 
-def find_grouped_peaks(team, peaks, units_stats):
+def find_grouped_peaks(team, peaks, units_stats,grouped_peaks):
     """
     Parameters
     ----------
@@ -430,30 +431,35 @@ def find_grouped_peaks(team, peaks, units_stats):
 
     """
     
-    peaks_coord = []
-    peak_name = []
-    grouped_peaks ={}
-    #peaks = {name_entity : {'coordinates' : (int(info_peak[0]), int(info_peak[1])), 'storage' : int(info_peak[2])}}
-    #peaks on our map side
-   
-    #check if there are other peaks in range of our favorable peaks, from less probable groupement (ex : 3x3) to most probable 
-    #get favorable_peak coordinates
-    for peak in peaks: #################### idée de changer cette fonction en récupérant tous groupes de peaks et de mettre la fonction favorable dans go-to-profitable_peaks(dans la formule)
-        peaks_coord.append(peaks[peak]['coordinates'])
-        peak_name.append (peak)
     
-    for index_1 in range(len(peaks_coord)) :
+    favorable_peaks = peaks_on_our_map_side(team,units_stats,peaks)
+    for peak in favorable_peaks :
+        if peaks[peak]['strorage'] != 0 :
+            group_nb = 1 
+            if grouped_peaks[team] == {} :
+                grouped_peaks[team] = {group_nb :{'name' : [peak], 'coord' : (), 'assigned_cruiser' : 0}} 
+            else :
+                value = False
+                for group_peaks in grouped_peaks : 
+                    for element in grouped_peaks[group_peaks] :
+                        if count_distance (peaks[peak]['coordinates'], peaks[element]['coordinates']) < 3 :
+                            grouped_peaks.append(peak)
+                            value = True  
+                if not value :
 
-        grouped_peaks[index_1] =[]
+                    group_nb += 1
+                    grouped_peaks[team] = {group_nb :{'name' : [peak], 'coord' : (), 'assigned_cruiser' : 0}}
+                    
+    for group_peaks in grouped_peaks : 
+        coord = []
+        for element in grouped_peaks[group_peaks]['name'] :
+            coord.append (peaks[element]['coordinates'])
+        coord = order_coord(coord,units_stats[team]['hub']['coordinates'])
 
-        if peaks[peak_name[index_1]]['storage']!=0 :
+        grouped_peaks[group_peaks]['coord'] = coord[-1]
 
-            for index_2 in range (len(peaks_coord)) :
+    return grouped_peaks
 
-                if count_distance (peaks_coord[index_1], peaks_coord[index_2]) < 4 and peaks and peaks[peak_name[index_2]]['storage']!=0 :
-                    grouped_peaks[index_1].append(peak_name[index_2])
-               
-    return grouped_peaks, peak_name
 
 def peaks_on_our_map_side(team, units_stats, peaks):
     """

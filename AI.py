@@ -667,7 +667,7 @@ def attack_hub (stance, AI_stats, ships, units_stats, alive_cruiser, ennemy_team
     for cruiser in alive_cruiser :
         total_dammage += ships[cruiser]['energy_point']/units_stats['common']['cruiser']['cost_attack']
     #attack the hub if we have double of health of the ennemy hub because we can lose cruiser.
-    if total_dammage/2 < units_stats[ennemy_team]['hub']['HP'] :
+    if total_dammage/2 < units_stats[ennemy_team]['hub']['HP'] or len(alive_ennemy_cruiser) == 0 : 
         attack_list = []
         move_list = []
         for cruiser in alive_cruiser:
@@ -732,47 +732,48 @@ def attack_cruiser_in_range(ships,alive_cruiser,alive_ennemy_cruiser,units_stats
 
                     ships[ally_cruiser]['target'] = target
                
+def attack_offensive (alive_cruiser,alive_ennemy_cruiser,ships,units_stats, team):
 
-def attack_cruiser_control (alive_cruiser,close_ennemy_cruiser,ships,units_stats, team):
+    targeted_cruiser = []
+    ally_attacker =[]
+    coord =[]
+    #select cruiser which don't have yet targeted a ennemy and the ennemy_cruiser which hadn't yet been targeted
+    for ally_cruiser in alive_cruiser:
+        if ships[ally_cruiser]['target'] != [] :
+            #store the ennemy which has already been targeted
+            targeted_cruiser.append (ships[ally_cruiser]['target'])
+        else :
+            #store the name and coord of the cruiser which don't have a target
+            ally_attacker.append(ally_cruiser)
+            coord.append(ships[ally_cruiser]['coordinates']) 
 
-    for ennemy in close_ennemy_cruiser :
-        not_already_targeted =[]
-        ally_attacker =[]
-        coord =[]
+    for ennemy in alive_ennemy_cruiser :
 
-        #select the cruiser which has not yet been targeted by an alive_cruiser
-        for ally_cruiser in alive_cruiser :
-            if ennemy not in ships[ally_cruiser]['target'] :
-                not_already_targeted.append(ennemy)
-                ally_attacker.append(ally_cruiser)
-                coord.append(ships[ally_cruiser]['coordinates'])
-        # select cruiser(s) to attack the cruiser
-        if ennemy in not_already_targeted :
+        if ennemy not in targeted_cruiser :
+
             energy = 0
             energy_to_kill = ships[ennemy]['HP'] * units_stats['common']['cruiser']['cost_attack']
-            
+            #sort the coordinates
             order_coord = order_coord (coord, ships[ennemy]['coordinates'])
             order_cruiser =[]
+            #associate the cooridnates with their cruiser
             for coord in order_coord :
-                for ally_cruiser in alive_cruiser :
+                for ally_cruiser in ally_attacker :
                     if ships[ally_cruiser]['coordinates'] == coord and ally_cruiser not in order_cruiser :
                         order_cruiser.append (ally_cruiser)
-
-
+            # add a target to the cruisers while energy> energy_to_kill
             for ally_cruiser in order_cruiser :
-                if ships[ally_cruiser]['coordinates'] == ships[ally_cruiser]['coordinates_to_go'] and ships[ally_cruiser]['energy_point'] !=0 and energy < energy_to_kill :
+                if ships[ally_cruiser]['energy_point'] !=0 and energy < energy_to_kill :
                     
                     energy += ships[ally_cruiser]['energy_point'] - count_distance(ships[ally_cruiser]['coordinates'], ships[ennemy]['coordiantes']) * units_stats[team]['cruiser']['move']
                     ships[ally_cruiser]['coordinates_to_go'] = ships[ennemy]['coordinates']
                     ships[ally_cruiser]['target'] = ennemy 
-                
-        else :
-            for ally_cruiser in ally_attacker :
-                
-                # if ennemy has move, change the coordinates_to_go
-                if ships[ally_cruiser]['coordinates_to_go'] != ships[ennemy]['coordinates']:
-                    ships[ally_cruiser]['coordinates_to_go'] = ships[ennemy]['coordinates']
 
+
+
+    
+               
+       
 def cruiser_squad (alive_cruiser,ships,cruiser,team):
     """
     Define a squad to a new cruiser

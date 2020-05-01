@@ -49,7 +49,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             link=True
 
     if team_1_type == 'AI' :
-        AI_stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_1]['hub']['energy_point'], 'alive_cruiser' : [] }
+        AI_stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_1]['hub']['energy_point']}
     
     if team_2_type == 'AI' :
         AI_stats[team_2]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_2]['hub']['energy_point'] }

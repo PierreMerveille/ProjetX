@@ -30,7 +30,6 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
     order_AI = []
     alive_tanker, alive_cruiser = create_ships_lists(ships,team)
     alive_ennemy_tanker, alive_ennemy_cruiser = create_ships_lists(ships,ennemy_team)
-    grouped_peaks, peak_name = find_grouped_peaks(team, peaks, units_stats)
     stance,total_peak_energy,our_total_peak_energy, favorable_peaks= stance (ships)
     AI_stats[team]['virtual_energy_point'] = units_stats[team]['hub']['energy_point']
     nb_tankers_to_create(team, units_stats, favorable_peaks, peaks)
@@ -40,7 +39,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
 
         create_control_ship (AI_stats,team,units_stats,alive_tanker,alive_cruiser)
         
-        order_AI += AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name)
+        order_AI += AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks)
 
         flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team)
 
@@ -55,7 +54,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
 
     elif stance == 'offensive':
 
-        order_AI += AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name)
+        order_AI += AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks)
 
         flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team,alive_cruiser)
 
@@ -66,7 +65,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
         ### note à l'attention de ce très cher Anthony, idée: attaquer en priorité un croiseur ayant plus d'énergie que les qutres et aussi ceux avec le moins d'HP
     elif stance == 'defensive' :
         # rajouter list de non flee si puisement
-        order_AI += AI_transfer_and_destination (ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name)
+        order_AI += AI_transfer_and_destination (ships,peaks,team,units_stats,total_peak_energy,grouped_peaks)
 
         flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team,alive_cruiser)
 
@@ -215,7 +214,7 @@ def create_IA_ship (type, team, nb_ship,AI_stats):
 
     return instruction, name
     
-def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name,alive_tanker,alive_cruiser,AI_stats,stance) :
+def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,alive_tanker,alive_cruiser,AI_stats,stance) :
     """ Identify the ideal coordinates where the tankers should go ans tore it in ships and create transfer_instruction for them 
 
     Parameters
@@ -226,7 +225,6 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
     units_states : states of each unit (dict)
     total_peak_energy : total of energy available on the map (int)
     grouped_peaks : dictionnary with all the peaks around each peak (example: {1:[peak_1,peak_2]; 2: [peak_3, peak_1]}) (dict)
-    peak_name : list of peaks with the corresponding to the groupe_peaks dictionnary (list)
     alive_tanker : list with the name of the tanker of the team which are alive (list)
     alive_cruiser : list with the name of the cruiser of the team which are alive (list)
 
@@ -281,12 +279,13 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
             if (ships[tanker]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 and total_peak_energy >0 ): # reflechir aux conditions
                 # si le tanker a moins de 60 % , calculer combien d'énergie restant, pour voir si plus rentable d'aller au hub ou au peak puis de rmeplir avec une totalité de réserve
                 ###########################rajouter la différentitation en focntion des phases 
-                for peak in peak_name :
+                for peak in peaks :
                     if peaks[peak]['storage'] > 0 :
                     #calculate the distance between the peak and the tanker
                         distance = count_distance (peaks[peak]['coordinates'], ships[tanker]['coordinates']) 
                         #formula of profitability
-                        profitability = (peaks[peak]['storage']/distance) * len(grouped_peaks[peak_name.index(peak)]) 
+                        
+                        profitability = (peaks[peak]['storage']/distance) 
                         
                         #select the peak if it's the most profitable
                         if profitability >= best_profitability :

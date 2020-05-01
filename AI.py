@@ -738,41 +738,6 @@ def attack_cruisers (alive_cruiser,alive_ennemy_cruiser,ships,units_stats, team)
                     ships[ally_cruiser]['coordinates_to_go'] = ships[ennemy]['coordinates']
                     ships[ally_cruiser]['target'] = ennemy 
 
-def cruiser_squad (ships,cruiser,team,nb_squad):
-    """
-    Define a squad to a new cruiser
-
-    Parameters
-    ----------
-    ships : ths dictionnary with all the ship (dictionnary).
-    cruiser : the cruiser to place in a squad (string)
-    team : the name of the team (string).
-    nb_squad : the different squad with the name of the cruiser in (dictionnary).
-
-    Notes
-    -----
-    A new variable apear in ships : squad.
-    the 2 first cruiser are create for the squad 'scout', they attack the ennemy tanker.
-    After all the cruiser are regroup of group of 3.
-
-    Version
-    -------
-    Specification : Anthony Pierard (v.1 01/05/2020)
-    Implementation : Anthony Pierard (v.1 01/05/2020)
-    """
-    if len(nb_squad['scout'])<2 : 
-        nb_squad['scout'].append(cruiser)
-    else :
-        place = True
-        for squad in nb_squad :
-            if squad != 'scout' and len(nb_squad[squad])<3 and place:
-                nb_squad[squad].append(cruiser)
-                place = False
-            else :
-                new_squad = 'squad_' + nb_squad['nb_squad']
-                nb_squad[new_squad] = [cruiser]
-                nb_squad['nb_squad'] +=1
-
 def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cruiser,alive_ennemy_tanker,dangerous_ennemy_tanker):
     """Command to a cruiser to attack the first tanker's ennemy if the AI is offensive.
 

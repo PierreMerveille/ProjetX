@@ -1090,7 +1090,7 @@ def tankers_this_round(team, AI_stats, units_stats, alive_tanker, nb_tanker_to_c
         
         nb_tankers_to_create_this_round = int(AI_stats[team]['virtual_energy_point']/units_stats['common']['tanker']['creation_cost'])
 
-def do_upgrades(team, units_stats, nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, AI_stats, nb_tankers_to_create_this_round, storage_or_regen):          
+def do_upgrades(team, units_stats, nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, AI_stats, nb_tankers_to_create_this_round, storage_or_regen, cost_upgrade):          
     
     """
     Parameters
@@ -1111,24 +1111,27 @@ def do_upgrades(team, units_stats, nb_range_upgrades, nb_storage_upgrades, nb_re
     """      
     instruction = ''
 
-    if nb_range_upgrades > 0:
+    if nb_range_upgrades > 0 and AI_stats[team]['virtual_energy_point'] >= cost_upgrade['cost_range_upgrade']:
         upgrade = 'range'
        
-        for nb in nb_range_upgrades:
+        for nb in range(nb_range_upgrades):
             instruction += 'upgrade:' + str(upgrade) + ' ' 
+            AI_stats[team]['virtual_energy_point'] -= cost_upgrade['cost_range_upgrade']
 
     #if storage more profitable than regen:
-    if storage_or_regen == 'storage' :
+    if storage_or_regen == 'storage' and AI_stats[team]['virtual_energy_point'] >= cost_upgrade['cost_upgrade_capacity']:
         upgrade = 'storage'
 
-        for nb in nb_storage_upgrades:
+        for nb in range(nb_storage_upgrades):
             instruction += 'upgrade:' + str(upgrade) + ' '
+            AI_stats[team]['virtual_energy_point'] -= cost_upgrade['cost_upgrade_capacity']
 
-    else :
+    elif storage_or_regen == 'regen' and AI_stats[team]['virtual_energy_point'] >= cost_upgrade['cost_regen_upgrade']:
         upgrade = 'regeneration'
 
-        for nb in nb_regen_upgrades:
-            instruction += 'upgrade:' + str(upgrade) + ' '    
+        for nb in range(nb_regen_upgrades):
+            instruction += 'upgrade:' + str(upgrade) + ' '
+            AI_stats[team]['virtual_energy_point'] -= cost_upgrade['cost_regen_upgrade']    
 
 def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_place,units_stats,AI_stats):
     """"""

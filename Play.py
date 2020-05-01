@@ -44,7 +44,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     grouped_peaks = {}
 
 
-    nb_squad ={'nb_squad' : 0,'scout' : []}
+    
     #Make a connection if there is one remote player
     for number in range(2):
         if teams[team_id[number]] == 'remote':

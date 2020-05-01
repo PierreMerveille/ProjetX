@@ -45,7 +45,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
 
         go_to_group_coordinates()
 
-        attack_cruiser_in_range(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,team)
+        attack_cruiser_in_range(ships,alive_cruiser,alive_ennemy_cruiser + alive_ennemy_tanker,units_stats,team)
 
               
 
@@ -666,7 +666,7 @@ def attack_hub (stance, AI_stats, ships, units_stats, alive_cruiser, ennemy_team
     
         
     
-def attack_cruiser_in_range(ships,alive_cruiser,alive_ennemy_cruiser,units_stats,team) :
+def attack_cruiser_in_range(ships,alive_cruiser ,alive_ennemy_cruiser,units_stats,team) :
 
             
         attacked_cruiser =[]
@@ -1279,8 +1279,8 @@ def offensive_attack()  :
         total_dammage += ships[cruiser]['energy_point']/units_stats['common']['cruiser']['cost_attack']
     #attack the hub if we have double of health of the ennemy hub because we can lose cruiser.
     if total_dammage/2 < units_stats[ennemy_team]['hub']['HP'] or len(alive_ennemy_cruiser) == 0 : 
-        attack_hub()
-        attack_cruiser_in_range ()
+        attack_hub(stance, AI_stats, ships, units_stats, alive_cruiser, ennemy_team, board, team, alive_ennemy_cruiser)
+        attack_cruiser_in_range (ships,alive_cruiser ,alive_ennemy_cruiser,units_stats,team)
     else : 
         attack_cruisers()
 
@@ -1331,8 +1331,8 @@ def new_cruiser_group (alive_cruiser,ships,grouped_peaks,team):
 def go_to_group_coordinates () :
     for group in grouped_peaks[team]:
         coord_group.append(grouped_peaks[team][index]['coord'])
-        for x in range(-2, 3)
-            for y in range(-2, 3)
+        for x in range(-2, 3) :
+            for y in range(-2, 3) :
 
                 coord_group.append((grouped_peaks[team][index]['coord'][0] + x,grouped_peaks[team][index]['coord'][0] + y))
 

@@ -508,7 +508,7 @@ def peaks_on_our_map_side(team, units_stats, peaks):
 
 """defense function"""
 
-def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team, alive_cruiser):
+def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team, alive_cruiser,long,larg):
     """
     Parameters
     ----------
@@ -1250,11 +1250,13 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_pla
     
     for y in range (1, (nb_line+1)*column_shift, column_shift) :
         for x in range(-abs(y),abs(y)+1) :
-            coord.append((ally_hub[0] + x, ally_hub[1]+ y ))
+            if (ally_hub[0] + x, ally_hub[1]+ y ) in board :
+                coord.append((ally_hub[0] + x, ally_hub[1]+ y ))
 
     for x in range (1, (nb_line+1)*row_shift, row_shift) :
         for y in range(-abs(x),abs(x)+1) :
-            coord.append((ally_hub[0] + x, ally_hub[1]+ y ))
+            if (ally_hub[0] + x, ally_hub[1]+ y ) in board :
+                coord.append((ally_hub[0] + x, ally_hub[1]+ y ))
 
 
     coord = order_coord(coord,units_stats[team]['hub']['coordinates'])

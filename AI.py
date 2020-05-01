@@ -787,7 +787,7 @@ def cruiser_squad (alive_cruiser,ships,cruiser,team):
     Notes
     -----
     A new variable apear in ships : squad.
-    the 2 first cruiser are create for the squad 'scoot', they attack the ennemy tanker.
+    the 2 first cruiser are create for the squad 'scout', they attack the ennemy tanker.
     After all the cruiser are regroup of group of 3.
 
     Version
@@ -797,9 +797,9 @@ def cruiser_squad (alive_cruiser,ships,cruiser,team):
     """
     #get the index of the cruiser
     index_cruiser = alive_cruiser.index(cruiser)
-    #if its' the first or the second the cruiser is a scoot
+    #if its' the first or the second the cruiser is a scout
     if index_cruiser <=2 :
-        ships[cruiser]['squad'] = 'scoot'
+        ships[cruiser]['squad'] = 'scout'
     #else it's a cruiser in a squad
     else :
         squad = 'squad_' + (index_cruiser-2)//3

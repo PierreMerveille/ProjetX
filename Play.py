@@ -48,7 +48,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             link=True
 
     if team_1_type == 'AI' :
-        AI_stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_1]['hub']['energy_point'] }
+        AI_stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_1]['hub']['energy_point'], 'alive_cruiser' : [] }
     
     if team_2_type == 'AI' :
         AI_stats[team_2]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_2]['hub']['energy_point'] }
@@ -474,12 +474,13 @@ def create_units (create_list, ships, team, board, units_stats, peaks,teams) :
 
             #Get the other stat of the ship and create it and put it on the board
             max_HP = units_stats['common'][instruction[1]]['max_HP'] 
-            ships[instruction[0]]= {'coordinates': coordinates , 'HP': max_HP, 'energy_point' : energy_point, 'type' : instruction[1], 'team' : team, 'coordinates_to_go' : coordinates, 'squad' : ''}
+            ships[instruction[0]]= {'coordinates': coordinates , 'HP': max_HP, 'energy_point' : energy_point, 'type' : instruction[1], 'team' : team, 'coordinates_to_go' : coordinates}
             board[coordinates]['list_entity'].append(instruction[0])
             change_value('hub',ships, peaks,-units_stats['common'][instruction[1]]['creation_cost'],'energy_point',units_stats,team)
             if teams[team] == 'AI': 
                 ships[ship]['coordinates_to_go'] = ships[ship]['coordinates']
                 ships[ship]['target'] = ''
+                ships[ship]['squad'] = cruiser_squad(alive_cruiser,ships,,team)
     return ships,board,units_stats
     
 def upgrade (upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade):

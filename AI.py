@@ -27,7 +27,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
     specification : Johan Rochet (v.1 25/04/20)
     
     """
-    order_AI = ' '
+    order_AI = []
     alive_tanker, alive_cruiser = create_ships_lists(ships,team)
     alive_ennemy_tanker, alive_ennemy_cruiser = create_ships_lists(ships,ennemy_team)
     grouped_peaks, peak_name = find_grouped_peaks(team, peaks, units_stats)
@@ -36,21 +36,8 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
     nb_tankers_to_create(team, units_stats, favorable_peaks, peaks)
     
     if stance == 'control' :
-        
-        while AI_stats[team]['virtual_energy_point'] > units_stats['common']['tanker']['creation_cost'] : 
 
-            if AI_stats[team]['nb_tanker'] != 4 or AI_stats[team]['nb_cruiser'] >0 :
-
-                instruction,name = create_IA_ship('tanker',team,'nb_tanker',AI_stats)
-                order_AI += ' ' + instruction
-                AI_stats[team]['virtual_energy_point'] -= units_stats['common']['tanker']['creation_cost']
-                #transfer from the new tanker to hub 
-                
-                order_AI += '%s:>%d-%d ' % (name,units_stats[team]['hub']['coordiantes'][0],units_stats[team]['hub']['coordiantes'][1] )
-            #create a security_cruiser
-            else :
-                instruction = create_IA_ship('cruiser',team,'nb_cruiser',AI_stats)
-                AI_stats[team]['virtual_energy_point'] -= units_stats['common']['cruiser']['creation_cost']
+        create_control_ship (AI_stats,team,units_stats,alive_tanker,alive_cruiser)
         
         order_AI += AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,peak_name)
 
@@ -1323,9 +1310,31 @@ def offensive_attack()  :
     else : 
         attack_cruisers()
 
-    
-        
+def create_control_ship (AI_stats,team,units_stats,alive_tanker,alive_cruiser) :
+    instructions =[]
+    while AI_stats[team]['virtual_energy_point'] > units_stats['common']['tanker']['creation_cost'] :
 
+        if alive_tanker <= 2* alive_cruiser and alive_tanker < nb_tankers_to_create :
+
+            instruction,name = create_IA_ship('tanker',team,'nb_tanker',AI_stats)
+            instructions.append(instruction)
+            
+            AI_stats[team]['virtual_energy_point'] -= units_stats['common']['tanker']['creation_cost']
+            #transfer from the new tanker to hub 
+            instructions.append('%s:>%d-%d' % (name,units_stats[team]['hub']['coordiantes'][0],units_stats[team]['hub']['coordiantes'][1] ))
+        #create a security_cruiser
+        else :
+            instruction,name = create_IA_ship('cruiser',team,'nb_cruiser',AI_stats)
+            instructions.append(instruction)
+            AI_stats[team]['virtual_energy_point'] -= units_stats['common']['cruiser']['creation_cost']
+        
+def find_famous_peak (alive_tanker,ships,peaks) :
+    famous_peak ={}
+    for peak in peaks :
+        for tanker in alive_tanker :
+            if ships[tanker]['target'] == peak :
+                famous_peak[peak] += 1
+    
 
             
 

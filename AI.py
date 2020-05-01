@@ -1160,13 +1160,13 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_pla
     
     for y in range (1, (nb_line+1)*column_shift, column_shift) :
         for x in range(-abs(y),abs(y)+1) :
-            if (ally_hub[0] + x, ally_hub[1]+ y ) in board :
-                coord.append((ally_hub[0] + x, ally_hub[1]+ y ))
+
+            coord.append((ally_hub[0] + x, ally_hub[1]+ y ))
 
     for x in range (1, (nb_line+1)*row_shift, row_shift) :
         for y in range(-abs(x),abs(x)+1) :
-            if (ally_hub[0] + x, ally_hub[1]+ y ) in board :
-                coord.append((ally_hub[0] + x, ally_hub[1]+ y ))
+
+            coord.append((ally_hub[0] + x, ally_hub[1]+ y ))
 
 
     coord = order_coord(coord,units_stats[team]['hub']['coordinates'])
@@ -1183,7 +1183,7 @@ def verif_if_ship_on_coord(coord,alive_cruiser, ships):
             if ships[cruiser]['coordinate_to_go'] == coordinate:
                 coordinate_not_empty = True
         
-            if not coordinate_not_empty:
+            if not coordinate_not_empty and coordinate in board:
                 coord_empty.append(coordinate)
 
     return coord_empty
@@ -1334,7 +1334,21 @@ def new_cruiser_group (alive_cruiser,ships,grouped_peaks,team):
                             placed = True
 
 def go_to_group_coordinates () :
-    for cruiser in alive_cruiser                     
+    for group in grouped_peaks[team]:
+        coord_group.append(grouped_peaks[team][index]['coord'])
+        for x in range(-2, 3)
+            for y in range(-2, 3)
+
+                coord_group.append((grouped_peaks[team][index]['coord'][0] + x,grouped_peaks[team][index]['coord'][0] + y))
+
+        coord_empty = verif_if_ship_on_coord(coord_group,alive_cruiser, ships)
+        for cruiser in alive_cruiser:
+
+            if ships[cruiser]['group'] == group:
+                ships[cruiser]['coordinates_to_go'] = choice(coord_empty)
+                index_coord_empty = coord_empty.index(ships[cruiser]['coordinates_to_go'])
+                del(coord_empty[index_coord_empty])
+                
 
                    
                 

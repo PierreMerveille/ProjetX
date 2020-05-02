@@ -1304,7 +1304,7 @@ def go_to_group_coordinates () :
         coord_empty = verif_if_ship_on_coord(coord_group,alive_cruiser, ships)
         for cruiser in alive_cruiser:
 
-            if ships[cruiser]['group'] == group:
+            if ships[cruiser]['group'] == group and ships[cruiser]['coordinates_to_go'] == ships[cruiser]['coordinates'] :
                 ships[cruiser]['coordinates_to_go'] = choice(coord_empty)
                 index_coord_empty = coord_empty.index(ships[cruiser]['coordinates_to_go'])
                 del(coord_empty[index_coord_empty])

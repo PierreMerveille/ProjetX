@@ -53,11 +53,11 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             link=True
     
     if team_1_type == 'AI' :
-        AI_stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_1]['hub']['energy_point'],'conflict' : False, 'cruiser_place' : []}
+        AI_stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_1]['hub']['energy_point'],'conflict' : False, 'placed_defense_cruiser' : [],'placed_control_cruiser' :[]}
         grouped_peaks[team_1] = {0:{'name':[] ,'coord' : units_stats[team_1]['hub']['coordinates'] , 'nb_cruiser' : 0}}
         find_grouped_peaks(team_1,peaks,units_stats,grouped_peaks,team_2)
     if team_2_type == 'AI' :
-        AI_stats[team_2]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_2]['hub']['energy_point'] ,'conflict' : False,'cruiser_place' : []}
+        AI_stats[team_2]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_2]['hub']['energy_point'] ,'conflict' : False,'placed_defense_cruiser' : [],'placed_control_cruiser': []}
         grouped_peaks[team_2] ={0:{'name':[] ,'coord' : units_stats[team_2]['hub']['coordinates'] , 'nb_cruiser' : 0}}
         find_grouped_peaks(team_2,peaks,units_stats,grouped_peaks,team_1)
     #Start the game
@@ -285,7 +285,7 @@ def end_game ( color_team, units_stats, end_counter, team, ennemy_team ):
     winner = 'NO'
 
     #check if 40 rounds have passed
-    if end_counter >= 40:
+    if end_counter >= 4000:
         end = True
 
         #Verify wich team has the most health point
@@ -637,7 +637,7 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                     #coordinates = tuple (x,y)
                     coordinates = (int(coordinates[0]),int(coordinates[1]))
                     #calculate the distance between 2 ships
-                    distance = count_distance(coordinates, coord_attack[1])
+                    distance = count_distance(coordinates, ships[instruction[0]]['coordinates'])
                     #verify in another function if we have the range
                     hithin_range = range_verification (units_stats, distance, ships, team)
                     
@@ -648,6 +648,7 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                     #attack if hithin_range is True
                     
                     if hithin_range and ships[instruction[0]]['energy_point']>=( int(coord_attack[1])*units_stats['common']['cruiser']['cost_attack'] ):
+                        print ('bonjour')
                         #reduce the energy of the ship
                         ships = change_value(instruction[0], ships, peaks, units_stats['common']['cruiser']['cost_attack'] * int(coord_attack[1])*-1, 'energy_point', units_stats, team)
                         #verify the coordinates of all the ship
@@ -872,7 +873,8 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
                     if units_stats[team]['hub']['coordinates'] ==  instruction[1] :
                         out_dico =units_stats[team]['hub']['energy_point']
                         #transfer energy
-                        if max_storage > in_dico and units_stats[team]['hub']['energy_point'] >0 and range_verification(units_stats, instruction[0], ships,units_stats[team]['hub']['coordinates'],team ):
+                        distance = count_distance(ships[instruction[0]]['coordinates'],units_stats[team]['hub']['coordinates'])
+                        if max_storage > in_dico and units_stats[team]['hub']['energy_point'] >0 and range_verification(units_stats, distance, ships, team ):
                         
                             while in_dico < max_storage and units_stats[team]['hub']['energy_point'] >0 :
                             
@@ -887,7 +889,8 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
                             if peaks[peak]['coordinates'] == instruction[1] :
                                 
                                 #transfer energy 
-                                if max_storage > in_dico and range_verification(units_stats, instruction[0], ships,instruction[1],team ):
+                                distance = count_distance(ships[instruction[0]]['coordinates'],instruction[1])
+                                if max_storage > in_dico and range_verification(units_stats, distance, ships,team ):
                                     
 
                                     while in_dico < max_storage and peaks[peak]['storage'] >0 :
@@ -901,7 +904,7 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
                 #--------------------------------------------------------------------------------------------------------
                 
                 #give energy  to a ship or the hub    
-                elif instruction [1][0] == '>' :
+                elif instruction [1][0] == '>' and instruction[1][1:] in ships or instruction[1][1:] == 'hub' :
                     
                     
                     out_dico = ships[instruction[0]]['energy_point']
@@ -1292,38 +1295,6 @@ def display_stats (elements, color_team, ships, units_stats, peaks):
 
     print(fg(255))   
     
-def range_verification (units_stats, distance, ships, team):
-
-    """  Verify if the ship can attend the box 
-
-    Parameters
-    ----------
-    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
-    distance : the distance between 2 coordinates (integer).
-    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
-    team : name of the team which is playing (str)   
-
-    Return 
-    ------
-    whithin_range : true if coordinates are in range and False if not (bool)
-
-    Notes
-    -----
-    This function is used for the move of the cruiser and the trnasfer of the tanker to verify if the coordinates are within the range of them (for the tanker: range = 1)
-
-    Versions
-    --------
-    specification : Johan Rochet (v.1 24/02/20)
-    implementation : Anthony Pierard (v.1 27/02/20)
-                     Pierre Merveille (v.2 12/03/20)
-    """
-
-    #Verify the range
-    if distance <= units_stats[team]['cruiser']['range'] :
-        
-        return True
-    else :
-        return False
 
 def create_order(long, larg,  team, ships, units_stats,peaks) :
 
@@ -1531,7 +1502,7 @@ def ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, pe
 
         #Get the order from the remote player
         order_list[team] = remote_play.get_remote_orders(connection)
-        print (order_list[team])
+        
 
     #Verify if the player is an AI
     elif teams[team] == 'AI':

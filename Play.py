@@ -42,6 +42,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     connection = 'NO'
     AI_stats ={}
     grouped_peaks = {}
+    order_list = {}
 
 
     
@@ -52,20 +53,25 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             link=True
     
     if team_1_type == 'AI' :
-        AI_stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_1]['hub']['energy_point'],'conflict' : False}
-        grouped_peaks[team] = {0:{'name':[] ,'coord' : units_stats[team_1]['hub']['coordinates'] , 'nb_cruiser' : 0}}
-        find_grouped_peaks(team_1,peaks,units_stats)
+        AI_stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_1]['hub']['energy_point'],'conflict' : False, 'cruiser_place' : []}
+        grouped_peaks[team_1] = {0:{'name':[] ,'coord' : units_stats[team_1]['hub']['coordinates'] , 'nb_cruiser' : 0}}
+        find_grouped_peaks(team_1,peaks,units_stats,grouped_peaks,team_2)
     if team_2_type == 'AI' :
-        AI_stats[team_2]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_2]['hub']['energy_point'] ,'conflict' : False}
-        grouped_peaks[team] ={0:{'name':[] ,'coord' : units_stats[team_2]['hub']['coordinates'] , 'nb_cruiser' : 0}}
-        find_grouped_peaks(team_2,peaks,units_stats)
+        AI_stats[team_2]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_2]['hub']['energy_point'] ,'conflict' : False,'cruiser_place' : []}
+        grouped_peaks[team_2] ={0:{'name':[] ,'coord' : units_stats[team_2]['hub']['coordinates'] , 'nb_cruiser' : 0}}
+        find_grouped_peaks(team_2,peaks,units_stats,grouped_peaks,team_1)
     #Start the game
     while end == False:
-        
-        order_list = ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, peaks) 
-        order_dico = {team_1 :{'upgrade' : '', 'move':'', 'create' : '', 'attack' :'' , 'transfer' : ''},
-                      team_2 :{'upgrade' : '', 'move':'', 'create' : '', 'attack' :'' , 'transfer' : ''}}
-        #Separate in 2 the round because there are 2 teams and start the gameplay phase
+        for team in color_team :
+            if team==team_1:
+                    ennemy_team=team_2
+            else :
+                ennemy_team = team_1
+
+            order_list = ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, peaks,ennemy_team,AI_stats,grouped_peaks,cost_upgrade, max_upgrade,board,team,order_list) 
+            order_dico = {team_1 :{'upgrade' : '', 'move':'', 'create' : '', 'attack' :'' , 'transfer' : ''},
+                        team_2 :{'upgrade' : '', 'move':'', 'create' : '', 'attack' :'' , 'transfer' : ''}}
+            #Separate in 2 the round because there are 2 teams and start the gameplay phase
         for team in color_team :
 
             #get the order of the team wich play
@@ -85,7 +91,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
         for team in color_team :
             
             #Create phase
-            ships, board, units_stats = create_units(order_dico[team]['create'], ships, team, board, units_stats,peaks)
+            ships, board, units_stats = create_units(order_dico[team]['create'], ships, team, board, units_stats,peaks,teams)
             
         for team in color_team :
             #Upgrade phase
@@ -218,7 +224,7 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
     for index in range (6, len(lines)):
 
         info_peak = lines[index][:-1].split(' ')
-        name_entity = 'peak' + str(index-5)
+        name_entity = 'peak_' + str(index-5)
         
         #Create and place the stat peak in a dictionary
         if index == 6:
@@ -901,7 +907,8 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
                     out_dico = ships[instruction[0]]['energy_point']
                     #give energy to a hub
                     if  instruction[1][1:] == 'hub' :
-                        if range_verification(units_stats, instruction[0], ships,units_stats[team][instruction[1][1:]]['coordinates'], team) :
+                        distance = count_distance(units_stats[team][instruction[1][1:]]['coordinates'],ships[instruction[0]]['coordinates'])
+                        if range_verification(units_stats,distance,ships,team) :
                         
                             while units_stats[team][instruction[1][1:]]['energy_point'] < units_stats['common']['hub']['max_energy_point'] and ships[instruction[0]]['energy_point'] > 0 :
 
@@ -909,7 +916,8 @@ def transfer (transfer_list, ships, team, units_stats, peaks, board) :
                                 units_stats[team][instruction[1][1:]]['energy_point'] += 1
                     #give energy to a cruiser
                     elif ships[instruction[1][1:]]['type']== 'cruiser' : 
-                        if range_verification(units_stats, instruction[0], ships,ships[instruction[1][1:]]['coordinates'], team) :
+                        distance = count_distance(ships[instruction[1][1:]]['coordinates'],ships[instruction[0]]['coordinates'])
+                        if range_verification(units_stats, distance,ships, team) :
                         
                             while ships[instruction[1][1:]]['energy_point'] < units_stats['common']['cruiser'] ['max_energy'] and ships[instruction[0]]['energy_point'] > 0:
                                 
@@ -1480,7 +1488,7 @@ def create_order(long, larg,  team, ships, units_stats,peaks) :
     
     return instruction_str
 
-def ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, peaks) :
+def ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, peaks,ennemy_team,AI_stats,grouped_peaks,cost_upgrade, max_upgrade,board,team,order_list) :
     """ Ask the order of the players 
 
     Paremters: 
@@ -1505,40 +1513,36 @@ def ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, pe
     implementation : Anthony Pierard (v.1 05/04/20)
 
     """
-    order_list={}
+    
+    #Verify if the player is an human
+    if teams[team] == 'human' :
 
-    #Separate in 2 the round because there are 2 teams and start the connectique phase
-    for team in team_id :
+        #Get the order from the human player
+        order = str(input("Let's get %s's orders: "% str(team)))
+        order_list[team]= order
 
-        #Verify if the player is an human
-        if teams[team] == 'human' :
-
-            #Get the order from the human player
-            order = str(input("Let's get %s's orders: "% str(team)))
-            order_list[team]= order
-
-            #Give the order to the remote player if there is one
-            if link :
-                remote_play.notify_remote_orders(connection, order)
+        #Give the order to the remote player if there is one
+        if link :
+            remote_play.notify_remote_orders(connection, order)
 
 
-        #Verify if the player is an remote player
-        elif  teams[team] == 'remote':
+    #Verify if the player is an remote player
+    elif  teams[team] == 'remote':
 
-            #Get the order from the remote player
-            order_list[team] = remote_play.get_remote_orders(connection)
-            print (order_list[team])
+        #Get the order from the remote player
+        order_list[team] = remote_play.get_remote_orders(connection)
+        print (order_list[team])
 
-        #Verify if the player is an AI
-        elif teams[team] == 'AI':
+    #Verify if the player is an AI
+    elif teams[team] == 'AI':
 
-            #Create the order from the AI
-            order = create_order (long, larg, team, ships, units_stats, peaks)
-            order_list[team] = order
+        #Create the order from the AI
+        order = order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,cost_upgrade, max_upgrade,board,long,larg)
+        order_list[team] = order
 
-            #Give the order to the remote player if there is one
-            if link :
-                remote_play.notify_remote_orders(connection, order)
+        #Give the order to the remote player if there is one
+        if link :
+            remote_play.notify_remote_orders(connection, order)
     return order_list
 
 

@@ -1082,21 +1082,26 @@ def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peak
     if nb_range_upgrades > 0:
         upgrade = 'range'
        
-        for nb in nb_range_upgrades:
-            instruction.append('upgrade:' + str(upgrade))
+        for nb in nb_range_upgrades :
+            if AI_stats[team]['virtual_energy_point'] >= cost_upgrade['cost_range_upgrade'] :
+                instruction.append('upgrade:' + str(upgrade))
+                AI_stats[team]['virtual_energy_point'] -= cost_upgrade['cost_range_upgrade']
+    
+    if storage_or_regen == 'storage' : 
+        nb_upgrades = nb_storage_upgrades
+        cost = cost_upgrade['cost_upgrade_capacity']
 
-    #if storage more profitable than regen:
-    if storage_or_regen == 'storage' :
-        upgrade = 'storage'
+    elif storage_or_regen == 'regen' :
+        nb_upgrades = nb_regen_upgrades
+        cost = cost_upgrade['cost_regen_upgrade']
 
-        for nb in nb_storage_upgrades:
-            instruction.append('upgrade:' + str(upgrade))
-
-    else :
-        upgrade = 'regeneration'
-
-        for nb in nb_regen_upgrades:
-            instruction.append('upgrade:' + str(upgrade))   
+    if len(alive_tanker) > 3 * nb_upgrades : 
+ 
+        #if storage more profitable than regen:
+        for nb in nb_upgrades :
+            if AI_stats[team]['virtual_energy_point'] >= cost :
+                instruction.append('upgrade:' + str(storage_or_regen))
+                AI_stats[team]['virtual_energy_point'] -= cost
 
 def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_place,units_stats,AI_stats):
     """

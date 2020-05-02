@@ -5,7 +5,7 @@ from Play import *
 
 # note : faire attention a ne pas créer un ordre d'attaque et de déplacemt pour le meme cruiser
 
-def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) : 
+def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,cost_upgrade, max_upgrade) : 
     """ 
     Main fonction to get the IA orders 
 
@@ -34,12 +34,15 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
     AI_stats[team]['virtual_energy_point'] = units_stats[team]['hub']['energy_point']
     nb_tankers_to_create(team, units_stats, favorable_peaks, peaks)
     order_AI += do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peaks, peaks, conflict, ennemy_team, cost_upgrade, max_upgrade)
-    
+    new_cruiser_group(alive_cruiser,ships,grouped_peaks,team)
+
+
     if stance == 'control' :
 
         create_control_ship (AI_stats,team,units_stats,alive_tanker,alive_cruiser)
         
-        order_AI += AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks)
+        instruction, no_movement = AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,alive_tanker,alive_cruiser,AI_stats,stance)
+        order_AI += instruction
 
         flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team)
 
@@ -51,8 +54,8 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
 
     elif stance == 'offensive':
 
-        order_AI += AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks)
-
+        instruction, no_movement = AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,alive_tanker,alive_cruiser,AI_stats,stance)
+        order_AI += instruction
         flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team,alive_cruiser)
 
         offensive_attack()
@@ -62,7 +65,8 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
         ### note à l'attention de ce très cher Anthony, idée: attaquer en priorité un croiseur ayant plus d'énergie que les qutres et aussi ceux avec le moins d'HP
     elif stance == 'defensive' :
         # rajouter list de non flee si puisement
-        order_AI += AI_transfer_and_destination (ships,peaks,team,units_stats,total_peak_energy,grouped_peaks)
+        instruction, no_movement = AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,alive_tanker,alive_cruiser,AI_stats,stance)
+        order_AI += instruction
 
         flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team,alive_cruiser)
 
@@ -240,9 +244,10 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
     #######################rajouter puiser dans le hub pour offensif et défensif 
     #initialise the variable
     best_profitability = 0
-    transfer_instruction = ''
+    transfer_instruction = []
     favorable_peaks = peaks_on_our_map_side(team, units_stats, peaks)
     no_movement =[]
+    
     #change the rate depending on the stance 
     if stance=='control':
         rate = 1/5
@@ -301,7 +306,7 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
 
                     #if the new peak is in range ==> draw 
                 if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) <= 2 :
-                    transfer_instruction += str(tanker) + ':<'+ ships[tanker]['coordinates_to_go'] + ' '
+                    transfer_instruction .append(str(tanker) + ':<'+ ships[tanker]['coordinates_to_go'] )
 
             elif ships[tanker]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 :
 
@@ -310,7 +315,7 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
                     # draw in the hub 
                     ships[tanker]['coordinates_to_go']= units_stats[team]['hub']['coordinates']
                 if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) <= 2 and AI_stats[team['virtual_energy_point']] > 0 :
-                    transfer_instruction += str(tanker) + ':<'+ ships[tanker]['coordinates_to_go'] + ' '
+                    transfer_instruction .append(str(tanker) + ':<'+ ships[tanker]['coordinates_to_go'])
                     count = 0
                     while  AI_stats[team['virtual_energy_point']] > 0 and count <(units_stats[team]['tanker']['max_energy'] - ships[tanker]['energy_point']):
                         AI_stats[team['virtual_energy_point']]-= 1
@@ -343,22 +348,21 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
 
                 if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) <= 2:
                 
-                    transfer_instruction += str(tanker) + ':>'+ ships[tanker]['target'] + ' '
+                    transfer_instruction.append(str(tanker) + ':>'+ ships[tanker]['target'])
                     no_movement.append(ships[tanker]['target'])
         #if the tanker has not yet given or drawn energy
         else :
             if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) ==2 :
                 if ships[tanker]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 and total_peak_energy >0 :
-                    transfer_instruction += str(tanker) + ':<'+ ships[tanker]['coordinates_to_go'] + ' '
+                    transfer_instruction.append(str(tanker) + ':<'+ ships[tanker]['coordinates_to_go'])
                 else : 
                     for cruiser_destination in alive_cruiser :
                         if ships[cruiser]['coordinates'] == ships[tanker]['coordinates_to_go']:
                             cruiser_destination = cruiser
-                    transfer_instruction += str(tanker) + ':>'+ cruiser_destination + ' '
+                    transfer_instruction.append(str(tanker) + ':>'+ cruiser_destination)
                     no_movement.append(cruiser_destination)
     #delete the space at the end of transfer_instruction                
-    if len (transfer_instruction) != 0:
-        transfer_instruction = transfer_instruction[:-1]
+    
     return transfer_instruction
 
 
@@ -1387,6 +1391,7 @@ def go_to_group_coordinates () :
                 index_coord_empty = coord_empty.index(ships[cruiser]['coordinates_to_go'])
                 del(coord_empty[index_coord_empty])
                 
+""" general secondary function"""
 
                    
                 

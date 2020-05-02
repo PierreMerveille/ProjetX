@@ -52,11 +52,11 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             link=True
     
     if team_1_type == 'AI' :
-        AI_stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_1]['hub']['energy_point']}
+        AI_stats[team_1]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_1]['hub']['energy_point'],'conflict' : False}
         grouped_peaks[team] = {0:{'name':[] ,'coord' : units_stats[team_1]['hub']['coordinates'] , 'nb_cruiser' : 0}}
         find_grouped_peaks(team_1,peaks,units_stats)
     if team_2_type == 'AI' :
-        AI_stats[team_2]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_2]['hub']['energy_point'] }
+        AI_stats[team_2]={'nb_tanker' : 0, 'nb_cruiser': 0, 'virtual_energy_point' : units_stats[team_2]['hub']['energy_point'] ,'conflict' : False}
         grouped_peaks[team] ={0:{'name':[] ,'coord' : units_stats[team_2]['hub']['coordinates'] , 'nb_cruiser' : 0}}
         find_grouped_peaks(team_2,peaks,units_stats)
     #Start the game
@@ -232,7 +232,7 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
     
     #Get the stat for the upgrade
     max_upgrade = {'max_regen_upgrade' :  50,  'max_range_upgrade' : 5, 'max_travel_upgrade' : 5, 'max_capacity_upgrade' : 900}
-    cost_upgrade = {'cost_regen_upgrade' : 750, 'cost_range_upgrade' : 400, 'cost_travel_upgrade' : 500, 'cost_upgrade_capacity':600}
+    cost_upgrade = {'cost_regen_upgrade' : 750, 'cost_range_upgrade' : 400, 'cost_travel_upgrade' : 500, 'cost_storage_upgrade':600}
 
     
     ships ={}
@@ -547,7 +547,7 @@ def upgrade (upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade):
 
             #Make the upgrade asked
             elif upgrade == 'storage':
-                storage_cost = cost_upgrade['cost_upgrade_capacity']
+                storage_cost = cost_upgrade['cost_storage_upgrade']
                 
                 #Verify if you have reached the maximum upgrade
                 if units_stats[team]['tanker']['max_energy'] < max_upgrade['max_capacity_upgrade']:

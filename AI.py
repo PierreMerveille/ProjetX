@@ -548,54 +548,6 @@ def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, en
                         y = 0
                     ships[tanker]['coordinates_to_go'] = (ships[tanker]['coordinates'][0] + x, ships[tanker]['coordinates'][1] + y)
 
-def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, ennemy_team):
-    """
-    Parameters
-    ----------
-    
-    favorable_peaks : list of peaks situated on our side of the map (list)
-    units_stats : dictionary with the stats (different or common) of the teams (hub /ship) (dict)
-    peaks : dictionary with informations about each peak (dict)
-    ships : dictionary with the statistics of each ship (tanker or cruiser)(dict)
-    ennemy_team : name of the ennemy_team (str)
-
-    Return
-    ------
-    alert_cruiser : If cruisers are closing in on one of our peaks True, else False (bool)
-    nb_cruisers : number of cruisers for the alert (int)
-    alert_tanker : If tankers are closinig in on one of our peaks True, else False (bool)
-    nb_tankers : number of tankers for the alert (int)
-
-    """
-    alert_tanker = False
-    alert_cruiser = False
-    close_ennemy_tanker = []
-    close_ennemy_cruiser = []
-            
-    #get coordinates of each ennemy ship
-    
-    for ship in ships:
-        if ships[ship]['team'] == ennemy_team :
-            for peak in favorable_peaks :
-
-                    distance = count_distance (peaks[peak]['coordinates'], ships[ship]['coordinates'])  
-                
-                    if distance <= units_stats[ennemy_team]['cruiser']['range']*1.5  and ship not in close_ennemy_cruiser and ship not in close_ennemy_tanker : # reflechir a une formule adequate 
-
-                        if ships[ship]['type'] == 'tanker' : 
-                            close_ennemy_tanker.append(ship)
-
-                        elif ships[ship]['type'] == 'cruiser'  :
-                            close_ennemy_cruiser.append(ship)
-
-    if len(close_ennemy_tanker) > 0: 
-        alert_tanker = True
-
-    if len(close_ennemy_cruiser) > 0:
-        alert_cruiser = True
-
-    return close_ennemy_cruiser,close_ennemy_tanker, alert_cruiser,alert_tanker
-
 def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
     """ Sends an alert if an ennemy tanker or cruiser gets close to our hub
 
@@ -1022,7 +974,7 @@ def best_nb_upgrades( team, ships, ennemy_team, peaks, AI_stats, units_stats, nb
         #calc money_lost_after_nb_tanker_to_create
         money_lost_tanker_creation = price_to_create_nb_tankers - money_back_from_tankers
         
-        #use money_lost_tanker_creation_list to calc if worth upgrading more : if money_lost_tanker_creation_list[1] - money_lost_tanker_creation_list[2] - cost_upgrade['cost_upgrade_capacity'] > 0
+        #use money_lost_tanker_creation_list to calc if worth upgrading more : if money_lost_tanker_creation_list[1] - money_lost_tanker_creation_list[2] - cost_upgrade['cost_storage_upgrade'] > 0
         money_lost_tanker_creation_list.append(money_lost_tanker_creation)
 
         #see what nb_upgrade would be optimal to reduce the nb of average hauls
@@ -1030,7 +982,7 @@ def best_nb_upgrades( team, ships, ennemy_team, peaks, AI_stats, units_stats, nb
         average_nb_hauls_list.append(average_nb_hauls)
     
     #see if upgrade is worth it for the money during tanker creation else don't do upgrade
-    if money_lost_tanker_creation_list[1] - money_lost_tanker_creation_list[2] - cost_upgrade['cost_upgrade_capacity'] > 0:
+    if money_lost_tanker_creation_list[1] - money_lost_tanker_creation_list[2] - cost_upgrade['cost_storage_upgrade'] > 0:
         
         nb_storage_upgrades = average_nb_hauls_list.index(min(average_nb_hauls_list))
 
@@ -1122,7 +1074,7 @@ def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peak
     
     if storage_or_regen == 'storage' : 
         nb_upgrades = nb_storage_upgrades
-        cost = cost_upgrade['cost_upgrade_capacity']
+        cost = cost_upgrade['cost_storage_upgrade']
 
     elif storage_or_regen == 'regen' :
         nb_upgrades = nb_regen_upgrades

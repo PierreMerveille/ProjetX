@@ -33,7 +33,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,
     stance,total_peak_energy,our_total_peak_energy, favorable_peaks= stance (ships)
     AI_stats[team]['virtual_energy_point'] = units_stats[team]['hub']['energy_point']
     nb_tankers_to_create(team, units_stats, favorable_peaks, peaks)
-    order_AI += do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peaks, peaks, conflict, ennemy_team, cost_upgrade, max_upgrade)
+    order_AI += do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peaks, peaks, ennemy_team, cost_upgrade, max_upgrade)
     new_cruiser_group(alive_cruiser,ships,grouped_peaks,team)
 
 
@@ -812,8 +812,9 @@ def target_to_shoot (alive_cruiser, ships, units_stats,team) :
                 orders.append(cruiser + ':*' + target_coord[0] + '-' + target_coord[1] + '=' + ships[cruiser]['energy_point']/ (2 * units_stats['common']['cruiser']['cost_attack']))      
                 ships[cruiser]['target'] = ''
                 ships[cruiser]['coordinates_to_go'] = ships[cruiser]['coordinates']
-            else :
-                conflict = True 
+            
+            AI_stats [team]['conflict'] = True
+            
 
 """ Upgrade functions """
 
@@ -919,13 +920,13 @@ def nb_hauls(storage_without_upgrade, storage_with_upgrade, team, units_stats, p
 
     return average_nb_hauls
 
-def best_nb_upgrades(conflict, team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, favorable_peaks, cost_upgrade, max_upgrade, alive_tanker):
+def best_nb_upgrades( team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, favorable_peaks, cost_upgrade, max_upgrade, alive_tanker):
 
     """ Calculates best nb of upgrades
 
     Parameters
     ----------
-    conflict : determines if conflict is incomming (bool)
+    
     team : name of the team which is playing (str) 
     ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
     ennemy_team : name of the ennemy_team (str)
@@ -1000,7 +1001,7 @@ def best_nb_upgrades(conflict, team, ships, ennemy_team, peaks, AI_stats, units_
     
     #see if upgrade is worth it for the money during tanker creation else don't do upgrade
     if money_lost_tanker_creation_list[1] - money_lost_tanker_creation_list[2] - cost_upgrade['cost_upgrade_capacity'] > 0:
-
+        
         nb_storage_upgrades = average_nb_hauls_list.index(min(average_nb_hauls_list))
 
     ###############check storage_or_regen###################
@@ -1018,7 +1019,7 @@ def best_nb_upgrades(conflict, team, ships, ennemy_team, peaks, AI_stats, units_
     ##################check range########################### indépendant de la stance
     #bool a mettre en paramètre et qui vient d'une fonction qui calcule si on attaque #check if their cruisers have a better range than ours  
 
-    if conflict == True : 
+    if AI_stats[team]['conflict'] == True : 
         
         if units_stats[team]['cruiser']['range'] == 1 : 
         
@@ -1054,7 +1055,7 @@ def nb_tankers_to_create(team, units_stats, favorable_peaks, peaks) :
     
     nb_tankers_to_create = int(our_total_energy/(units_stats[team]['tanker']['max_energy_point'])*units_stats)
 
-def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peaks, peaks, conflict, ennemy_team, cost_upgrade, max_upgrade):          
+def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peaks, peaks, ennemy_team, cost_upgrade, max_upgrade):          
     
     """
     Parameters
@@ -1075,7 +1076,7 @@ def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peak
     """      
     nb_rounds = find_nb_rounds(team, ships, units_stats, AI_stats, alive_tanker)
     nb_tankers_to_create = nb_tankers_to_create(team, units_stats, favorable_peaks, peaks)
-    nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, storage_or_regen = best_nb_upgrades(conflict, team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, favorable_peaks, cost_upgrade, max_upgrade, alive_tanker)
+    nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, storage_or_regen = best_nb_upgrades( team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, favorable_peaks, cost_upgrade, max_upgrade, alive_tanker)
 
     instruction = []
 

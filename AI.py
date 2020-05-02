@@ -76,7 +76,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,
 
 
     
-    coordinates_to_go(ships)
+    order_AI += coordinates_to_go(ships)
     target_to_shoot(alive_cruiser, ships, units_stats)
     order = ''
     for instruction in order_AI :
@@ -152,7 +152,7 @@ def coordinates_to_go (ships,no_movement):
     ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
     no_movement : list with the name of the ships which musn't move (list)
     """
-    instructions = ''
+    instructions = []
 
     for ship in ships :
         if ships[ship]['coordinates_to_go'] != ships[ship]['coordinates'] and ship not in no_movement :
@@ -167,9 +167,8 @@ def coordinates_to_go (ships,no_movement):
                 y += 1
             elif y > ships[ship]['coordinates_to_go'][1] :
                 y -= 1
-            instructions += str(ship) + ':@'+ str(ships[ship]['coordinates_to_go']) + ' '
-    if instructions != '':
-        instructions= instructions[:-1]
+            instructions.append(str(ship) + ':@'+ str(ships[ship]['coordinates_to_go'])]
+    
     return instructions
 
 def count_distance (coord_1, coord_2):
@@ -805,12 +804,12 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cru
                     ships[ally_cruiser]['coordinates_to_go'] = ships[tanker]['coordinates']    
 
 def target_to_shoot (alive_cruiser, ships, units_stats,team) :
-
+    orders =[]
     for cruiser in alive_cruiser :
         if ships[cruiser]['target'] != '' :
             target_coord = ships[cruiser]['coordinates_to_go']
             if range_verification(units_stats,cruiser,target_coord,team) :
-                order = cruiser + ':*' + target_coord[0] + '-' + target_coord[1] + '=' + ships[cruiser]['energy_point']/ (2 * units_stats['common']['cruiser']['cost_attack'])      
+                orders.append(cruiser + ':*' + target_coord[0] + '-' + target_coord[1] + '=' + ships[cruiser]['energy_point']/ (2 * units_stats['common']['cruiser']['cost_attack']))      
                 ships[cruiser]['target'] = ''
                 ships[cruiser]['coordinates_to_go'] = ships[cruiser]['coordinates']
             else :

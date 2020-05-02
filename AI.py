@@ -5,7 +5,7 @@ from Play import *
 
 # note : faire attention a ne pas créer un ordre d'attaque et de déplacemt pour le meme cruiser
 
-def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,cost_upgrade, max_upgrade) : 
+def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,cost_upgrade, max_upgrade,board) : 
     """ 
     Main fonction to get the IA orders 
 
@@ -1160,7 +1160,7 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_pla
     coord_empty = verif_if_ship_on_coord(coord, alive_cruiser)
     cruiser_place = place_ship(coord_empty, cruiser_place, alive_cruiser)
       
-def verif_if_ship_on_coord(coord,alive_cruiser, ships):
+def verif_if_ship_on_coord(coord,alive_cruiser, ships,board):
     """ 
     Select the coordinates which has not already been assigned to a cruiser 
 

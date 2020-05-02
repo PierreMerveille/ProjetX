@@ -121,7 +121,8 @@ def stance(ships, team, ennemy_team, peaks, units_stats, AI_stats,alive_tanker, 
 
 def create_ships_lists(ships,team):
 
-    """
+    """Creates a list per type containing the ships from the team
+
     Parameters
     ----------
     ships : dictionary with the statistics of each ship (tanker or cruiser)(dict)
@@ -222,7 +223,7 @@ def create_IA_ship (type, team, nb_ship,AI_stats):
     return instruction, name
     
 def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,alive_tanker,alive_cruiser,AI_stats,stance) :
-    """ Identify the ideal coordinates where the tankers should go ans tore it in ships and create transfer_instruction for them 
+    """ Identify the ideal coordinates where the tankers should go and store it in ships and create transfer_instruction for them 
 
     Parameters
     ----------
@@ -416,7 +417,8 @@ def control_is_worth (team, ennemy_team, peaks, ships, units_stats,AI_stats):
     return control_is_worth, our_total_peak_energy, total_peak_energy, favorable_peak
 
 def find_grouped_peaks(team, peaks, units_stats,grouped_peaks):
-    """
+    """creates a dictionary with the grouped peaks
+
     Parameters
     ----------
     team : name of the team which is playing (str)   
@@ -436,7 +438,6 @@ def find_grouped_peaks(team, peaks, units_stats,grouped_peaks):
     specification : Kevin Schweitzer (v.1 24/04/20)
 
     """
-    
     
     favorable_peaks = peaks_on_our_map_side(team,units_stats,peaks)
     for peak in favorable_peaks :
@@ -468,7 +469,8 @@ def find_grouped_peaks(team, peaks, units_stats,grouped_peaks):
 
 
 def peaks_on_our_map_side(team, units_stats, peaks):
-    """
+    """ Makes a list containing the names of peaks on our map side
+
     Parameters
     ----------
 
@@ -507,7 +509,8 @@ def peaks_on_our_map_side(team, units_stats, peaks):
 """defense function"""
 
 def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team, alive_cruiser,long,larg):
-    """
+    """ Makes a tanker flee if he senses danger coming
+
     Parameters
     ----------
    
@@ -546,7 +549,6 @@ def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, en
                     ships[tanker]['coordinates_to_go'] = (ships[tanker]['coordinates'][0] + x, ships[tanker]['coordinates'][1] + y)
 
 def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, ennemy_team):
-
     """
     Parameters
     ----------
@@ -569,8 +571,6 @@ def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, e
     alert_cruiser = False
     close_ennemy_tanker = []
     close_ennemy_cruiser = []
-    
-    
             
     #get coordinates of each ennemy ship
     
@@ -597,7 +597,8 @@ def alert_ennemy_close_to_our_peak(favorable_peaks, units_stats, peaks, ships, e
     return close_ennemy_cruiser,close_ennemy_tanker, alert_cruiser,alert_tanker
 
 def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
-    """
+    """ Sends an alert if an ennemy tanker or cruiser gets close to our hub
+
     Parameters
     ----------
  
@@ -631,24 +632,18 @@ def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
                     close_ennemy_hub_cruiser.append(ship)
 
     return close_ennemy_hub_tanker,close_ennemy_hub_cruiser
-    
-   
-
+     
 """ offensive function"""
 
-def attack_hub (stance, AI_stats, ships, units_stats, alive_cruiser, ennemy_team, board, team, alive_ennemy_cruiser):
+def attack_hub (ships, units_stats, alive_cruiser, ennemy_team):
     """ Command all the cruiser to attack the ennemy hub 
 
     Parameters
     ----------
-    team : name of the team which is playing (str) 
-    stance : the stance of the AI (string).
-    AI_stats : the dictionnary with all the info of the AI (dictionnary).
-    ships : the dictionnary with all the ships (dictionnary).
-    units_stats : the dictionnary with the info of the hub (dictionnary). 
-    alive_cruiser : the list of the cruiser (list).
-    ennemy_team : the name of the ennemy team (string).
-    board : dictionnary with all the case of the board (dictionnary).
+    ships : the dictionnary with all the ships (dict)
+    units_stats : the dictionnary with the info of the hub (dict) 
+    alive_cruiser : the list of the cruiser (list)
+    ennemy_team : the name of the ennemy team (str)
 
     Notes 
     -----
@@ -677,41 +672,63 @@ def attack_hub (stance, AI_stats, ships, units_stats, alive_cruiser, ennemy_team
         
     
 def attack_cruiser_in_range(ships,alive_cruiser ,alive_ennemy_cruiser,units_stats,team) :
+    """ Assign the most profitable target in range to cruisers
 
+    Parameters
+    ----------
+    
+    ships : the dictionnary with all the ships (dict)
+    alive_cruiser : the list of the cruiser (list)
+    alive_ennemy_cruiser : list with the name of the alive cruiser of the ennemy_team (list)
+    units_stats : the dictionnary with the info of the hub (dict) 
+    team : name of the team which is playing (str) 
+    
+    """
             
-        attacked_cruiser =[]
+    attacked_cruiser =[]
 
-        for ally_cruiser in alive_cruiser :
+    for ally_cruiser in alive_cruiser :
 
-            if ships[ally_cruiser]['coordinates'] == ships[ally_cruiser]['coordinates_to_go'] or ships[ally_cruiser]['target'] == 'hub' and ships[ally_cruiser]['energy_point'] !=0 :
-                target_ships =[]
-                #get the cruisers in range that aren't already attacked
-                for cruiser in alive_ennemy_cruiser :
-                    if range_verification(units_stats, ally_cruiser,ships, ships[cruiser]['coordinates'],team) and cruiser not in attacked_cruiser :
-                        target_ships.append (cruiser) 
-                if target_ships != [] : 
-                    #order the tanker depending on their HP and energy
-                    HP_list = order_ship_by_caracteristic(target_ships, 'HP')
-                    energy_list = order_ship_by_caracteristic(target_ships, 'energy_point')
+        if ships[ally_cruiser]['coordinates'] == ships[ally_cruiser]['coordinates_to_go'] or ships[ally_cruiser]['target'] == 'hub' and ships[ally_cruiser]['energy_point'] !=0 :
+            target_ships =[]
+            #get the cruisers in range that aren't already attacked
+            for cruiser in alive_ennemy_cruiser :
+                if range_verification(units_stats, ally_cruiser,ships, ships[cruiser]['coordinates'],team) and cruiser not in attacked_cruiser :
+                    target_ships.append (cruiser) 
+            if target_ships != [] : 
+                #order the tanker depending on their HP and energy
+                HP_list = order_ship_by_caracteristic(target_ships, 'HP')
+                energy_list = order_ship_by_caracteristic(target_ships, 'energy_point')
 
-                    attack_dico ={}
-                    for cruiser in target_ships :
-                        attack_dico[cruiser] = len(HP_list) - HP_list.index(cruiser) + energy_list.index(cruiser)
-                    
-                    #select the profitbale cruiser to attack 
-                    key_nb = 0 
-                    for cruiser in attack_dico :
-                        if key_nb == 0 :
-                            target = cruiser
-                        else :
-                            if attack_dico[cruiser]> attack_dico[target] :
-                                target = cruiser 
-                        key_nb += 1 
-                    attacked_cruiser.append(target)
+                attack_dico ={}
+                for cruiser in target_ships :
+                    attack_dico[cruiser] = len(HP_list) - HP_list.index(cruiser) + energy_list.index(cruiser)
+                
+                #select the profitbale cruiser to attack 
+                key_nb = 0 
+                for cruiser in attack_dico :
+                    if key_nb == 0 :
+                        target = cruiser
+                    else :
+                        if attack_dico[cruiser]> attack_dico[target] :
+                            target = cruiser 
+                    key_nb += 1 
+                attacked_cruiser.append(target)
 
-                    ships[ally_cruiser]['target'] = target
+                ships[ally_cruiser]['target'] = target
                
-def attack_cruisers (alive_cruiser,alive_ennemy_cruiser,ships,units_stats, team):
+def attack_cruisers (alive_cruiser, alive_ennemy_cruiser, ships,units_stats, team):
+    """ Assign a target to a cruiser without target during offensive stance
+
+    Parameters
+    ----------
+    alive_cruiser : the list of the cruiser (list)
+    alive_ennemy_cruiser : list with the name of the alive cruiser of the ennemy_team (list)
+    ships : the dictionnary with all the ships (dict)
+    units_stats : the dictionnary with the info of the hub (dict) 
+    team : name of the team which is playing (str)
+    
+    """
 
     targeted_cruiser = []
     ally_attacker =[]
@@ -748,17 +765,15 @@ def attack_cruisers (alive_cruiser,alive_ennemy_cruiser,ships,units_stats, team)
                     ships[ally_cruiser]['coordinates_to_go'] = ships[ennemy]['coordinates']
                     ships[ally_cruiser]['target'] = ennemy 
 
-def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cruiser,alive_ennemy_tanker,dangerous_ennemy_tanker):
+def attack_tanker (AI_stats,ships,team,ennemy_team, alive_cruiser,alive_ennemy_tanker,dangerous_ennemy_tanker):
     """Command to a cruiser to attack the first tanker's ennemy if the AI is offensive.
 
     Parameters
     ----------
-    stance : if we are defensive or offensive (str).
-    AI_stats : the dictionnary with all the stats of the AI (dict).
-    ships : the dictionnary with all the ships (dict).
-    units_stats : the dictionnary with the info of the hub (dict).
-    team = the name of our team (str).
-    ennemy_team = the name of the ennemy team (str).
+    AI_stats : the dictionnary with all the stats of the AI (dict)
+    ships : the dictionnary with all the ships (dict)
+    team = the name of our team (str)
+    ennemy_team = the name of the ennemy team (str)
 
     Notes
     -----
@@ -803,7 +818,21 @@ def attack_tanker (stance,AI_stats,ships,units_stats,team,ennemy_team, alive_cru
                 if ships[cruiser]['coordinates_to_go'] != ships[tanker]['coordinates']:
                     ships[ally_cruiser]['coordinates_to_go'] = ships[tanker]['coordinates']    
 
-def target_to_shoot (alive_cruiser, ships, units_stats,team) :
+def target_to_shoot (AI_stats, alive_cruiser, ships, units_stats,team) :
+    """ Gives the attack instruction for each alive cruiser
+    Parameters
+    ----------
+    AI_stats : the dictionnary with all the stats of the AI (dict)
+    alive_cruiser : the list of the cruiser (list)
+    ships : the dictionnary with all the ships (dict)
+    units_stats : the dictionnary with the info of the hub (dict) 
+    team : name of the team which is playing (str)
+
+    Return
+    ------
+    orders : list of attack instructions (list)
+
+    """
     orders =[]
     for cruiser in alive_cruiser :
         if ships[cruiser]['target'] != '' :
@@ -814,7 +843,7 @@ def target_to_shoot (alive_cruiser, ships, units_stats,team) :
                 ships[cruiser]['coordinates_to_go'] = ships[cruiser]['coordinates']
             
             AI_stats [team]['conflict'] = True
-            
+    return orders
 
 """ Upgrade functions """
 
@@ -829,11 +858,12 @@ def find_nb_rounds(team, ships, units_stats, AI_stats, alive_tanker):
     ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
     units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
     AI_stats: dictionary of the specific information for the AI(s) (dict)
+    alive_tanker : list containing the alive tankers from the team (list)
+
 
     Return
     ------
-
-    nb_rounds : number of rounds to wait for THE closest FULL tanker to come back or number of rounds to wait for the TWO closest FULL tankers to come back (int)
+    nb_rounds : number of rounds to wait until hub has enough energy to create a new tanker (int)
     
     """
     order_tanker = order_full_tanker(team, ships, units_stats, alive_tanker)
@@ -858,10 +888,10 @@ def order_full_tanker(team, ships, units_stats, alive_tanker):
     team : name of the team which is playing (str)   
     ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
     units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    alive_tanker : list containing the alive tankers from the team (list)
 
     Return
     ------
-
     order_tanker : list with full tankers in proximity order to our hub (list)
 
     """
@@ -892,7 +922,7 @@ def order_full_tanker(team, ships, units_stats, alive_tanker):
     return order_tanker
 
 def nb_hauls(storage_without_upgrade, storage_with_upgrade, team, units_stats, peaks, max_upgrade):
-    """
+    """ Calculates nb of average hauls needed to emtpy a peak
     Parameters
     ----------
 
@@ -1033,7 +1063,8 @@ def best_nb_upgrades( team, ships, ennemy_team, peaks, AI_stats, units_stats, nb
 
 def nb_tankers_to_create(team, units_stats, favorable_peaks, peaks) :
 
-    """
+    """ Calculates the ideal number of tankers to create during the game
+
     Parameters
     ---------- 
     team : name of the team which is playing (str) 
@@ -1057,7 +1088,8 @@ def nb_tankers_to_create(team, units_stats, favorable_peaks, peaks) :
 
 def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peaks, peaks, ennemy_team, cost_upgrade, max_upgrade):          
     
-    """
+    """ Creates instructions to make desired upgrades
+    
     Parameters
     ----------
     team : name of the team which is playing (str) 
@@ -1293,7 +1325,7 @@ def order_ship_by_caracteristic(ship_list, caracteristic,ships) :
 
 def offensive_attack(alive_cruiser,ships,units_stats,ennemy_team,alive_ennemy_cruiser,AI_stats,board,team)  :
     """ 
-    This function handle with the function call for the attack in offensive stance
+    This function handles the function calls for the attack in offensive stance
 
     Parameters
     ----------
@@ -1322,7 +1354,7 @@ def offensive_attack(alive_cruiser,ships,units_stats,ennemy_team,alive_ennemy_cr
 
 def create_control_ship (AI_stats,team,units_stats,alive_tanker,alive_cruiser) :
     """
-    This function create the creation of ships in the control stance 
+    This function creates the creation of ships in the control stance 
 
     Parameters :
     ------------

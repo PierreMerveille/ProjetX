@@ -974,17 +974,17 @@ def best_nb_upgrades(conflict, team, ships, ennemy_team, peaks, AI_stats, units_
     min_lost_money = min(lost_money_without_regen_upgrade_list)
 
     #find the best nb of regen upgrades for actual nb_rounds  
-    nb_regen_upgrades = lost_money_without_regen_upgrade_list.index(min_lost_money)
+    nb_regen_upgrades = lost_money_without_regen_upgrade_list.index(min_lost_money) #mettre + 1
 
     ###########check storage################
     storage_without_upgrade = units_stats[team]['tanker']['max_energy']
 
-    for times_upgraded in range (0,(max_upgrade['max_capacity_upgrade'] - storage_without_upgrade)/100 + 1 ):
+    for times_upgraded in range (0,(max_upgrade['max_capacity_upgrade'] - storage_without_upgrade)/100 + 1 ): #mettre 1
 
         storage_with_upgrade = storage_without_upgrade + 100 * times_upgraded
         
         #calc money_back_from_tankers = nb_tankers_to_create * units_stats[team]['tanker']['max_energy']
-        money_back_from_tankers = nb_tankers_to_create * storage_with_upgrade #tankers qui doivent encore être créés
+        money_back_from_tankers = nb_tankers_to_create * storage_with_upgrade 
         
         #calc price for creating nb_tankers_to_create
         price_to_create_nb_tankers = nb_tankers_to_create * units_stats['common']['tanker']['creation_cost'] #tankers qui doivent encore être créés

@@ -86,7 +86,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,
 
 
     return order
-def stance(ships, team, ennemy_team, peaks, units_stats, AI_stats,alive_tanker, alive_cruiser,alive_ennemy_tanker, alive_ennemy_cruiser):
+def stance(ships, team, ennemy_team, peaks, units_stats, AI_stats, alive_cruiser,alive_ennemy_tanker, alive_ennemy_cruiser):
     """Decide if the adopted stance by the AI should be defensive or offensive
 
     Parameters
@@ -95,7 +95,12 @@ def stance(ships, team, ennemy_team, peaks, units_stats, AI_stats,alive_tanker, 
     ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
     team : name of the team which is playing (str) 
     ennemy_team : name of the ennemy_team (str)
-
+    peaks 
+    units_stats
+    AI_stats
+    alive_cruiser
+    alive_ennemy_tanker
+    alive_ennemy_cruiser
     Return
     ------
 
@@ -117,7 +122,7 @@ def stance(ships, team, ennemy_team, peaks, units_stats, AI_stats,alive_tanker, 
        
         stance = 'control'
 
-    return stance,total_peak_energy,our_total_peak_energy, favorable_peaks
+    return stance, total_peak_energy, our_total_peak_energy, favorable_peaks
 
 def create_ships_lists(ships,team):
 
@@ -142,7 +147,7 @@ def create_ships_lists(ships,team):
             else :
                 cruiser_list.append(ship)
         
-    return tanker_list,cruiser_list
+    return tanker_list, cruiser_list
 
 def coordinates_to_go (ships,no_movement):
     """
@@ -222,7 +227,7 @@ def create_IA_ship (type, team, nb_ship,AI_stats):
 
     return instruction, name
     
-def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,alive_tanker,alive_cruiser,AI_stats,stance, favorable_peaks) :
+def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,alive_tanker,alive_cruiser,AI_stats,stance) :
     """ Identify the ideal coordinates where the tankers should go and store it in ships and create transfer_instruction for them 
 
     Parameters
@@ -363,14 +368,14 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
                     no_movement.append(cruiser_destination)
     #delete the space at the end of transfer_instruction                
     
-    return transfer_instruction
+    return transfer_instruction, no_movement
 
 
 """ control function"""
 
 
 
-def control_is_worth (team, ennemy_team, peaks, ships, units_stats,AI_stats):
+def control_is_worth (team, ennemy_team, peaks, units_stats, AI_stats):
     """
     Calculate if farming the energy out of peaks (staying in control) is worth the time
 
@@ -548,6 +553,7 @@ def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, en
                         y = 0
                     ships[tanker]['coordinates_to_go'] = (ships[tanker]['coordinates'][0] + x, ships[tanker]['coordinates'][1] + y)
 
+    return ships
 def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
     """ Sends an alert if an ennemy tanker or cruiser gets close to our hub
 
@@ -1359,8 +1365,9 @@ def new_cruiser_group (alive_cruiser,ships,grouped_peaks,team):
                             ships[cruiser]['group'] = index
                              
                             placed = True
+    return ships
 
-def go_to_group_coordinates () :
+def go_to_group_coordinates (grouped_peaks, ships, team) :
     for group in grouped_peaks[team]:
         coord_group.append(grouped_peaks[team][index]['coord'])
         for x in range(-2, 3) :

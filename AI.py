@@ -973,20 +973,20 @@ def best_nb_upgrades(conflict, team, ships, ennemy_team, peaks, AI_stats, units_
     min_lost_money = min(lost_money_without_regen_upgrade_list)
 
     #find the best nb of regen upgrades for actual nb_rounds  
-    nb_regen_upgrades = lost_money_without_regen_upgrade_list.index(min_lost_money) #mettre + 1
+    nb_regen_upgrades = lost_money_without_regen_upgrade_list.index(min_lost_money) + 1 
 
     ###########check storage################
     storage_without_upgrade = units_stats[team]['tanker']['max_energy']
 
-    for times_upgraded in range (0,(max_upgrade['max_capacity_upgrade'] - storage_without_upgrade)/100 + 1 ): #mettre 1
+    for times_upgraded in range (0,(max_upgrade['max_capacity_upgrade'] - storage_without_upgrade)/100 + 1 ):
 
         storage_with_upgrade = storage_without_upgrade + 100 * times_upgraded
         
         #calc money_back_from_tankers = nb_tankers_to_create * units_stats[team]['tanker']['max_energy']
-        money_back_from_tankers = nb_tankers_to_create * storage_with_upgrade 
+        money_back_from_tankers = (nb_tankers_to_create - len(alive_tanker)) * storage_with_upgrade 
         
         #calc price for creating nb_tankers_to_create
-        price_to_create_nb_tankers = nb_tankers_to_create * units_stats['common']['tanker']['creation_cost'] #tankers qui doivent encore être créés
+        price_to_create_nb_tankers = (nb_tankers_to_create - len(alive_tanker))* units_stats['common']['tanker']['creation_cost'] #tankers qui doivent encore être créés
         
         #calc money_lost_after_nb_tanker_to_create
         money_lost_tanker_creation = price_to_create_nb_tankers - money_back_from_tankers
@@ -1052,7 +1052,7 @@ def nb_tankers_to_create(team, units_stats, favorable_peaks, peaks) :
 
         our_total_energy += peaks[peak]['storage'] 
     
-        nb_tankers_to_create = int(our_total_energy/(units_stats[team]['tanker']['max_energy_point'])*units_stats)
+    nb_tankers_to_create = int(our_total_energy/(units_stats[team]['tanker']['max_energy_point'])*units_stats)
 
 def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peaks, peaks, conflict, ennemy_team, cost_upgrade, max_upgrade):          
     

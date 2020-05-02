@@ -222,7 +222,7 @@ def create_IA_ship (type, team, nb_ship,AI_stats):
 
     return instruction, name
     
-def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,alive_tanker,alive_cruiser,AI_stats,stance) :
+def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,grouped_peaks,alive_tanker,alive_cruiser,AI_stats,stance, favorable_peaks) :
     """ Identify the ideal coordinates where the tankers should go and store it in ships and create transfer_instruction for them 
 
     Parameters
@@ -235,6 +235,7 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
     grouped_peaks : dictionnary with all the peaks around each peak (example: {1:[peak_1,peak_2]; 2: [peak_3, peak_1]}) (dict)
     alive_tanker : list with the name of the tanker of the team which are alive (list)
     alive_cruiser : list with the name of the cruiser of the team which are alive (list)
+    favorable_peaks : list with the name of peaks situated closer to our hub (our side of the map) (list)
 
     Return :
     --------
@@ -245,7 +246,6 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,g
     #initialise the variable
     best_profitability = 0
     transfer_instruction = []
-    favorable_peaks = peaks_on_our_map_side(team, units_stats, peaks)
     no_movement =[]
     
     #change the rate depending on the stance 
@@ -930,15 +930,11 @@ def best_nb_upgrades( team, ships, ennemy_team, peaks, AI_stats, units_stats, nb
     storage_or_regen : name of the upgrade that is currently worth more (str)
 
     """
-    favorable_peaks = peaks_on_our_map_side(team, units_stats, peaks)
 
     #control upgrades are tanker_capacity, regen and range   
     nb_range_upgrades = 0
-    current_hub_energy = AI_stats[team]['virtual_energy_point']
     regen_without_upgrade = units_stats[team]['hub']['regeneration']
     lost_money_without_regen_upgrade_list = []
-    peaks_modulo_yes = []
-    rest_modulo_list = []
     money_lost_tanker_creation_list = []
     average_nb_hauls_list = []
 

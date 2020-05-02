@@ -74,7 +74,14 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats) :
     
     coordinates_to_go(ships)
     target_to_shoot(alive_cruiser, ships, units_stats)
+    order = ''
+    for instruction in order_AI :
+        order += instruction + ' '
+    if len(order_AI) >0 :
+        order -= ' '
 
+
+    return order
 def stance(ships, team, ennemy_team, peaks, units_stats, AI_stats,alive_tanker, alive_cruiser,alive_ennemy_tanker, alive_ennemy_cruiser):
     """Decide if the adopted stance by the AI should be defensive or offensive
 
@@ -1056,7 +1063,8 @@ def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peak
     nb_regen_upgrades : optimal number of regen upgrades to reach max profitability (int)
     AI_stats: dictionary of the specific information for the AI(s) (dict)
     storage_or_regen : name of the upgrade that is currently worth more (str)
-
+    favorables_peaks : peaks on the map side of the team (list)
+    alive_tanker : list with the name of the alive tanker of the team (list)
     Return
     ------
     instruction : instruction to make the number of the desired upgrades
@@ -1088,7 +1096,21 @@ def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peak
             instruction.append('upgrade:' + str(upgrade))   
 
 def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_place,units_stats,AI_stats):
-    """"""
+    """
+    This function create a defensive block before the team hub to protect him
+
+    Parameters :
+    ------------
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    board : dictionary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
+    team : name of the team which is playing (str)  
+    ennemy_team : name of the ennemy_team (str)
+    alive_cruiser : list with the name of the alive cruiser of the team (list)
+    cruiser_place : 
+    units_stats : dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    AI_stats: dictionary of the specific information for the AI(s)
+    
+    """
     ally_hub = units_stats[team]['hub']['coordinates']
     ennemy_hub = units_stats[ennemy_team]['hub']['coordinates']
     nb_cruiser = len(alive_cruiser)
@@ -1136,6 +1158,19 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,cruiser_pla
     cruiser_place = place_ship(coord_empty, cruiser_place, alive_cruiser)
       
 def verif_if_ship_on_coord(coord,alive_cruiser, ships):
+    """ 
+    Select the coordinates which has not already been assigned to a cruiser 
+
+    Parameters
+    ----------
+    coord : list with the coordinates to assign (list)
+    alive_cruiser :list with the name of the alive cruiser of the team (list)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
+
+    Return 
+    ------
+    coord_empty : list with the coordinates  which has not already been assigned to a cruiser (list)
+    """
     
     coord_empty = []
     for coordinate in coord:
@@ -1145,20 +1180,20 @@ def verif_if_ship_on_coord(coord,alive_cruiser, ships):
             if ships[cruiser]['coordinate_to_go'] == coordinate:
                 coordinate_not_empty = True
         
-            if not coordinate_not_empty and coordinate in board:
-                coord_empty.append(coordinate)
+        if not coordinate_not_empty and coordinate in board:
+            coord_empty.append(coordinate)
 
     return coord_empty
 
 def order_coord(coord,destination) :
 
     """ 
-    Sorting algorithm which sorts the coordinates by distance from the hub 
+    Sorting algorithm which sorts different coordinates by distance from other coordinates
 
     Parameters
     ----------
     coord : list with the coordinates to order  (list)
-    units_stats :dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    destination : coordinates of the stable point (tuple)
 
     Return:
     -------
@@ -1209,6 +1244,19 @@ def place_ship(coord_empty, cruiser_place, alive_cruiser):
     return cruiser_place
            
 def order_ship_by_caracteristic(ship_list, caracteristic,ships) :
+    """
+    Sorting function which sort the ships by caracteristic (HP or energy_point) (recursive function)
+
+    Parameters 
+    ----------
+    ships_list : list of the name of the ship to sort (list)
+    caracteristic : name of the caracteristic (str)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    
+    Return
+    ------
+    order_coord : list with the ordered coordinates (list)
+    """
     
     b= []
     c=[]
@@ -1234,7 +1282,21 @@ def order_ship_by_caracteristic(ship_list, caracteristic,ships) :
         
         return order_ship_by_caracteristic(b)+ [pivot]+ order_ship_by_caracteristic(c)
 
-def offensive_attack()  :
+def offensive_attack(alive_cruiser,ships,units_stats,ennemy_team,alive_ennemy_cruiser,AI_stats,board,team)  :
+    """ 
+    This function handle with the function call for the attack in offensive stance
+
+    Parameters
+    ----------
+    alive_cruiser : list with the name of the alive cruiser of the team (list)
+    ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
+    units_stats : dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    ennemy_team : name of the ennemy_team (str)
+    alive_ennemy_cruiser : list with the name of the alive cruiser of the ennemy_team (list)
+    AI_stats: dictionary of the specific information for the AI(s)
+    board : dictionary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
+    team : name of the team which is playing (str)  
+    """
 
     
 
@@ -1250,6 +1312,21 @@ def offensive_attack()  :
         attack_cruisers()
 
 def create_control_ship (AI_stats,team,units_stats,alive_tanker,alive_cruiser) :
+    """
+    This function create the creation of ships in the control stance 
+
+    Parameters :
+    ------------
+    AI_stats: dictionary of the specific information for the AI(s)
+    team : name of the team which is playing (str)  
+    units_stats : dictionary with the stats (different or common) of the teams (hub /ship) (dict)
+    alive_tanker : list with the name of the alive tanker of the team (list)
+    alive_cruiser : list with the name of the alive cruiser of the team (list)
+
+    Return
+    ------
+    instructions : list with the different instructions (list)
+    """
     instructions =[]
     while AI_stats[team]['virtual_energy_point'] > units_stats['common']['tanker']['creation_cost'] :
 
@@ -1266,6 +1343,7 @@ def create_control_ship (AI_stats,team,units_stats,alive_tanker,alive_cruiser) :
             instruction,name = create_IA_ship('cruiser',team,'nb_cruiser',AI_stats)
             instructions.append(instruction)
             AI_stats[team]['virtual_energy_point'] -= units_stats['common']['cruiser']['creation_cost']
+    return instructions
         
 def new_cruiser_group (alive_cruiser,ships,grouped_peaks,team):
     nb_group = 0

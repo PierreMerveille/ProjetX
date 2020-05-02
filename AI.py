@@ -77,7 +77,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,
 
     
     order_AI += coordinates_to_go(ships)
-    target_to_shoot(alive_cruiser, ships, units_stats)
+    order_AI += target_to_shoot(alive_cruiser, ships, units_stats)
     order = ''
     for instruction in order_AI :
         order += instruction + ' '
@@ -167,7 +167,7 @@ def coordinates_to_go (ships,no_movement):
                 y += 1
             elif y > ships[ship]['coordinates_to_go'][1] :
                 y -= 1
-            instructions.append(str(ship) + ':@'+ str(ships[ship]['coordinates_to_go'])]
+            instructions.append(str(ship) + ':@'+ str(ships[ship]['coordinates_to_go']))
     
     return instructions
 

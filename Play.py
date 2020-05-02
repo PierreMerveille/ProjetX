@@ -484,7 +484,7 @@ def create_units (create_list, ships, team, board, units_stats, peaks,teams) :
             board[coordinates]['list_entity'].append(instruction[0])
             change_value('hub',ships, peaks,-units_stats['common'][instruction[1]]['creation_cost'],'energy_point',units_stats,team)
             if teams[team] == 'AI': 
-                ships[instruction[0]]['coordinates_to_go'] = ships[ship]['coordinates']
+                ships[instruction[0]]['coordinates_to_go'] = ships[instruction[0]]['coordinates']
                 ships[instruction[0]]['target'] = ''
                 if ships[instruction[0]]['type'] == 'cruiser' :
                     ships[instruction[0]]['group'] = -1

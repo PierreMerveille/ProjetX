@@ -83,7 +83,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,
 
     
     order_AI += coordinates_to_go(ships,no_movement)
-    order_AI += target_to_shoot(AI_stats, alive_cruiser, ships, units_stats,team)
+    order_AI += target_to_shoot(AI_stats, alive_cruiser, ships, units_stats,team,ennemy_team)
     order = ''
     for instruction in order_AI :
         order += instruction + ' '
@@ -793,7 +793,7 @@ def attack_tanker (AI_stats,ships,team,ennemy_team, alive_cruiser,alive_ennemy_t
                 if ships[cruiser]['coordinates_to_go'] != ships[tanker]['coordinates']:
                     ships[ally_cruiser]['coordinates_to_go'] = ships[tanker]['coordinates']    
 
-def target_to_shoot (AI_stats, alive_cruiser, ships, units_stats,team) :
+def target_to_shoot (AI_stats, alive_cruiser, ships, units_stats,team,ennemy_team) :
     """ Gives the attack instruction for each alive cruiser
     Parameters
     ----------
@@ -815,8 +815,8 @@ def target_to_shoot (AI_stats, alive_cruiser, ships, units_stats,team) :
                 target_coord =ships[ships[cruiser]['target']]['coordinates']
                 HP = ships[ships[cruiser]['target']]['HP']
             else : 
-                target_coord = units_stats[team]['hub']['coordinates']
-                HP = units_stats[team]['hub']['HP']
+                target_coord = units_stats[ennemy_team]['hub']['coordinates']
+                HP = units_stats[ennemy_team]['hub']['HP']
             distance = count_distance(ships[cruiser]['coordinates'],target_coord)
             if range_verification(units_stats,distance,ships,team) :
                 orders.append(str(cruiser) + ':*' + str(target_coord[0]) + '-' + str(target_coord[1]) + '=' + str(min (ships[cruiser]['energy_point']//units_stats['common']['cruiser']['cost_attack'], HP)))      

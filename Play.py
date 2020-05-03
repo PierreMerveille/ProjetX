@@ -106,7 +106,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             #Attack phase
             end_counter,attacking_list = attack(order_dico[team]['attack'], board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team)
         for ship in ships :
-            if ships[ship]['HP']< 0 :
+            if ships[ship]['HP'] <= 0 :
                 cruiser_dead.append(ship)
             #delete the ships which are destroyed
         for ship in cruiser_dead:

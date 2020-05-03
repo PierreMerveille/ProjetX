@@ -815,7 +815,12 @@ def target_to_shoot (AI_stats, alive_cruiser, ships, units_stats,team) :
     orders =[]
     for cruiser in alive_cruiser :
         if ships[cruiser]['target'] != '' :
-            target_coord = ships[ships[cruiser]['target']]['coordinates']
+            if ships[cruiser]['target'] in ships :
+                target_coord =ships[ships[cruiser]['target']]['coordinates']
+                HP = ships[ships[cruiser]['target']]['HP']
+            else : 
+                target = units_stats[team]['hub']['coordinates']
+                HP = units_stats[team]['hub']['HP']
             distance = count_distance(ships[cruiser]['coordinates'],target_coord)
             if range_verification(units_stats,distance,ships,team) :
                 orders.append(str(cruiser) + ':*' + str(target_coord[0]) + '-' + str(target_coord[1]) + '=' + str(min (ships[cruiser]['energy_point']//units_stats['common']['cruiser']['cost_attack'], ships[ships[cruiser]['target']]['HP'])))      

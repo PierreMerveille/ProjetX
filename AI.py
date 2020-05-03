@@ -1269,15 +1269,18 @@ def order_coord(coord,destination) :
 
 def place_ship(coord_empty, placed_defense_cruiser, alive_cruiser,ships):
     """"""
-    for coord in coord_empty:
-        full = True
-        for cruiser in alive_cruiser:
-            if cruiser not in placed_defense_cruiser and  full :
-                ships[cruiser]['coordinate_to_go'] = coord
-                placed_defense_cruiser.append(cruiser)
-                full = False
-            
+    for cruiser in alive_cruiser:
 
+            if cruiser not in placed_defense_cruiser:
+
+                ships[cruiser]['coordinate_to_go'] = choice.(coord_empty)
+
+                index_coord_empty = coord_empty.index(ships[cruiser]['coordinates_to_go'])
+                del(coord_empty[index_coord_empty])
+
+                placed_defense_cruiser.append(cruiser)
+                
+            
     return placed_defense_cruiser
            
 def order_ship_by_caracteristic(ship_list, caracteristic,ships) :

@@ -924,15 +924,12 @@ def nb_hauls(storage_without_upgrade, storage_with_upgrade, team, units_stats, p
 
         for peak in peaks:
 
-            if peaks[peak]['storage'] % (storage_with_upgrade*60/100) == 0:
+            nb_hauls = peaks[peak]['storage']/(storage_with_upgrade*60/100)
+            hauls_list.append(nb_hauls)
 
-                nb_hauls = peaks[peak]['storage']/(storage_with_upgrade*60/100)
-                hauls_list.append(nb_hauls)
-
-    if hauls_list != [] :
-        average_nb_hauls = ceil(sum(hauls_list)/len(hauls_list))
-    else : 
-        average_nb_hauls = 0
+    
+    average_nb_hauls = ceil(sum(hauls_list)/len(hauls_list))
+    
 
 
     return average_nb_hauls
@@ -993,31 +990,32 @@ def best_nb_upgrades( team, ships, ennemy_team, peaks, AI_stats, units_stats, nb
     ###########check storage################
     storage_without_upgrade = units_stats[team]['tanker']['max_energy']
     
+    if storage_without_upgrade < max_upgrade['max_capacity_upgrade'] :
+            
+        for times_upgraded in range (0,int ((max_upgrade['max_capacity_upgrade'] - storage_without_upgrade)/100 + 1)):
 
-    for times_upgraded in range (0,int ((max_upgrade['max_capacity_upgrade'] - storage_without_upgrade)/100 + 1)):
+            storage_with_upgrade = storage_without_upgrade + 100 * times_upgraded
+            
+            #calc money_back_from_tankers = nb_tankers_to_create * units_stats[team]['tanker']['max_energy']
+            money_back_from_tankers = (nb_tankers_to_create_var - len(alive_tanker)) * storage_with_upgrade 
+            
+            #calc price for creating nb_tankers_to_create
+            price_to_create_nb_tankers = (nb_tankers_to_create_var - len(alive_tanker))* units_stats['common']['tanker']['creation_cost'] #tankers qui doivent encore etre crees
+            
+            #calc money_lost_after_nb_tanker_to_create
+            money_lost_tanker_creation = price_to_create_nb_tankers - money_back_from_tankers
+            
+            #use money_lost_tanker_creation_list to calc if worth upgrading more : if money_lost_tanker_creation_list[1] - money_lost_tanker_creation_list[2] - cost_upgrade['cost_storage_upgrade'] > 0
+            money_lost_tanker_creation_list.append(money_lost_tanker_creation)
 
-        storage_with_upgrade = storage_without_upgrade + 100 * times_upgraded
+            #see what nb_upgrade would be optimal to reduce the nb of average hauls
+            average_nb_hauls = nb_hauls(storage_without_upgrade, storage_with_upgrade, team, units_stats, peaks, max_upgrade)
+            average_nb_hauls_list.append(average_nb_hauls)
         
-        #calc money_back_from_tankers = nb_tankers_to_create * units_stats[team]['tanker']['max_energy']
-        money_back_from_tankers = (nb_tankers_to_create_var - len(alive_tanker)) * storage_with_upgrade 
-        
-        #calc price for creating nb_tankers_to_create
-        price_to_create_nb_tankers = (nb_tankers_to_create_var - len(alive_tanker))* units_stats['common']['tanker']['creation_cost'] #tankers qui doivent encore etre crees
-        
-        #calc money_lost_after_nb_tanker_to_create
-        money_lost_tanker_creation = price_to_create_nb_tankers - money_back_from_tankers
-        
-        #use money_lost_tanker_creation_list to calc if worth upgrading more : if money_lost_tanker_creation_list[1] - money_lost_tanker_creation_list[2] - cost_upgrade['cost_storage_upgrade'] > 0
-        money_lost_tanker_creation_list.append(money_lost_tanker_creation)
-
-        #see what nb_upgrade would be optimal to reduce the nb of average hauls
-        average_nb_hauls = nb_hauls(storage_without_upgrade, storage_with_upgrade, team, units_stats, peaks, max_upgrade)
-        average_nb_hauls_list.append(average_nb_hauls)
-    
-    #see if upgrade is worth it for the money during tanker creation else don't do upgrade
-    if money_lost_tanker_creation_list[1] - money_lost_tanker_creation_list[2] - cost_upgrade['cost_storage_upgrade'] > 0:
-        
-        nb_storage_upgrades = average_nb_hauls_list.index(min(average_nb_hauls_list))
+        #see if upgrade is worth it for the money during tanker creation else don't do upgrade
+        if money_lost_tanker_creation_list[1] - money_lost_tanker_creation_list[2] - cost_upgrade['cost_storage_upgrade'] > 0:
+            
+            nb_storage_upgrades = average_nb_hauls_list.index(min(average_nb_hauls_list))
 
     ###############check storage_or_regen###################
     storage_with_upgrade = storage_without_upgrade + 100 * nb_storage_upgrades
@@ -1330,16 +1328,11 @@ def offensive_attack(alive_cruiser,ships,units_stats,ennemy_team,alive_ennemy_cr
 
     
 
-    total_dammage=0
-    #calculate all the dammage of the cruiser
-    for cruiser in alive_cruiser :
-        total_dammage += ships[cruiser]['energy_point']/units_stats['common']['cruiser']['cost_attack']
-    #attack the hub if we have double of health of the ennemy hub because we can lose cruiser.
-    if total_dammage/2 < units_stats[ennemy_team]['hub']['HP'] or len(alive_ennemy_cruiser) == 0 : 
-        attack_hub(ships, units_stats, alive_cruiser, ennemy_team)
-        attack_cruiser_in_range (ships,alive_cruiser ,alive_ennemy_cruiser,units_stats,team)
-    else : 
-        attack_cruisers(alive_cruiser, alive_ennemy_cruiser, ships,units_stats, team)
+    
+    
+    attack_hub(ships, units_stats, alive_cruiser, ennemy_team)
+    attack_cruiser_in_range (ships,alive_cruiser ,alive_ennemy_cruiser,units_stats,team)
+    
 
 def create_control_ship (AI_stats,team,units_stats,alive_tanker,alive_cruiser,nb_tankers_to_create_var) :
     """

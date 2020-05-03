@@ -384,7 +384,7 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,a
 
 
 
-def control_is_worth_function (team, ennemy_team, peaks, units_stats, AI_stats,alive_tanker):
+def control_is_worth_function (team, ennemy_team, peaks, units_stats, AI_stats,alive_tanker,alive_cruiser,alive_ennemy_tanker,alive_ennemy_cruiser):
     """
     Calculate if farming the energy out of peaks (staying in control) is worth the time
 
@@ -424,7 +424,9 @@ def control_is_worth_function (team, ennemy_team, peaks, units_stats, AI_stats,a
         total_peak_energy += peaks[peak]['storage']
     
     #if (ennemy has more energy on his side of the map) and (ennemy has currently more energy in his hub than we do) and (has more tankers and cruisers), control is not worth
-    if ((total_peak_energy - our_total_peak_energy)>(total_peak_energy/2)) and ((units_stats[ennemy_team]['hub']['energy_point']/units_stats['common']['hub']['max_energy_point']) > (units_stats[team]['hub']['energy_point']/units_stats['common']['hub']['max_energy_point'])) and ((AI_stats[ennemy_team]['nb_tanker'] > AI_stats[team]['nb_tanker']) and (AI_stats[ennemy_team]['nb_cruiser'] > AI_stats[team]['nb_cruiser'])):
+    
+
+    if ((total_peak_energy - our_total_peak_energy)>(total_peak_energy/2)) and ((units_stats[ennemy_team]['hub']['energy_point']/units_stats['common']['hub']['max_energy_point']) > (units_stats[team]['hub']['energy_point']/units_stats['common']['hub']['max_energy_point'])) and (len(alive_ennemy_tanker) > len(alive_tanker) and len( alive_ennemy_cruiser) >len(alive_cruiser)):
         control_is_worth = False
 
     if our_total_peak_energy < total_tanker_storage + units_stats[team]['tanker']['max_energy']:

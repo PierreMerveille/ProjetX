@@ -104,13 +104,19 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             else :
                 ennemy_team = team_1
             #Attack phase
-            end_counter,attacking_list,cruiser_dead = attack(order_dico[team]['attack'], board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team,cruiser_dead)
+            end_counter,attacking_list, = attack(order_dico[team]['attack'], board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team)
             
             #delete the ships which are destroyed
-        for ship in cruiser_dead:
+        for ship in ships :
+            if ships[ship]['HP']<=0:
+                cruiser_dead.append(ship)
+        for ship in cruiser_dead :
             index = board[ships[ship]['coordinates']]['list_entity'].index(ship)
             del (board[ships[ship]['coordinates']]['list_entity'][index])
             del ships[ship] 
+                                    #stock a dead cruiser
+                                    
+            
         for team in color_team :
             #Move phase
             board, ships = move(order_dico[team]['move'], ships, team, board, units_stats, peaks,attacking_list)
@@ -586,7 +592,7 @@ def upgrade (upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade):
                         units_stats[team]['hub']['energy_point'] -= 400
     return units_stats
                         
-def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team,cruiser_dead):
+def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team):
     
     """Execute an attack on a chosen box
     
@@ -601,7 +607,7 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
     peaks : the dictionary with all the peaks (dict)
     end_counter : number of rounds without attacks (float)
     color_team : dictionary with the number of the team with the color of each team (dict)
-    cruiser_dead : list of killed cruiser during the attack (list)
+   
     
     Returns
     -------
@@ -653,16 +659,14 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                         ships = change_value(instruction[0], ships, peaks, units_stats['common']['cruiser']['cost_attack'] * int(coord_attack[1])*-1, 'energy_point', units_stats, team)
                         #verify the coordinates of all the ship
                         for ship in ships :
-                            if ships[ship]['coordinates']==coordinates:
+                            if ships[ship]['coordinates']==coordinates :
                                 #change the value of the point of structure of the ship in the coordinate
                                 ships = change_value(ship, ships, peaks, int(coord_attack[1])*-1, 'HP', units_stats, ennemy_team)
                                 hit+=1
                                 end_counter=0
+                            
                                 
                                 
-                                if ships[ship]['HP']<=0:
-                                    #stock a dead cruiser
-                                    cruiser_dead.append(ship)
                         for team_name in color_team: 
                         #verify if the is in the coordinates
                             if units_stats[team_name]['hub']['coordinates']==coordinates :
@@ -683,7 +687,7 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                         end_counter += 0.5
                     
                            
-    return end_counter,attacking_list,cruiser_dead
+    return end_counter,attacking_list
     
 def move (move_list, ships, team, board, units_stats, peaks, attacking_list) :
     

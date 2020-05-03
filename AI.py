@@ -39,7 +39,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,
 
     
     if stance == 'control' :
-        print (stance)
+        
         AI_stats[team]['placed_defense_cruiser'] = []
         order_AI += create_control_ship (AI_stats,team,units_stats,alive_tanker,alive_cruiser,nb_tankers_to_create_var)
         
@@ -55,7 +55,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,
               
 
     elif stance == 'offensive':
-        print (stance)
+        
         AI_stats[team]['placed_control_cruiser'] = []
         AI_stats[team]['placed_defense_cruiser'] = []
         instruction, no_movement = AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,alive_tanker,alive_cruiser,AI_stats,stance)
@@ -69,7 +69,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,
         
     elif stance == 'defensive' :
         AI_stats[team]['placed_control_cruiser'] = []
-        print (stance)
+        
         # rajouter list de non flee si puisement
         instruction, no_movement = AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,alive_tanker,alive_cruiser,AI_stats,stance)
         order_AI += instruction
@@ -116,7 +116,7 @@ def stance_function(ships, team, ennemy_team, peaks, units_stats, AI_stats, aliv
     
 
     control_is_worth, our_total_peak_energy, total_peak_energy, favorable_peaks = control_is_worth_function(team, ennemy_team, peaks, units_stats, AI_stats,alive_tanker) 
-    print (control_is_worth)
+    
     close_ennemy_hub_tanker,close_ennemy_hub_cruiser = alert_ennemy_close_to_our_hub(units_stats,ships,team,ennemy_team)
 
     if len(close_ennemy_hub_cruiser)>0 : 
@@ -267,7 +267,7 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,a
     elif stance == 'offensive' :
         rate = 1/2
     
-    print (stance)
+   
     for tanker in alive_tanker :
         
          # verfify in the target peak is not empty 
@@ -709,7 +709,7 @@ def attack_cruisers (alive_cruiser, alive_ennemy_cruiser, ships,units_stats, tea
     targeted_cruiser = []
     ally_attacker =[]
     coord =[]
-    print (ships)
+   
     #select cruiser which don't have yet targeted a ennemy and the ennemy_cruiser which hadn't yet been targeted
     for ally_cruiser in alive_cruiser:
         if ships[ally_cruiser]['target'] != [] :
@@ -734,7 +734,7 @@ def attack_cruisers (alive_cruiser, alive_ennemy_cruiser, ships,units_stats, tea
                 for ally_cruiser in ally_attacker :
                     if ships[ally_cruiser]['coordinates'] == coord and ally_cruiser not in order_cruiser :
                         order_cruiser.append (ally_cruiser)
-            print (order_cruiser)
+            
             # add a target to the cruisers while energy> energy_to_kill
             for ally_cruiser in order_cruiser :
                 if ships[ally_cruiser]['energy_point'] !=0 and energy < energy_to_kill :
@@ -742,7 +742,7 @@ def attack_cruisers (alive_cruiser, alive_ennemy_cruiser, ships,units_stats, tea
                     energy += ships[ally_cruiser]['energy_point'] - count_distance(ships[ally_cruiser]['coordinates'], ships[ennemy]['coordinates']) * units_stats[team]['cruiser']['move']
                     ships[ally_cruiser]['coordinates_to_go'] = ships[ennemy]['coordinates']
                     ships[ally_cruiser]['target'] = ennemy 
-                    print (ships[ally_cruiser]['target'])
+                    
 
 def attack_tanker (AI_stats,ships,team,ennemy_team, alive_cruiser,alive_ennemy_tanker,dangerous_ennemy_tanker):
     """Command to a cruiser to attack the first tanker's ennemy if the AI is offensive.

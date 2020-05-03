@@ -1181,7 +1181,7 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,placed_defe
 
     coord = order_coord(coord,units_stats[team]['hub']['coordinates'])
     coord_empty = verif_if_ship_on_coord(coord,alive_cruiser, ships,board)
-    AI_stats[team]['placed_defense_cruiser'] = place_ship(coord_empty, AI_stats[team]['placed_defense_cruiser'], alive_cruiser)
+    AI_stats[team]['placed_defense_cruiser'] = place_ship(coord_empty, AI_stats[team]['placed_defense_cruiser'], alive_cruiser,ships)
       
 def verif_if_ship_on_coord(coord,alive_cruiser, ships,board):
     """ 
@@ -1258,7 +1258,7 @@ def order_coord(coord,destination) :
         return order_coord(b,destination)+ [pivot]+ order_coord(c,destination)
     
 
-def place_ship(coord_empty, placed_defense_cruiser, alive_cruiser):
+def place_ship(coord_empty, placed_defense_cruiser, alive_cruiser,ships):
     """"""
     for coord in coord_empty:
         full = True

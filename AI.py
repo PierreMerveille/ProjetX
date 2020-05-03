@@ -41,6 +41,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,
     if stance == 'control' :
         
         AI_stats[team]['placed_defense_cruiser'] = []
+        
         order_AI += create_control_ship (AI_stats,team,units_stats,alive_tanker,alive_cruiser,nb_tankers_to_create_var)
         
         instruction, no_movement = AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,alive_tanker,alive_cruiser,AI_stats,stance)
@@ -57,7 +58,8 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,
     elif stance == 'offensive':
         
         AI_stats[team]['placed_control_cruiser'] = []
-        AI_stats[team]['placed_defense_cruiser'] = []
+        order_AI += create_defense_attack_ship (AI_stats,team,units_stats)
+
         instruction, no_movement = AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,alive_tanker,alive_cruiser,AI_stats,stance)
         order_AI += instruction
         flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, ennemy_team, alive_cruiser,long,larg)
@@ -69,7 +71,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,
         
     elif stance == 'defensive' :
         AI_stats[team]['placed_control_cruiser'] = []
-        
+        order_AI += create_defense_attack_ship (AI_stats,team,units_stats)
         # rajouter list de non flee si puisement
         instruction, no_movement = AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,alive_tanker,alive_cruiser,AI_stats,stance)
         order_AI += instruction
@@ -1456,7 +1458,13 @@ def range_verification (units_stats, distance, ships, team):
         return False
                 
 """ general secondary function"""
-
+def create_defense_attack_ship (AI_stats,team,units_stats) :
+    instructions =[]
+    while AI_stats[team]['virtual_energy_point'] >= units_stats['common']['cruiser']['creation_cost'] : 
+        instruction,name = create_IA_ship('cruiser',team,'nb_cruiser',AI_stats)
+        instructions.append(instruction)
+        AI_stats[team]['virtual_energy_point'] -= units_stats['common']['cruiser']['creation_cost']
+    return instructions
                    
                 
            

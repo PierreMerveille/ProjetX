@@ -3,7 +3,7 @@ from Play import *
 
 """ general function """
 
-# note : faire attention a ne pas créer un ordre d'attaque et de déplacemt pour le meme cruiser
+# note : faire attention a ne pas creer un ordre d'attaque et de deplacemt pour le meme cruiser
 
 def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,cost_upgrade, max_upgrade,board,long,larg) : 
     """ 
@@ -66,7 +66,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,
         
         
         
-        ### note à l'attention de ce très cher Anthony, idée: attaquer en priorité un croiseur ayant plus d'énergie que les qutres et aussi ceux avec le moins d'HP
+        ### note a l'attention de ce tres cher Anthony, idee: attaquer en priorite un croiseur ayant plus d'energie que les qutres et aussi ceux avec le moins d'HP
     elif stance == 'defensive' :
         AI_stats[team]['placed_control_cruiser'] = []
         print (stance)
@@ -253,7 +253,7 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,a
     transfer_instruction : AI order for transfer (str)
     no_movement : list with the name of the ships which musn't move (list)
     """
-    #######################rajouter puiser dans le hub pour offensif et défensif 
+    #######################rajouter puiser dans le hub pour offensif et defensif 
     #initialise the variable
     best_profitability = 0
     transfer_instruction = []
@@ -298,8 +298,8 @@ def AI_transfer_and_destination(ships,peaks,team,units_stats,total_peak_energy,a
             
             #go to draw energy 
             if (ships[tanker]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100 ) * 60 and total_peak_energy >0 ): # reflechir aux conditions
-                # si le tanker a moins de 60 % , calculer combien d'énergie restant, pour voir si plus rentable d'aller au hub ou au peak puis de rmeplir avec une totalité de réserve
-                ###########################rajouter la différentitation en focntion des phases 
+                # si le tanker a moins de 60 % , calculer combien d'energie restant, pour voir si plus rentable d'aller au hub ou au peak puis de rmeplir avec une totalite de reserve
+                ###########################rajouter la differentitation en focntion des phases 
                 for peak in peaks :
                     if peaks[peak]['storage'] > 0 :
                     #calculate the distance between the peak and the tanker
@@ -597,7 +597,7 @@ def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
             #calc dist between ennemy ships and hub
             distance = count_distance(units_stats[team]['hub']['coordinates'], ships[ship]['coordinates'])
 
-            if distance <= distance_hub//3 : #réfléchir à une formule pour changer 10
+            if distance <= distance_hub//3 : #reflechir a une formule pour changer 10
                 #check ship type
                 if ships[ship]['type'] == 'tanker' : 
                     close_ennemy_hub_tanker.append(ship)
@@ -1001,7 +1001,7 @@ def best_nb_upgrades( team, ships, ennemy_team, peaks, AI_stats, units_stats, nb
         money_back_from_tankers = (nb_tankers_to_create_var - len(alive_tanker)) * storage_with_upgrade 
         
         #calc price for creating nb_tankers_to_create
-        price_to_create_nb_tankers = (nb_tankers_to_create_var - len(alive_tanker))* units_stats['common']['tanker']['creation_cost'] #tankers qui doivent encore être créés
+        price_to_create_nb_tankers = (nb_tankers_to_create_var - len(alive_tanker))* units_stats['common']['tanker']['creation_cost'] #tankers qui doivent encore être crees
         
         #calc money_lost_after_nb_tanker_to_create
         money_lost_tanker_creation = price_to_create_nb_tankers - money_back_from_tankers
@@ -1030,8 +1030,8 @@ def best_nb_upgrades( team, ships, ennemy_team, peaks, AI_stats, units_stats, nb
     else : 
         storage_or_regen = 'regen'
         
-    ##################check range########################### indépendant de la stance
-    #bool a mettre en paramètre et qui vient d'une fonction qui calcule si on attaque #check if their cruisers have a better range than ours  
+    ##################check range########################### independant de la stance
+    #bool a mettre en parametre et qui vient d'une fonction qui calcule si on attaque #check if their cruisers have a better range than ours  
 
     if AI_stats[team]['conflict'] == True : 
         
@@ -1041,7 +1041,7 @@ def best_nb_upgrades( team, ships, ennemy_team, peaks, AI_stats, units_stats, nb
 
         if units_stats[ennemy_team]['cruiser']['range'] >= units_stats[team]['cruiser']['range']:
 
-            nb_range_upgrades += units_stats[ennemy_team]['cruiser']['range'] - units_stats[team]['cruiser']['range'] #si >= à la condition au dessus alors + 1
+            nb_range_upgrades += units_stats[ennemy_team]['cruiser']['range'] - units_stats[team]['cruiser']['range'] #si >= a la condition au dessus alors + 1
 
     return nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, storage_or_regen
 
@@ -1469,4 +1469,4 @@ def range_verification (units_stats, distance, ships, team):
 
             
 
-#une fonction qui en fonction du groupe la met sur la coord et quand il est placé ==> attack_cruiser in range
+#une fonction qui en fonction du groupe la met sur la coord et quand il est place ==> attack_cruiser in range

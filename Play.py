@@ -250,7 +250,7 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
 
     #Display the board and the stat of the element (peak, cruiser,...)
     board_display(board, color_team, ships, peaks, units_stats, elements,long, larg)
-    #display_stats(elements,color_team,ships,units_stats,peaks)
+    display_stats(elements,color_team,ships,units_stats,peaks)
 
     return board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks, long,larg,teams
     

@@ -104,7 +104,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             else :
                 ennemy_team = team_1
             #Attack phase
-            end_counter,attacking_list,cruiser_dead = attack(order_dico[team]['attack'], board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team)
+            end_counter,attacking_list = attack(order_dico[team]['attack'], board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team)
         for ship in ships :
             if ships[ship]['HP']< 0 :
                 cruiser_dead.append(ship)
@@ -603,8 +603,7 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
     peaks : the dictionary with all the peaks (dict)
     end_counter : number of rounds without attacks (float)
     color_team : dictionary with the number of the team with the color of each team (dict)
-    cruiser_dead : list of killed cruiser during the attack (list)
-    
+        
     Returns
     -------
     end_counter : number of rounds without attacks (float)
@@ -681,7 +680,7 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                         end_counter += 0.5
                     
                            
-    return end_counter,attacking_list,cruiser_dead
+    return end_counter,attacking_list
     
 def move (move_list, ships, team, board, units_stats, peaks, attacking_list) :
     

@@ -73,7 +73,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
                         team_2 :{'upgrade' : '', 'move':'', 'create' : '', 'attack' :'' , 'transfer' : ''}}
             #Separate in 2 the round because there are 2 teams and start the gameplay phase
         for team in color_team :
-
+            
             #get the order of the team wich play
             order = order_list[team]
             
@@ -963,11 +963,12 @@ def round_end (board, end_counter, units_stats, peaks, elements, color_team, shi
         if units_stats[team]['hub']['energy_point'] + units_stats[team]['hub']['regeneration'] < units_stats['common']['hub']['max_energy_point']:
             change_value('hub', ships, peaks, units_stats[team]['hub']['regeneration'], 'energy_point', units_stats, team)
         
-    #display board every round end
-    board_display(board, color_team, ships, peaks, units_stats, elements, long, larg)
+    
 
     #display stats every round end
-    display_stats (elements, color_team, ships, units_stats, peaks)
+    #display_stats (elements, color_team, ships, units_stats, peaks)
+    #display board every round end
+    board_display(board, color_team, ships, peaks, units_stats, elements, long, larg)
     return units_stats
     
 def select_value_to_print (board, coordinates, units_stats, ships, peaks, color_team, elements):

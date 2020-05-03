@@ -649,7 +649,6 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                     #attack if hithin_range is True
                     
                     if hithin_range and ships[instruction[0]]['energy_point']>=( int(coord_attack[1])*units_stats['common']['cruiser']['cost_attack'] ):
-                        print ('bonjour')
                         #reduce the energy of the ship
                         ships = change_value(instruction[0], ships, peaks, units_stats['common']['cruiser']['cost_attack'] * int(coord_attack[1])*-1, 'energy_point', units_stats, team)
                         #verify the coordinates of all the ship

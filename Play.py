@@ -105,7 +105,9 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
                 ennemy_team = team_1
             #Attack phase
             end_counter,attacking_list,cruiser_dead = attack(order_dico[team]['attack'], board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team,cruiser_dead)
-            
+        for ship in ships :
+            if ships[ship]['HP']< 0 :
+                cruiser_dead.append(ship)
             #delete the ships which are destroyed
         for ship in cruiser_dead:
             index = board[ships[ship]['coordinates']]['list_entity'].index(ship)
@@ -178,7 +180,7 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
     """
     
     #Initialize the variable use for the design
-    elements = {'hub' : '⚑' , 'cruiser': 'ѧ' , 'tanker' : 'ѫ' , 'peak' : 'ϟ'}
+    elements = {'hub' : '⚑' , 'cruiser': 'A' , 'tanker' : 'M' , 'peak' : 'ϟ'}
     color_team = {team_1 : fg(1), team_2: fg(4)}
 
     #Select the dimension of the map
@@ -586,7 +588,7 @@ def upgrade (upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade):
                         units_stats[team]['hub']['energy_point'] -= 400
     return units_stats
                         
-def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team,cruiser_dead):
+def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, end_counter,color_team):
     
     """Execute an attack on a chosen box
     
@@ -659,10 +661,6 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                                 hit+=1
                                 end_counter=0
                                 
-                                
-                                if ships[ship]['HP']<=0:
-                                    #stock a dead cruiser
-                                    cruiser_dead.append(ship)
                         for team_name in color_team: 
                         #verify if the is in the coordinates
                             if units_stats[team_name]['hub']['coordinates']==coordinates :

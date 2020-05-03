@@ -601,7 +601,7 @@ def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
             #calc dist between ennemy ships and hub
             distance = count_distance(units_stats[team]['hub']['coordinates'], ships[ship]['coordinates'])
 
-            if distance <= distance_hub//3 : #reflechir a une formule pour changer 10
+            if distance <= distance_hub : #reflechir a une formule pour changer 10
                 #check ship type
                 if ships[ship]['type'] == 'tanker' : 
                     close_ennemy_hub_tanker.append(ship)
@@ -1182,9 +1182,11 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,placed_defe
 
             coord.append((ally_hub[0] + x, ally_hub[1]+ y ))
 
-
+    
     coord = order_coord(coord,units_stats[team]['hub']['coordinates'])
+    
     coord_empty = verif_if_ship_on_coord(coord,alive_cruiser, ships,board)
+    
     AI_stats[team]['placed_defense_cruiser'] = place_ship(coord_empty, AI_stats[team]['placed_defense_cruiser'], alive_cruiser,ships)
       
 def verif_if_ship_on_coord(coord,alive_cruiser, ships,board):

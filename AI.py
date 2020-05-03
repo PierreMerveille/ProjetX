@@ -66,7 +66,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,
         
         
         
-        ### note a l'attention de ce tres cher Anthony, idee: attaquer en priorite un croiseur ayant plus d'energie que les qutres et aussi ceux avec le moins d'HP
+        
     elif stance == 'defensive' :
         AI_stats[team]['placed_control_cruiser'] = []
         print (stance)

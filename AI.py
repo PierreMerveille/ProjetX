@@ -1146,17 +1146,20 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,placed_defe
     nb_cruiser = len(alive_cruiser)
     coord = []
 
-    nb_line = 1
+    nb_lines = 1
+    
+
+    
     go_on = True
     result = 0
     while go_on  :
-        result += nb_line *4 + 1 
+        result += nb_lines *4 + 1 
         if result <nb_cruiser :
             
-           nb_line += 1 
+            nb_lines += 1 
         else : 
             go_on = False 
-    
+
 
     if ally_hub[0] - ennemy_hub[0] >= 0:
         column_shift = -1
@@ -1169,24 +1172,24 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,placed_defe
         
     else:
         row_shift = 1
-     
-   
-    
-    for y in range (1, (nb_line+1)*column_shift, column_shift) :
-        for x in range(-abs(y),abs(y)+1) :
+        
 
-            coord.append((ally_hub[0] + x, ally_hub[1]+ y ))
+    for nb_line in range(1,nb_lines +1): 
+        for x in range (-(column_shift), (nb_line+1)*column_shift, column_shift) :
+            if (ally_hub[0] + x ,ally_hub[1]+ row_shift*nb_line, ) not in coord :
 
-    for x in range (1, (nb_line+1)*row_shift, row_shift) :
-        for y in range(-abs(x),abs(x)+1) :
+                coord.append((ally_hub[0] + x ,ally_hub[1]+ row_shift*nb_line ))
 
-            coord.append((ally_hub[0] + x, ally_hub[1]+ y ))
-
+        for y in range (-row_shift, (nb_line+1)*row_shift, row_shift) :
+            
+            if (ally_hub[0] +column_shift*nb_line, ally_hub[1]+ y ) not in coord :
+                coord.append((ally_hub[0] +column_shift*nb_line, ally_hub[1]+ y ))
     
     coord = order_coord(coord,units_stats[team]['hub']['coordinates'])
     
     coord_empty = verif_if_ship_on_coord(coord,alive_cruiser, ships,board)
-    
+    print (coord)
+    print (coord_empty)
     AI_stats[team]['placed_defense_cruiser'] = place_ship(coord_empty, AI_stats[team]['placed_defense_cruiser'], alive_cruiser,ships)
       
 def verif_if_ship_on_coord(coord,alive_cruiser, ships,board):

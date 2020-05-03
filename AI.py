@@ -631,14 +631,10 @@ def attack_hub (ships, units_stats, alive_cruiser, ennemy_team):
     """
 
     
-    move_list = []
-    
+        
     hub_coordinate = units_stats[ennemy_team]['hub']['coordinates']
     for cruiser in alive_cruiser:
-        
-        cruiser_coordinate = ships[cruiser]['coordinates']
-        distance = count_distance(cruiser_coordinate,hub_coordinate)
-                
+                                
         ships[cruiser]['target'] = 'hub'
         ships[cruiser]['coordinates_to_go'] = hub_coordinate
        

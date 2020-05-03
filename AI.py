@@ -1001,7 +1001,7 @@ def best_nb_upgrades( team, ships, ennemy_team, peaks, AI_stats, units_stats, nb
         money_back_from_tankers = (nb_tankers_to_create_var - len(alive_tanker)) * storage_with_upgrade 
         
         #calc price for creating nb_tankers_to_create
-        price_to_create_nb_tankers = (nb_tankers_to_create_var - len(alive_tanker))* units_stats['common']['tanker']['creation_cost'] #tankers qui doivent encore être crees
+        price_to_create_nb_tankers = (nb_tankers_to_create_var - len(alive_tanker))* units_stats['common']['tanker']['creation_cost'] #tankers qui doivent encore etre crees
         
         #calc money_lost_after_nb_tanker_to_create
         money_lost_tanker_creation = price_to_create_nb_tankers - money_back_from_tankers

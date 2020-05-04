@@ -1346,12 +1346,13 @@ def go_to_group_coordinates (grouped_peaks, ships, team, board, alive_cruiser, A
         coord_group = []
         for x in range(-1, 2) :
             for y in range(-1, 2) :
-
+                #Get the coordinates wich is next to the group peak
                 coord_group.append((grouped_peaks[team][group]['coord'][0] + x, grouped_peaks[team][group]['coord'][1] + y))
-
+        #Verif if there is ship on coord
         coord_empty = verif_if_ship_on_coord(coord_group, alive_cruiser, ships, board)
         
         for cruiser in alive_cruiser:
+            #Put a cruiser in a coord if it isn t in movement
             if ships[cruiser]['group'] == group and cruiser not in AI_stats[team]['placed_control_cruiser'] :
                 ships[cruiser]['coordinates_to_go'] = choice(coord_empty)
                 index_coord_empty = coord_empty.index(ships[cruiser]['coordinates_to_go'])

@@ -1410,7 +1410,7 @@ def go_to_group_coordinates (grouped_peaks, ships, team, board, alive_cruiser, A
         coord_empty = verif_if_ship_on_coord(coord_group, alive_cruiser, ships, board)
         
         for cruiser in alive_cruiser:
-            if ships[cruiser]['group'] == group and cruiser not in AI_stats[team]['placed_control_cruiser'] :
+            if ships[cruiser]['group'] == group and cruiser not in AI_stats[team]['placed_control_cruiser'] and coord_empty != [] :
                 ships[cruiser]['coordinates_to_go'] = choice(coord_empty)
                 index_coord_empty = coord_empty.index(ships[cruiser]['coordinates_to_go'])
                 del(coord_empty[index_coord_empty])

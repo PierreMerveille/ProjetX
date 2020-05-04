@@ -43,7 +43,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     AI_stats ={}
     grouped_peaks = {}
     order_list = {}
-
+    
 
     
     #Make a connection if there is one remote player
@@ -180,7 +180,7 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
     """
     
     #Initialize the variable use for the design
-    elements = {'hub' : '⚑' , 'cruiser': 'A' , 'tanker' : 'M' , 'peak' : 'ϟ'}
+    elements = {'hub' : '⚑' , 'cruiser': 'A' , 'tanker' : 'Ѫ' , 'peak' : 'ϟ'}
     color_team = {team_1 : fg(1), team_2: fg(4)}
 
     #Select the dimension of the map

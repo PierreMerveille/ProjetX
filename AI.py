@@ -39,6 +39,7 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,
 
     print (stance)
     
+    
     if stance == 'control' :
         
         AI_stats[team]['placed_defense_cruiser'] = []
@@ -550,7 +551,7 @@ def flee_tanker(alive_tanker, alive_ennemy_cruiser, ships, units_stats, team, en
     """
     for tanker in alive_tanker :
 
-        if ships[tanker]['target'] not in alive_cruiser and ships[tanker]['target'] != 'hub' :
+        if ships[tanker]['target'] not in alive_cruiser or ships[tanker]['target'] != 'hub' :
 
             for ennemy_cruiser in alive_ennemy_cruiser:
                 
@@ -602,7 +603,7 @@ def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
             #calc dist between ennemy ships and hub
             distance = count_distance(units_stats[team]['hub']['coordinates'], ships[ship]['coordinates'])
 
-            if distance <= distance_hub//3 : 
+            if distance <= units_stats[ennemy_team]['cruiser']['range'] + 3 : 
                 #check ship type
                 if ships[ship]['type'] == 'tanker' : 
                     close_ennemy_hub_tanker.append(ship)
@@ -970,27 +971,30 @@ def best_nb_upgrades( team, ships, ennemy_team, peaks, AI_stats, units_stats, nb
 
     #control upgrades are tanker_capacity, regen and range   
     nb_range_upgrades = 0
+    nb_storage_upgrades = 0
+    nb_regen_upgrades = 0
     regen_without_upgrade = units_stats[team]['hub']['regeneration']
     lost_money_without_regen_upgrade_list = []
     money_lost_tanker_creation_list = []
     average_nb_hauls_list = []
-    nb_storage_upgrades = 0
+    
 
     ######################check regen###################### 
-    for times_upgraded in  range (1, (max_upgrade['max_regen_upgrade'] - regen_without_upgrade)//5 + 1):
+    if regen_without_upgrade < max_upgrade['max_regen_upgrade'] :
+        for times_upgraded in  range (1, (max_upgrade['max_regen_upgrade'] - regen_without_upgrade)//5 + 1):
 
-        regen_with_upgrade = regen_without_upgrade + 5 * times_upgraded
+            regen_with_upgrade = regen_without_upgrade + 5 * times_upgraded
 
-        money_normal_regen = nb_rounds * regen_without_upgrade
-        money_upgraded_regen = nb_rounds * regen_with_upgrade
+            money_normal_regen = nb_rounds * regen_without_upgrade
+            money_upgraded_regen = nb_rounds * regen_with_upgrade
 
-        lost_money = money_upgraded_regen - money_normal_regen
-        lost_money_without_regen_upgrade_list.append(lost_money)
-    
-    min_lost_money = min(lost_money_without_regen_upgrade_list)
+            lost_money = money_upgraded_regen - money_normal_regen
+            lost_money_without_regen_upgrade_list.append(lost_money)
+        
+        min_lost_money = min(lost_money_without_regen_upgrade_list)
 
-    #find the best nb of regen upgrades for actual nb_rounds  
-    nb_regen_upgrades = lost_money_without_regen_upgrade_list.index(min_lost_money) + 1 
+        #find the best nb of regen upgrades for actual nb_rounds  
+        nb_regen_upgrades = lost_money_without_regen_upgrade_list.index(min_lost_money) + 1 
 
     ###########check storage################
     storage_without_upgrade = units_stats[team]['tanker']['max_energy']
@@ -1016,7 +1020,7 @@ def best_nb_upgrades( team, ships, ennemy_team, peaks, AI_stats, units_stats, nb
             #see what nb_upgrade would be optimal to reduce the nb of average hauls
             average_nb_hauls = nb_hauls(storage_without_upgrade, storage_with_upgrade, team, units_stats, peaks, max_upgrade)
             average_nb_hauls_list.append(average_nb_hauls)
-        
+    
         #see if upgrade is worth it for the money during tanker creation else don't do upgrade
         if money_lost_tanker_creation_list[0] - money_lost_tanker_creation_list[1] - cost_upgrade['cost_storage_upgrade'] > 0:
             
@@ -1028,11 +1032,11 @@ def best_nb_upgrades( team, ships, ennemy_team, peaks, AI_stats, units_stats, nb
     regen_with_upgrade = regen_without_upgrade + nb_regen_upgrades * 5
     money_from_regen = regen_with_upgrade * nb_rounds
    
-    if money_from_regen <= money_from_storage:
+    if money_from_regen <= money_from_storage and units_stats[team]['tanker']['max_energy'] != max_upgrade['max_capacity_upgrade'] :
         storage_or_regen = 'storage'
 
-    else : 
-        storage_or_regen = 'regen'
+    else :
+        storage_or_regen = 'regeneration'
         
     ##################check range########################### independant de la stance
     #bool a mettre en parametre et qui vient d'une fonction qui calcule si on attaque #check if their cruisers have a better range than ours  
@@ -1043,9 +1047,9 @@ def best_nb_upgrades( team, ships, ennemy_team, peaks, AI_stats, units_stats, nb
         
             nb_range_upgrades += 1 
 
-        if units_stats[ennemy_team]['cruiser']['range'] >= units_stats[team]['cruiser']['range']:
+        if units_stats[ennemy_team]['cruiser']['range'] >= units_stats[team]['cruiser']['range'] and units_stats[team]['cruiser']['range'] != max_upgrade['max_range_upgrade'] :
 
-            nb_range_upgrades += units_stats[ennemy_team]['cruiser']['range'] - units_stats[team]['cruiser']['range'] #si >= a la condition au dessus alors + 1
+            nb_range_upgrades += 1 #si >= a la condition au dessus alors + 1
 
     return nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, storage_or_regen
 
@@ -1104,6 +1108,7 @@ def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peak
 
     if nb_range_upgrades > 0:
         upgrade = 'range'
+        
        
         for nb in range(1,nb_range_upgrades +1) :
             if AI_stats[team]['virtual_energy_point'] >= cost_upgrade['cost_range_upgrade'] :
@@ -1114,8 +1119,9 @@ def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peak
         nb_upgrades = nb_storage_upgrades
         cost = cost_upgrade['cost_storage_upgrade']
 
-    elif storage_or_regen == 'regen' :
+    elif storage_or_regen == 'regeneration' :
         nb_upgrades = nb_regen_upgrades
+        
         cost = cost_upgrade['cost_regen_upgrade']
 
     if len(alive_tanker) > 3 * nb_upgrades : 
@@ -1125,6 +1131,7 @@ def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peak
             if AI_stats[team]['virtual_energy_point'] >= cost :
                 instruction.append('upgrade:' + str(storage_or_regen))
                 AI_stats[team]['virtual_energy_point'] -= cost
+        
     return instruction 
 def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,placed_defense_cruiser,units_stats,AI_stats):
     """
@@ -1256,7 +1263,7 @@ def place_ship(coord_empty, placed_defense_cruiser, alive_cruiser,ships):
     """"""
     for cruiser in alive_cruiser:
 
-            if cruiser not in placed_defense_cruiser:
+            if cruiser not in placed_defense_cruiser and coord_empty != [] :
 
                 ships[cruiser]['coordinates_to_go'] = choice(coord_empty)
                

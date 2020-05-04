@@ -43,6 +43,7 @@ def order_AI (team, ships, units_stats, peaks, ennemy_team, AI_stats, grouped_pe
     order_AI += do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peaks, peaks, ennemy_team, cost_upgrade, max_upgrade)
     new_cruiser_group(alive_cruiser, ships, grouped_peaks, team)
     print (stance)
+    print (units_stats[team]['hub']['HP'])
     if stance == 'control' :
         
         AI_stats[team]['placed_defense_cruiser'] = []

@@ -1499,14 +1499,14 @@ def ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, pe
 
     #Verify if the player is an remote player
     elif  teams[team] == 'remote':
-
+        print (order_list[team])
         #Get the order from the remote player
         order_list[team] = remote_play.get_remote_orders(connection)
         
 
     #Verify if the player is an AI
     elif teams[team] == 'AI':
-
+        
         #Create the order from the AI
         order = order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,cost_upgrade, max_upgrade,board,long,larg)
         order_list[team] = order

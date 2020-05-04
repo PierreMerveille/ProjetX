@@ -113,6 +113,12 @@ def stance_function(ships, team, ennemy_team, peaks, units_stats, AI_stats, aliv
     Return
     ------
     stance : sets the stance to adopt by the AI (str)
+
+    Version
+    -------
+    specification : Pierre Merveille (v.1 21/04/20)
+    implementation : Pierre Merveille (v.1 21/04/20)
+    
     """
 
     #Verif if the control is worth
@@ -144,6 +150,11 @@ def create_ships_lists(ships, team):
     ------
     tanker_list : list containing the tankers of the selected team (list)
     cruiser_list : list containing the cruisers of the selected team (list)
+
+    Version
+    -------
+    specification : Anthony Pierard (v.1 23/04/20)
+    implementation : Anthony Pierard (v.1 23/04/20)
     """
     #Initialize our variable
     tanker_list = [] 
@@ -168,6 +179,11 @@ def coordinates_to_go (ships, no_movement):
     ----------
     ships :  dictionary with the statistics of each ship (tanker or cruiser)(dict)
     no_movement : list containing the name of the ships that wich musn't move (list)
+
+    Version
+    -------
+    specification : Johan Rochet (v.1 26/04/20)
+    implementation : Johan Rochet (v.1 26/04/20)
     """
     instructions = []
 
@@ -260,6 +276,11 @@ def AI_transfer_and_destination(ships, peaks, team, units_stats, total_peak_ener
     --------
     transfer_instruction : AI order for transfer (str)
     no_movement : list containing the name of the ships which musn't move (list)
+
+    Version
+    -------
+    specification : Johan Rochet (v.1 28/04/20)
+    implementation : Johan Rochet (v.1 28/04/20)
     """
     
     #initialise the variable
@@ -408,6 +429,7 @@ def control_is_worth_function (team, ennemy_team, peaks, units_stats, AI_stats, 
     Versions
     --------
     specification : Kevin Schweitzer (v.1 24/04/20)
+    implementation : Kevin Schweitzer (v.1 24/04/20)
 
     """
     our_total_peak_energy = 0
@@ -460,6 +482,7 @@ def find_grouped_peaks(team, peaks, units_stats, grouped_peaks, ennemy_team):
     Version
     -------
     specification : Kevin Schweitzer (v.1 24/04/20)
+    implementation : Kevin Schweitzer (v.1 24/04/20)
     """
     #Get the peak in our map side
     favorable_peaks = peaks_on_our_map_side(team, units_stats, peaks,ennemy_team)
@@ -518,6 +541,11 @@ def peaks_on_our_map_side(team, units_stats, peaks, ennemy_team):
     Notes
     -----
     get distance between the two hubs and the peaks find the ones with minimal distance to each hub
+
+    Version
+    -------
+    specification : Kevin Schweitzer (v.1 24/04/20)
+    implementation : Kevin Schweitzer (v.1 25/04/20)
     """
     our_hub_coordinates = units_stats[team]['hub']['coordinates']
     their_hub_coordinates = units_stats[ennemy_team]['hub']['coordinates']
@@ -553,6 +581,11 @@ def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
     nb_hub_cruisers : number of cruisers for the alert (int)
     alert_hub_tanker : If tankers are closinig in on our hub True, else False (bool)
     nb_hub_tankers : number of tankers for the alert (int)
+
+    Version
+    -------
+    specification : Kevin Schweitzer (v.1 25/04/20)
+    implementation : Kevin Schweitzer (v.1 26/04/20)
     """
     close_ennemy_hub_tanker = []
     close_ennemy_hub_cruiser = []
@@ -614,6 +647,11 @@ def attack_cruiser_in_range(ships, alive_cruiser , alive_ennemy_cruiser, units_s
     alive_ennemy_cruiser : list with the name of the alive cruisers of the ennemy_team (list)
     units_stats : the dictionnary with the info of the hub (dict) 
     team : name of the team which is playing (str) 
+
+    Version
+    -------
+    specification : Anthony Pierard (v.1 27/04/20)
+    implementation : Anthony Pierard (v.1 27/04/20)
     
     """            
     attacked_cruiser = []
@@ -665,6 +703,11 @@ def target_to_shoot(AI_stats, alive_cruiser, ships, units_stats, team, ennemy_te
     Return
     ------
     orders : list of attack instructions (list)
+
+    Version
+    -------
+    specification : Johan Rochet (v.1 26/04/20)
+    implementation : Johan Rochet (v.1 26/04/20)
     """
     orders = []
     for cruiser in alive_cruiser :
@@ -709,7 +752,11 @@ def find_nb_rounds(team, ships, units_stats, AI_stats, alive_tanker):
     Return
     ------
     nb_rounds : number of rounds to wait until hub has enough energy to create a new tanker (int)
-    
+
+    Version
+    -------
+    specification : Kevin Schweitzer (v.1 27/04/20)
+    implementation : Kevin Schweitzer (v.1 27/04/20)
     """
     # order each tanker full of energy with the distance between them and the hub
     # the energy virtual of the hub (energy of the hub + tanker in way)
@@ -742,6 +789,10 @@ def order_full_tanker(team, ships, units_stats, alive_tanker):
     ------
     order_tanker : list with full tankers in proximity order to our hub (list)
 
+    Version
+    -------
+    specification : Johan Rochet (v.1 30/04/20)
+    implementation : Johan Rochet (v.1 01/05/20)
     """
     full_tankers = []
     distance_list = []
@@ -788,6 +839,11 @@ def nb_hauls(storage_without_upgrade, storage_with_upgrade, team, units_stats, p
     Return
     ------
     average_nb_hauls : average hauls needed for a tanker to empty a peak on the map depending on the actual upgrade (list)
+
+    Version
+    -------
+    specification : Kevin Schweitzer (v.1 26/04/20)
+    implementation : Kevin Schweitzer (v.1 27/04/20)
     """
     hauls_list = []
 
@@ -828,6 +884,11 @@ def best_nb_upgrades(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_
     nb_storage_upgrades : optimal number of storage upgrades to reach max profitability (int)
     nb_regen_upgrades : optimal number of regen upgrades to reach max profitability (int)
     storage_or_regen : name of the upgrade that is currently worth more (str)
+
+    Version
+    -------
+    specification : Kevin Schweitzer (v.1 25/04/20)
+    implementation : Kevin Schweitzer (v.1 26/04/20)
     """
     #control upgrades are tanker_capacity, regen and range   
     nb_range_upgrades = 0
@@ -925,6 +986,10 @@ def nb_tankers_to_create(team, units_stats, favorable_peaks, peaks):
     ------
     nb_tankers_to_create : number of tankers to create determined from the number of energy in the peaks on our side of them map (int)
     
+    Version
+    -------
+    specification : Kevin Schweitzer (v.1 24/04/20)
+    implementation : Kevin Schweitzer (v.1 25/04/20)
     """
     our_total_energy = 0
 
@@ -959,6 +1024,11 @@ def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peak
     Return
     ------
     instruction : instruction to make the number of desired upgrades
+
+    Version
+    -------
+    specification : Kevin Schweitzer (v.1 26/04/20)
+    implementation : Kevin Schweitzer (v.1 30/04/20)
     """      
     #Get the usefull variable
     nb_rounds = find_nb_rounds(team, ships, units_stats, AI_stats, alive_tanker)
@@ -1007,9 +1077,14 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser, placed_def
     team : name of the team which is playing (str)  
     ennemy_team : name of the ennemy_team (str)
     alive_cruiser : list with the name of the alive cruiser of the team (list)
-    placed_defense_cruiser : ?????????
+    placed_defense_cruiser : list with the name of the placed cruiser of the team
     units_stats : dictionary with the stats (different or common) of the teams (hub /ship) (dict)
     AI_stats : dictionary of the specific information for the AI(s) (dict)
+
+    Version
+    -------
+    specification : Pierre Merveille (v.1 23/04/20)
+    implementation : Pierre Merveille (v.1 25/04/20)
     """
     #Get the usefull variable
     ally_hub = units_stats[team]['hub']['coordinates']
@@ -1063,6 +1138,11 @@ def verif_if_ship_on_coord(coord, alive_cruiser, ships, board):
     Return 
     ------
     coord_empty : list with the coordinates  which has not already been assigned to a cruiser (list)
+
+    Version
+    -------
+    specification : Pierre Merveille (v.1 23/04/20)
+    implementation : Pierre Merveille (v.1 25/04/20)
     """
     coord_empty = []
     #To each coord verify if there is a cruiser on
@@ -1141,6 +1221,11 @@ def place_ship(coord_empty, placed_defense_cruiser, alive_cruiser, ships):
     Return
     ------
     placed_defense_cruiser : list with the name of the placed cruiser of the team (list)
+
+    Version
+    -------
+    specification : Pierre Merveille (v.1 23/04/20)
+    implementation : Pierre Merveille (v.1 25/04/20)
     """
     
     for cruiser in alive_cruiser:
@@ -1171,6 +1256,11 @@ def order_ship_by_caracteristic(ship_list, caracteristic, ships) :
     Return
     ------
     order_coord : list with the ordered coordinates (list)
+
+    Version
+    -------
+    specification : Johan Rochet (v.1 26/04/20)
+    implementation : Johan Rochet (v.1 29/04/20)
     """
     
     b = []
@@ -1217,6 +1307,11 @@ def offensive_attack(alive_cruiser, ships, units_stats, ennemy_team, alive_ennem
     AI_stats: dictionary of the specific information for the AI(s)
     board : dictionary with the coordinates of all boxes of the board which gives a list of element on this place (dict)
     team : name of the team which is playing (str)  
+
+    Version
+    -------
+    specification : Pierre Merveille (v.1 23/04/20)
+    implementation : Pierre Merveille (v.1 30/04/20)
     """    
     #Make the offensive function
     attack_hub(ships, units_stats, alive_cruiser, ennemy_team)
@@ -1238,6 +1333,11 @@ def create_control_ship (AI_stats, team, units_stats, alive_tanker, alive_cruise
     Return
     ------
     instructions : list with the different instructions (list)
+
+    Version
+    -------
+    specification : Anthony Pierard (v.1 28/04/20)
+    implementation : Anthony Pierard (v.1 29/04/20)
     """
     instructions = []
     no_stop = True 
@@ -1274,7 +1374,10 @@ def new_cruiser_group (alive_cruiser, ships, grouped_peaks, team):
     grouped_peaks : dictionnary with the group of peaks
     team : name of the team which is playing (str)  
 
-
+    Version
+    -------
+    specification : Pierre Merveille (v.1 26/04/20)
+    implementation : Pierre Merveille (v.1 27/04/20)
     """
     nb_group = 0
     
@@ -1315,7 +1418,10 @@ def go_to_group_coordinates (grouped_peaks, ships, team, board, alive_cruiser, A
     AI_stats : dictionary of the specific information for the AI(s)
     
 
-
+    Version
+    -------
+    specification : Pierre Merveille (v.1 26/04/20)
+    implementation : Kevin Schweitzer (v.1 27/04/20)
     """
     
     for group in grouped_peaks[team]:
@@ -1380,6 +1486,11 @@ def create_defense_attack_ship (AI_stats, team, units_stats, alive_tanker):
     Return
     ------
     instructions : list with the different instructions (list)
+
+    Versions
+    --------
+    specification : Anthony Pierard (v.1 30/04/20)
+    implementation : Anthony Pierard (v.1 30/04/20)
     """
     instructions =[]
     while AI_stats[team]['virtual_energy_point'] >= units_stats['common']['cruiser']['creation_cost'] :
@@ -1407,6 +1518,11 @@ def defense_in_L (column_shift, row_shift, nb_cruiser, ally_hub, coord):
     nb_cruiser: the nbr of cruiser (int)
     ally_hub : the coordinates of the ally hub (list)
     coord : coord of the defensive line(list)
+
+    Versions
+    --------
+    specification : Johan Rochet (v.1 27/04/20)
+    implementation : Johan Rochet (v.1 28/04/20)
     
     """
     nb_lines = 1
@@ -1452,6 +1568,11 @@ def defense_in_line (column_shift, row_shift, nb_cruiser, ally_hub, coord):
     Returns
     -------
     coord : coordinates round the ally_hub (list)
+
+    Version
+    -------
+    specification : Pierre Merveille (v.1 27/04/20)
+    implementation : Pierre Merveille (v.1 28/04/20)
     """
 
     nb_lines = 1  

@@ -63,7 +63,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     #Start the game
     while end == False:
         print (units_stats[team_2]['hub']['energy_point'])
-        for team in color_team : 
+        for team in team_id : 
             if team==team_1:
                     ennemy_team=team_2
             else :
@@ -72,7 +72,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             order_list = ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, peaks,ennemy_team,AI_stats,grouped_peaks,cost_upgrade, max_upgrade,board,team,order_list) 
             order_dico = {team_1 :{'upgrade' : '', 'move':'', 'create' : '', 'attack' :'' , 'transfer' : ''},
                         team_2 :{'upgrade' : '', 'move':'', 'create' : '', 'attack' :'' , 'transfer' : ''}}
-        print (order_list)
+        
             #Separate in 2 the round because there are 2 teams and start the gameplay phase
         for team in color_team :
             
@@ -1510,6 +1510,7 @@ def ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, pe
         #Create the order from the AI
         order = order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,cost_upgrade, max_upgrade,board,long,larg)
         order_list[team] = order
+        
 
         #Give the order to the remote player if there is one
         if link :

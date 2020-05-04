@@ -1224,20 +1224,26 @@ def order_coord(coord, destination) :
     """
     b = []
     c = []
+    
     if len(coord) <= 1 :
         return coord
+    
     if len(coord) == 2 :
         if count_distance(coord[0], destination)> count_distance(coord[1], destination) :
+            #swap the two places 
             swap = coord[0]
             coord[0] = coord[1]
             coord[1] = swap
         return coord
+    # recursive part
     else :
+        #select a pivot
         index = randint (0, len(coord) - 1)
         
         pivot= coord[index]
         pivot_distance = count_distance(pivot, destination)
         del(coord[index])
+        #see if the element are closer from the destination or not
         for element in coord :
             if count_distance(element,destination) < pivot_distance : 
                 b.append(element)
@@ -1288,15 +1294,20 @@ def order_ship_by_caracteristic(ship_list, caracteristic, ships) :
         return ship_list
     if len(ship_list) == 2 :
         if ships[ship_list[0]][caracteristic] > ships[ship_list[1]][caracteristic] :
+            #swap the two places 
             swap = ship_list[0]
             ship_list[0] = ship_list[1]
             ship_list[1] = swap
+
         return ship_list
+    # recursive part 
     else :
+        #select a pivot
         index = randint (0, len(ship_list)-1)
         
         pivot = ship_list[index]
         del(ship_list[index])
+        #see if the element has less caracteristic than the other
         for element in ship_list :
             if ships[element][caracteristic] < ships[pivot][caracteristic] :  
                 b.append(element)
@@ -1502,7 +1513,20 @@ def defense_in_L (column_shift, row_shift, nb_cruiser, ally_hub, coord):
     return coord          
            
 def defense_in_line (column_shift, row_shift, nb_cruiser, ally_hub, coord):
-    """?????
+    """
+    Places the defense line between the hub and the ennemy hub in line
+
+    Parameters
+    ----------
+    column_shift : column that we have to def (-1,1)(left,right)(int)
+    row_shift : row taht we have to def (-1,1)(up,down) (int)
+    nb_cruiser : number of ally cruiser  (int)
+    ally_hub : coordinates of the hub (tuple)
+    coord : coordinates round the ally_hub (list)
+
+    Returns
+    -------
+    coord : coordinates round the ally_hub (list)
     """
 
     nb_lines = 1  

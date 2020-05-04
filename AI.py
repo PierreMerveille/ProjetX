@@ -37,8 +37,8 @@ def order_AI (team,ships,units_stats,peaks, ennemy_team, AI_stats,grouped_peaks,
     order_AI += do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peaks, peaks, ennemy_team, cost_upgrade, max_upgrade)
     new_cruiser_group(alive_cruiser,ships,grouped_peaks,team)
 
-    print(stance)
-    print (AI_stats[team]['nb_cruiser'])
+    print (stance)
+    
     if stance == 'control' :
         
         AI_stats[team]['placed_defense_cruiser'] = []
@@ -1174,8 +1174,7 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser,placed_defe
     coord = order_coord(coord,units_stats[team]['hub']['coordinates'])
     
     coord_empty = verif_if_ship_on_coord(coord,alive_cruiser, ships,board)
-    print (coord)
-    print (coord_empty)
+    
     AI_stats[team]['placed_defense_cruiser'] = place_ship(coord_empty, AI_stats[team]['placed_defense_cruiser'], alive_cruiser,ships)
       
 def verif_if_ship_on_coord(coord,alive_cruiser, ships,board):
@@ -1260,7 +1259,7 @@ def place_ship(coord_empty, placed_defense_cruiser, alive_cruiser,ships):
             if cruiser not in placed_defense_cruiser:
 
                 ships[cruiser]['coordinates_to_go'] = choice(coord_empty)
-                print (coord_empty)
+               
                 
                 index_coord_empty = coord_empty.index(ships[cruiser]['coordinates_to_go'])
                 del(coord_empty[index_coord_empty])

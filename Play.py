@@ -49,7 +49,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     #Make a connection if there is one remote player
     for number in range(2):
         if teams[team_id[number]] == 'remote':
-            connection = remote_play.create_connection(team_id[number], team_id[number-1], verbose=True)
+            connection = remote_play.create_connection(team_id[number-1],team_id[number] , verbose=True)
             link=True
     
     if team_1_type == 'AI' :

@@ -968,7 +968,7 @@ def round_end (board, end_counter, units_stats, peaks, elements, color_team, shi
     
 
     #display stats every round end
-    display_stats (elements, color_team, ships, units_stats, peaks)
+    #display_stats (elements, color_team, ships, units_stats, peaks)
     #display board every round end
     board_display(board, color_team, ships, peaks, units_stats, elements, long, larg)
     return units_stats

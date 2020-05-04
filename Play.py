@@ -62,6 +62,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
         find_grouped_peaks(team_2,peaks,units_stats,grouped_peaks,team_1)
     #Start the game
     while end == False:
+        print (units_stats[team_2]['hub']['energy_point'])
         for team in color_team :
             if team==team_1:
                     ennemy_team=team_2
@@ -251,7 +252,7 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
 
     #Display the board and the stat of the element (peak, cruiser,...)
     board_display(board, color_team, ships, peaks, units_stats, elements,long, larg)
-    display_stats(elements,color_team,ships,units_stats,peaks)
+    #display_stats(elements,color_team,ships,units_stats,peaks)
 
     return board, units_stats, max_upgrade, cost_upgrade, elements, color_team, ships, peaks, long,larg,teams
     

@@ -72,6 +72,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             order_list = ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, peaks,ennemy_team,AI_stats,grouped_peaks,cost_upgrade, max_upgrade,board,team,order_list) 
             order_dico = {team_1 :{'upgrade' : '', 'move':'', 'create' : '', 'attack' :'' , 'transfer' : ''},
                         team_2 :{'upgrade' : '', 'move':'', 'create' : '', 'attack' :'' , 'transfer' : ''}}
+        print (order_list)
             #Separate in 2 the round because there are 2 teams and start the gameplay phase
         for team in color_team :
             
@@ -968,7 +969,7 @@ def round_end (board, end_counter, units_stats, peaks, elements, color_team, shi
     
 
     #display stats every round end
-    display_stats (elements, color_team, ships, units_stats, peaks)
+    #display_stats (elements, color_team, ships, units_stats, peaks)
     #display board every round end
     board_display(board, color_team, ships, peaks, units_stats, elements, long, larg)
     return units_stats

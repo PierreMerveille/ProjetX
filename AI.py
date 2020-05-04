@@ -27,6 +27,11 @@ def order_AI (team, ships, units_stats, peaks, ennemy_team, AI_stats, grouped_pe
     Version :
     ---------
     specification : Johan Rochet (v.1 25/04/20)
+    implementation : Johan Rochet (v.1 25/04/20)
+                     Kevin Schweitzer (v.2 27/04/20)
+                     Pierre Merveille (v.3 28/04/20)
+                     Anthony Pierard (v.4 30/04/20)
+                     Johan Rochet (v.5 04/04/20)
     
     """
     #Set the usefull var
@@ -118,6 +123,7 @@ def stance_function(ships, team, ennemy_team, peaks, units_stats, AI_stats, aliv
     -------
     specification : Pierre Merveille (v.1 21/04/20)
     implementation : Pierre Merveille (v.1 21/04/20)
+                     Anthony Pierard (v.2 28/04/20)
     
     """
 
@@ -281,6 +287,8 @@ def AI_transfer_and_destination(ships, peaks, team, units_stats, total_peak_ener
     -------
     specification : Johan Rochet (v.1 28/04/20)
     implementation : Johan Rochet (v.1 28/04/20)
+                     Johan Rochet (v.2 30/04/20)
+                     Johan Rochet (v.3 01/05/20)
     """
     
     #initialise the variable
@@ -652,6 +660,7 @@ def attack_cruiser_in_range(ships, alive_cruiser , alive_ennemy_cruiser, units_s
     -------
     specification : Anthony Pierard (v.1 27/04/20)
     implementation : Anthony Pierard (v.1 27/04/20)
+                     Pierre Merveille (v.1 03/04/20)
     
     """            
     attacked_cruiser = []
@@ -889,6 +898,7 @@ def best_nb_upgrades(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_
     -------
     specification : Kevin Schweitzer (v.1 25/04/20)
     implementation : Kevin Schweitzer (v.1 26/04/20)
+                     Kevin Schweitzer (v.2 30/04/20)
     """
     #control upgrades are tanker_capacity, regen and range   
     nb_range_upgrades = 0
@@ -1029,6 +1039,7 @@ def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peak
     -------
     specification : Kevin Schweitzer (v.1 26/04/20)
     implementation : Kevin Schweitzer (v.1 30/04/20)
+                     Johan Rochet (v.2 01/05/20)
     """      
     #Get the usefull variable
     nb_rounds = find_nb_rounds(team, ships, units_stats, AI_stats, alive_tanker)
@@ -1085,6 +1096,7 @@ def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser, placed_def
     -------
     specification : Pierre Merveille (v.1 23/04/20)
     implementation : Pierre Merveille (v.1 25/04/20)
+                     Pierre Merveille (v.2 03/05/20)
     """
     #Get the usefull variable
     ally_hub = units_stats[team]['hub']['coordinates']

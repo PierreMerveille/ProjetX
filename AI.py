@@ -1458,7 +1458,7 @@ def defense_in_line (column_shift, row_shift, nb_cruiser, ally_hub, coord):
     go_on = True
     result = 0
     add = 5
-
+    #get the nb of line
     while go_on  :
         result += add 
 
@@ -1467,7 +1467,7 @@ def defense_in_line (column_shift, row_shift, nb_cruiser, ally_hub, coord):
 
         else : 
             go_on = False 
-
+    #get the coordinates of the boxes on the line
     for nb_line in range(1, nb_lines+1):    
         for a in range(-2,3):
             if column_shift == 0 :

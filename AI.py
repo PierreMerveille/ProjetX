@@ -56,7 +56,7 @@ def order_AI (team, ships, units_stats, peaks, ennemy_team, AI_stats, grouped_pe
 
         go_to_group_coordinates(grouped_peaks, ships, team,board, alive_cruiser, AI_stats)
 
-        attack_cruiser_in_range(ships, alive_cruiser, alive_ennemy_cruiser, alive_ennemy_tanker, units_stats, team)
+        attack_cruiser_in_range(ships, alive_cruiser, alive_ennemy_cruiser,  units_stats, team)
 
     elif stance == 'offensive':
         

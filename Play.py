@@ -63,7 +63,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
     #Start the game
     while end == False:
         print (units_stats[team_2]['hub']['energy_point'])
-        for team in color_team :
+        for team in color_team : 
             if team==team_1:
                     ennemy_team=team_2
             else :

@@ -1,10 +1,6 @@
 from math import *
 from Play import * 
 
-""" general function """
-
-# note : faire attention a ne pas creer un ordre d'attaque et de deplacemt pour le meme cruiser
-
 def order_AI (team, ships, units_stats, peaks, ennemy_team, AI_stats, grouped_peaks, cost_upgrade, max_upgrade, board, long, larg) : 
     """ 
     Main fonction to get the IA orders 
@@ -265,7 +261,7 @@ def AI_transfer_and_destination(ships, peaks, team, units_stats, total_peak_ener
     transfer_instruction : AI order for transfer (str)
     no_movement : list containing the name of the ships which musn't move (list)
     """
-    #######################rajouter puiser dans le hub pour offensif et defensif 
+    
     #initialise the variable
     best_profitability = 0
     transfer_instruction = []
@@ -310,8 +306,7 @@ def AI_transfer_and_destination(ships, peaks, team, units_stats, total_peak_ener
             
             #go to draw energy 
             if (ships[tanker]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100) * 60 and total_peak_energy > 0 ): # reflechir aux conditions
-                # si le tanker a moins de 60 % , calculer combien d'energie restant, pour voir si plus rentable d'aller au hub ou au peak puis de rmeplir avec une totalite de reserve
-                ###########################rajouter la differentitation en fonction des phases 
+                 
                 for peak in peaks :
                     if peaks[peak]['storage'] > 0 :
                     #calculate the distance between the peak and the tanker
@@ -387,11 +382,6 @@ def AI_transfer_and_destination(ships, peaks, team, units_stats, total_peak_ener
     #delete the space at the end of transfer_instruction                
     
     return transfer_instruction, no_movement
-
-
-""" control function"""
-
-
 
 def control_is_worth_function (team, ennemy_team, peaks, units_stats, AI_stats, alive_tanker, alive_cruiser, alive_ennemy_tanker, alive_ennemy_cruiser):
     """
@@ -510,7 +500,6 @@ def find_grouped_peaks(team, peaks, units_stats, grouped_peaks, ennemy_team):
 
     return grouped_peaks
 
-
 def peaks_on_our_map_side(team, units_stats, peaks, ennemy_team):
     """ 
     Makes a list containing the names of peaks on our map side
@@ -546,10 +535,6 @@ def peaks_on_our_map_side(team, units_stats, peaks, ennemy_team):
         
     return favorable_peaks
     #favorable_peaks = [peak_1, peak_2]
-
-
-"""defense function"""
-
 
 def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
     """ 
@@ -589,8 +574,6 @@ def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
                     close_ennemy_hub_cruiser.append(ship)
 
     return close_ennemy_hub_tanker,close_ennemy_hub_cruiser
-     
-""" offensive function"""
 
 def attack_hub(ships, units_stats, alive_cruiser, ennemy_team):
     """ 
@@ -665,8 +648,6 @@ def attack_cruiser_in_range(ships, alive_cruiser , alive_ennemy_cruiser, units_s
                 attacked_cruiser.append(target)
 
                 ships[ally_cruiser]['target'] = target
-               
-
 
 def target_to_shoot(AI_stats, alive_cruiser, ships, units_stats, team, ennemy_team) :
     """ 
@@ -710,8 +691,6 @@ def target_to_shoot(AI_stats, alive_cruiser, ships, units_stats, team, ennemy_te
             AI_stats[team]['conflict'] = True
     
     return orders
-
-""" Upgrade functions """
 
 def find_nb_rounds(team, ships, units_stats, AI_stats, alive_tanker):
     
@@ -918,9 +897,7 @@ def best_nb_upgrades(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_
     else :
         storage_or_regen = 'regeneration'
         
-    ##################check range########################### independant de la stance
-    #bool a mettre en parametre et qui vient d'une fonction qui calcule si on attaque #check if their cruisers have a better range than ours  
-
+    ##################check range########################### 
     if AI_stats[team]['conflict'] == True : 
         
         if units_stats[team]['cruiser']['range'] == 1 : 
@@ -929,7 +906,7 @@ def best_nb_upgrades(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_
 
         if units_stats[ennemy_team]['cruiser']['range'] >= units_stats[team]['cruiser']['range'] and units_stats[team]['cruiser']['range'] != max_upgrade['max_range_upgrade'] :
 
-            nb_range_upgrades += 1 #si >= a la condition au dessus alors + 1
+            nb_range_upgrades += 1 
 
     return nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, storage_or_regen
 
@@ -1151,7 +1128,6 @@ def order_coord(coord, destination) :
                 c.append(element)
         
         return order_coord(b, destination) + [pivot] + order_coord(c, destination)
-    
 
 def place_ship(coord_empty, placed_defense_cruiser, alive_cruiser, ships):
     """Assign a coordinate to a cruiser to get there.
@@ -1390,9 +1366,7 @@ def range_verification (units_stats, distance, ships, team):
         return True
     else :
         return False
-                
-""" general secondary function"""
-
+ 
 def create_defense_attack_ship (AI_stats, team, units_stats, alive_tanker):
     """Create the ship in the offensive or defensive stance
     Parameters

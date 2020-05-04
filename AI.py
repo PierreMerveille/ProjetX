@@ -1505,7 +1505,7 @@ def defense_in_L (column_shift, row_shift, nb_cruiser, ally_hub, coord):
     return coord          
            
 def defense_in_line (column_shift, row_shift, nb_cruiser, ally_hub, coord):
-    """?????
+    """????
     """
 
     nb_lines = 1  

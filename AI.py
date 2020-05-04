@@ -691,60 +691,6 @@ def attack_cruiser_in_range(ships, alive_cruiser , alive_ennemy_cruiser, units_s
                         ships[ship]['virtual_HP'] -= min(ships[ally_cruiser]['energy_point']//units_stats['common']['cruiser']['cost_attack'], ships[ship]['HP'])
                 ships[ally_cruiser]['target'] = target
 
-def attack_tanker(AI_stats, ships, team, ennemy_team, alive_cruiser, alive_ennemy_tanker, dangerous_ennemy_tanker):
-    """
-    Command to a cruiser to attack the first tanker's ennemy if the AI is offensive.
-
-    Parameters
-    ----------
-    AI_stats : dictionary of the specific information for the AI(s) (dict)
-    ships : the dictionnary with all the ships (dict)
-    team = the name of our team (str)
-    ennemy_team = the name of the ennemy team (str)
-    alive_cruiser : list containing the name of the alive cruisers of the team (list)
-    alive_ennemy_tanker : list containing the name of the alive tankers of the ennemy_team (list)
-    dangerous_ennemy_tanker ???? 
-
-    Notes
-    -----
-    If the ennemy is an attacker the AI don't use this function
-
-    Version
-    -------
-    specification : Anthony Pierard (v.1 24/04/20)
-    implementation : Anthony Pierard (v.1 27/04/20)
-    """
-    #verify if the ennemy is defensive
-    for tanker in dangerous_ennemy_tanker : 
-        not_already_targeted = []
-        ally_attacker = []
-        #select the closest cruiser
-        for ally_cruiser in alive_cruiser :
-            if tanker not in ships[ally_cruiser]['target'] :
-                not_already_targeted.append(tanker)
-                ally_attacker.append(ally_cruiser)
-        
-
-        if tanker not in not_already_targeted :
-            for cruiser in alive_cruiser :
-                #if cruiser in standby
-                if ships[cruiser]['coordinates'] == ships[cruiser]['coordinates_to_go'] and ships[cruiser]['energy_point'] != 0 :
-                    if alive_cruiser.index(cruiser)== 0 :
-                        attacking_cruiser = cruiser
-                        target_tanker = tanker
-                        distance = count_distance(ships[attacking_cruiser]['coordinates'],ships[tanker]['coordinates'] )
-                    elif count_distance(ships[attacking_cruiser]['coordinates'],ships[tanker]['coordinates'] ) < distance :
-                        attacking_cruiser = cruiser
-                        target_tanker = tanker
-                        distance = count_distance(ships[attacking_cruiser]['coordinates'],ships[tanker]['coordinates'] )
-                        
-            ships[cruiser_target]['coordinates_to_go'] = ships[target_tanker]['coordinates']
-            ships[cruiser_target]['target'] = target_tanker
-        else :
-            for cruiser in ally_attacker :
-                # if ennemy has moved, change the coordinates_to_go
-                if ships[cruiser]['coordinates_to_go'] != ships[tanker]['coordinates'] :
-                    ships[ally_cruiser]['coordinates_to_go'] = ships[tanker]['coordinates']    
 
 def target_to_shoot(AI_stats, alive_cruiser, ships, units_stats, team, ennemy_team) :
     """ 

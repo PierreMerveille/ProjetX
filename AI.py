@@ -1506,4 +1506,4 @@ def defense_in_line (column_shift, row_shift, nb_cruiser, ally_hub, coord):
 
                     coord.append((ally_hub[0] + nb_line * column_shift, ally_hub[1] + a))
     return coord
-#une fonction qui en fonction du groupe la met sur la coord et quand il est place ==> attack_cruiser in range
+

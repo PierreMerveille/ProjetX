@@ -974,7 +974,7 @@ def best_nb_upgrades(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_
         storage_or_regen = 'regeneration'
         
     ##################check range########################### 
-    if AI_stats[team]['conflict'] == True : 
+    if len(alive_tanker) > 0: 
         
         if units_stats[team]['cruiser']['range'] == 1 : 
         

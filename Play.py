@@ -61,7 +61,10 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
         grouped_peaks[team_2] ={0:{'name':[] ,'coord' : units_stats[team_2]['hub']['coordinates'] , 'nb_cruiser' : 0}}
         find_grouped_peaks(team_2,peaks,units_stats,grouped_peaks,team_1)
     #Start the game
+    nb_turn = 1
     while end == False:
+        print ('nb_turn' + str(nb_turn))
+        nb_turn += 1
         print (units_stats[team_2]['hub']['energy_point'])
         for team in team_id : 
             if team==team_1:
@@ -72,7 +75,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             order_list = ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, peaks,ennemy_team,AI_stats,grouped_peaks,cost_upgrade, max_upgrade,board,team,order_list) 
             order_dico = {team_1 :{'upgrade' : '', 'move':'', 'create' : '', 'attack' :'' , 'transfer' : ''},
                         team_2 :{'upgrade' : '', 'move':'', 'create' : '', 'attack' :'' , 'transfer' : ''}}
-        
+            print (order_list)
             #Separate in 2 the round because there are 2 teams and start the gameplay phase
         for team in color_team :
             

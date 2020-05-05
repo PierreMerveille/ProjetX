@@ -189,8 +189,8 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
     fh = open(map_title + ".eq",'r')
     lines= fh.readlines()
     board_dimension= lines[1][:-1].split(' ')
-    larg = int(board_dimension[0])
-    long = int(board_dimension[1])
+    long = int(board_dimension[0])
+    larg = int(board_dimension[1])
 
     #Create the board
     for x in range (1, long + 1):
@@ -215,10 +215,10 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
         else:
             name_team = team_2
             
-        board[(int(info_hub[1]),int(info_hub[0]) )]['list_entity'] = [name_team]
+        board[(int(info_hub[0]), int(info_hub[1]))]['list_entity'] = [name_team]
         
         #put the hub stat in the variable units_stats
-        units_stats[name_team]['hub']['coordinates'] = (int(info_hub[1]),int(info_hub[0]))
+        units_stats[name_team]['hub']['coordinates'] = (int(info_hub[0]),int(info_hub[1]))
         units_stats[name_team]['hub']['HP'] = int(info_hub[2])
         units_stats[name_team]['hub']['energy_point'] =int(info_hub[3])
         units_stats[name_team]['hub']['regeneration'] = int(info_hub[4])
@@ -233,12 +233,12 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
         
         #Create and place the stat peak in a dictionary
         if index == 6:
-            peaks = {name_entity : {'coordinates' : (int(info_peak[1]),int(info_peak[0])), 'storage' : int(info_peak[2])}}
+            peaks = {name_entity : {'coordinates' : (int(info_peak[0]), int(info_peak[1])), 'storage' : int(info_peak[2])}}
         else:
-            peaks[name_entity]= {'coordinates' : (int(info_peak[1]),int(info_peak[0])), 'storage' : int(info_peak[2])}
+            peaks[name_entity]= {'coordinates' : (int(info_peak[0]), int(info_peak[1])), 'storage' : int(info_peak[2])}
 
         #Put the peak on the board  
-        board[(int(info_peak[1]),int(info_peak[0]))]['list_entity'] = [name_entity]
+        board[(int(info_peak[0]), int(info_peak[1]))]['list_entity'] = [name_entity]
 
     
     #Get the stat for the upgrade

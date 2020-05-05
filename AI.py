@@ -668,16 +668,14 @@ def attack_cruiser_in_range(ships, alive_cruiser , alive_ennemy_cruiser, units_s
                      Pierre Merveille (v.1 03/04/20)
     
     """            
-    attacked_cruiser = []
-    hub_coordinates = units_stats[ennemy_team]['hub']['coordinates']
     for ally_cruiser in alive_cruiser :
-        distance = count_distance(ships[ally_cruiser]['coordinates'],hub_coordinates)
-        if ships[ally_cruiser]['coordinates'] == ships[ally_cruiser]['coordinates_to_go'] or ships[ally_cruiser]['target'] == 'hub' and ships[ally_cruiser]['energy_point'] !=0 and not range_verification(units_stats, distance, ships, team) :
+
+        if ships[ally_cruiser]['coordinates'] == ships[ally_cruiser]['coordinates_to_go'] or ships[ally_cruiser]['target'] == 'hub' and ships[ally_cruiser]['energy_point'] !=0 :
             target_ships = []
             #get the cruisers in range that aren't already attacked
             for cruiser in alive_ennemy_cruiser :
                 distance = count_distance(ships[ally_cruiser]['coordinates'],ships[cruiser]['coordinates'])
-                if range_verification(units_stats, distance,ships,team) and cruiser not in attacked_cruiser :
+                if range_verification(units_stats, distance,ships,team) and ships[cruiser]['virtual_HP'] > 0 :
                     target_ships.append(cruiser) 
             if target_ships != [] : 
                 #order the tanker depending on their HP and energy
@@ -697,8 +695,10 @@ def attack_cruiser_in_range(ships, alive_cruiser , alive_ennemy_cruiser, units_s
                         if attack_dico[cruiser]> attack_dico[target] :
                             target = cruiser 
                     key_nb += 1 
-                attacked_cruiser.append(target)
-
+                
+                for ship in alive_ennemy_cruiser :
+                    if ships[ship]['coordinates'] == ships[target]['coordinates'] :
+                        ships[ship]['virtual_HP'] -= min(ships[ally_cruiser]['energy_point']//units_stats['common']['cruiser']['cost_attack'], ships[ship]['HP'])
                 ships[ally_cruiser]['target'] = target
 
 def target_to_shoot(AI_stats, alive_cruiser, ships, units_stats, team, ennemy_team) :

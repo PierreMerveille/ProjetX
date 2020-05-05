@@ -58,7 +58,7 @@ def order_AI (team, ships, units_stats, peaks, ennemy_team, AI_stats, grouped_pe
         #Move the cruiser in their group
         go_to_group_coordinates(grouped_peaks, ships, team,board, alive_cruiser, AI_stats)
         #Attack a cruiser if he is in range
-        attack_cruiser_in_range(ships, alive_cruiser, alive_ennemy_cruiser +alive_ennemy_tanker, units_stats, team)
+        attack_cruiser_in_range(ships, alive_cruiser, alive_ennemy_cruiser +alive_ennemy_tanker, units_stats, team , ennemy_team)
 
     elif stance == 'offensive':
         #Offensive stance
@@ -85,7 +85,7 @@ def order_AI (team, ships, units_stats, peaks, ennemy_team, AI_stats, grouped_pe
         #Place de cruiser in def
         place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser, AI_stats[team]['placed_defense_cruiser'], units_stats, AI_stats)
         #Attack a cruiser if he is in range
-        attack_cruiser_in_range(ships, alive_cruiser, alive_ennemy_cruiser, units_stats, team)
+        attack_cruiser_in_range(ships, alive_cruiser, alive_ennemy_cruiser, units_stats, team, ennemy_team)
     
     #Create order
     order_AI += coordinates_to_go(ships, no_movement)
@@ -606,7 +606,7 @@ def alert_ennemy_close_to_our_hub(units_stats, ships, team, ennemy_team):
             #calc dist between ennemy ships and hub
             distance = count_distance(units_stats[team]['hub']['coordinates'], ships[ship]['coordinates'])
 
-            if distance <= units_stats[ennemy_team]['cruiser']['range'] + 3 : 
+            if distance <= units_stats[ennemy_team]['cruiser']['range'] + 5: 
                 #check ship type
                 if ships[ship]['type'] == 'tanker' : 
                     close_ennemy_hub_tanker.append(ship)
@@ -644,7 +644,7 @@ def attack_hub(ships, units_stats, alive_cruiser, ennemy_team):
         ships[cruiser]['target'] = 'hub'
         ships[cruiser]['coordinates_to_go'] = hub_coordinate
     
-def attack_cruiser_in_range(ships, alive_cruiser , alive_ennemy_cruiser, units_stats, team):
+def attack_cruiser_in_range(ships, alive_cruiser , alive_ennemy_cruiser, units_stats, team, ennemy_team):
     """ 
     Assign the most profitable target in range to cruisers
 
@@ -664,10 +664,10 @@ def attack_cruiser_in_range(ships, alive_cruiser , alive_ennemy_cruiser, units_s
     
     """            
     attacked_cruiser = []
-
+    hub_coordinates = units_stats[ennemy_team]['hub']['coordinates']
     for ally_cruiser in alive_cruiser :
-
-        if ships[ally_cruiser]['coordinates'] == ships[ally_cruiser]['coordinates_to_go'] or ships[ally_cruiser]['target'] == 'hub' and ships[ally_cruiser]['energy_point'] !=0 :
+        distance = count_distance(ships[ally_cruiser]['coordinates'],hub_coordinates)
+        if ships[ally_cruiser]['coordinates'] == ships[ally_cruiser]['coordinates_to_go'] or ships[ally_cruiser]['target'] == 'hub' and ships[ally_cruiser]['energy_point'] !=0 and not range_verification(units_stats, distance, ships, team) :
             target_ships = []
             #get the cruisers in range that aren't already attacked
             for cruiser in alive_ennemy_cruiser :
@@ -1327,7 +1327,7 @@ def offensive_attack(alive_cruiser, ships, units_stats, ennemy_team, alive_ennem
     """    
     #Make the offensive function
     attack_hub(ships, units_stats, alive_cruiser, ennemy_team)
-    attack_cruiser_in_range (ships, alive_cruiser , alive_ennemy_cruiser, units_stats, team)
+    attack_cruiser_in_range (ships, alive_cruiser , alive_ennemy_cruiser, units_stats, team, ennemy_team)
     
 def create_control_ship (AI_stats, team, units_stats, alive_tanker, alive_cruiser, nb_tankers_to_create_var):
     """
@@ -1447,7 +1447,7 @@ def go_to_group_coordinates (grouped_peaks, ships, team, board, alive_cruiser, A
         
         for cruiser in alive_cruiser:
             #Put a cruiser in a coord if it isn t in movement
-            if ships[cruiser]['group'] == group and cruiser not in AI_stats[team]['placed_control_cruiser'] :
+            if ships[cruiser]['group'] == group and cruiser not in AI_stats[team]['placed_control_cruiser'] and coord_empty != [] :
                 ships[cruiser]['coordinates_to_go'] = choice(coord_empty)
                 index_coord_empty = coord_empty.index(ships[cruiser]['coordinates_to_go'])
                 del(coord_empty[index_coord_empty])

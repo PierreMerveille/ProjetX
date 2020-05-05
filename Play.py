@@ -1075,18 +1075,18 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements, long
     """
     board_str= fg(255)
     # creation of the board
-    for i in range (larg+2):
+    for i in range (long+2):
         #jump for each row
         board_str += bg(0) + '\n'
         
-        if i == 0 or i == larg +1 :
+        if i == 0 or i == long +1 :
             #first and last row
-            for j in range (long+2):
+            for j in range (larg+2):
                 #begin
                 if j == 0 :
                     board_str += bg('6')+'   ' 
                 #end
-                elif j == long+1 :
+                elif j == larg+1 :
                     board_str+= bg('6') +'   '
                 #column < 10        
                 elif j<10:
@@ -1098,9 +1098,9 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements, long
         else : 
             
             #intermediate rows
-            for j in range (long+2):
+            for j in range (larg+2):
                 #begin and end
-                if j==0 or j==long+1:
+                if j==0 or j==larg+1:
                     board_str += bg('6') + str(i) 
                     if i<10 : 
                         #begin
@@ -1115,10 +1115,10 @@ def board_display ( board, color_team, ships, peaks, units_stats, elements, long
                     else : 
                         color = bg('115')
                     # add the character and the front color of the character and reset color to white after
-                    board_str += color + select_value_to_print(board, (j,i),units_stats,ships,peaks, color_team,elements)  + attr(0) + fg('255')
+                    board_str += color + select_value_to_print(board, (i,j),units_stats,ships,peaks, color_team,elements)  + attr(0) + fg('255')
     board_str += bg('0')       
     print(board_str) 
-        
+            
 def display_stats (elements, color_team, ships, units_stats, peaks):
     """
     Displays the statistics of all the ships, peaks and hubs

@@ -341,11 +341,15 @@ def AI_transfer_and_destination(ships, peaks, team, units_stats, total_peak_ener
                     if peaks[peak]['storage'] > 0 :
                     #calculate the distance between the peak and the tanker
                         distance = count_distance(peaks[peak]['coordinates'], ships[tanker]['coordinates']) 
+                        if peaks[peak]['storage'] >= units_stats[team]['tanker']['max_energy']:
+                            storage = 600 
+                        else : 
+                            storage = peaks[peak]['storage']
                         #formula of profitability
                         if distance == 0 :
-                            profitability = peaks[peak]['storage']
+                            profitability = storage
                         else :
-                            profitability = (peaks[peak]['storage']/distance) 
+                            profitability = (storage/distance) 
                         
                         #select the peak if it's the most profitable
                         if profitability >= best_profitability :

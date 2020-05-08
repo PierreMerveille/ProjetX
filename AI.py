@@ -89,7 +89,7 @@ def order_AI (team, ships, units_stats, peaks, ennemy_team, AI_stats, grouped_pe
         attack_cruiser_in_range(ships, alive_cruiser, alive_ennemy_cruiser, units_stats, team, ennemy_team)
     
     #Create order
-    order_AI += coordinates_to_go(ships, no_movement)
+    order_AI += coordinates_to_go(ships, no_movement,alive_cruiser)
     order_AI += target_to_shoot(AI_stats, alive_cruiser, ships, units_stats, team, ennemy_team)
     order = ''
     for instruction in order_AI :
@@ -178,7 +178,7 @@ def create_ships_lists(ships, team):
         
     return tanker_list, cruiser_list
 
-def coordinates_to_go (ships, no_movement):
+def coordinates_to_go (ships, no_movement,alive_cruiser):
     """
     Create the move order for all the ships
 
@@ -194,7 +194,7 @@ def coordinates_to_go (ships, no_movement):
     """
     instructions = []
 
-    for ship in ships :
+    for ship in alive_cruiser :
         #Verif if the ships is in movement or if it is arrived
         if ships[ship]['coordinates_to_go'] != ships[ship]['coordinates'] and ship not in no_movement :
             
@@ -974,7 +974,7 @@ def best_nb_upgrades(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_
         storage_or_regen = 'regeneration'
         
     ##################check range########################### 
-    if len(alive_tanker) > 0: 
+    if len(alive_tanker) > 3: 
         
         if units_stats[team]['cruiser']['range'] == 1 : 
         

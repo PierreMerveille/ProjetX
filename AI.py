@@ -422,7 +422,11 @@ def AI_transfer_and_destination(ships, peaks, team, units_stats, total_peak_ener
             if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) == 2 :
                 if ships[tanker]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100) * 60 and total_peak_energy > 0 :
                     transfer_instruction.append(str(tanker) + ':<' + str(ships[tanker]['coordinates_to_go'][0]) + '-' + str(ships[tanker]['coordinates_to_go'][1]))
-
+                    if ships[tanker]['coordinates_to_go']  ==  units_stats[team]['hub']['coordinates'] :
+                        count = 0
+                        while  AI_stats[team]['virtual_energy_point'] > 0 and count < (units_stats[team]['tanker']['max_energy'] - ships[tanker]['energy_point']) :
+                            AI_stats[team]['virtual_energy_point'] -= 1
+                            count+= 1
                 else : 
                     transfer_instruction.append(str(tanker) + ':>' + ships[tanker]['target'])
                     no_movement.append(ships[tanker]['target'])

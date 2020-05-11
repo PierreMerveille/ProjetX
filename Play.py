@@ -75,7 +75,7 @@ def play (map_title, team_1, team_1_type, team_2, team_2_type):
             order_list = ask_order (team_id,teams,link,connection, long, larg, ships, units_stats, peaks,ennemy_team,AI_stats,grouped_peaks,cost_upgrade, max_upgrade,board,team,order_list) 
             order_dico = {team_1 :{'upgrade' : '', 'move':'', 'create' : '', 'attack' :'' , 'transfer' : ''},
                         team_2 :{'upgrade' : '', 'move':'', 'create' : '', 'attack' :'' , 'transfer' : ''}}
-            print (order_list)
+        print (order_list)
             #Separate in 2 the round because there are 2 teams and start the gameplay phase
         for team in color_team :
             
@@ -433,8 +433,7 @@ def separate_instruction (order, ships, units_stats,board,team,peaks):
                     transfer_list.append([order[0],order[1]])
                                         
                 elif order[1][0] == '>' :
-                    if order[1][1:] == 'hub' or order[1][1:] in ships:
-                        transfer_list.append([order[0],order[1]])
+                    transfer_list.append([order[0],order[1]])
 
            
 
@@ -488,7 +487,7 @@ def create_units (create_list, ships, team, board, units_stats, peaks,teams) :
             
             #Get the energy point of the ship
             if instruction[1]== 'tanker' :
-                energy_point = units_stats[team][instruction[1]]['max_energy'] 
+                energy_point = 600 
             else : 
                 energy_point = units_stats['common'][instruction[1]]['max_energy']
 
@@ -661,7 +660,7 @@ def attack (attack_list, board, units_stats, ships, team, ennemy_team, peaks, en
                         for ship in ships :
                             if ships[ship]['coordinates']==coordinates:
                                 #change the value of the point of structure of the ship in the coordinate
-                                ships = change_value(ship, ships, peaks, int(coord_attack[1])*-1, 'HP', units_stats, ennemy_team)
+                                ships = change_value(ship, ships, peaks, int(coord_attack[1])*-1, 'HP', units_stats, ships[ship]['team'])
                                 hit+=1
                                 end_counter=0
                                 
@@ -976,7 +975,7 @@ def round_end (board, end_counter, units_stats, peaks, elements, color_team, shi
     board_display(board, color_team, ships, peaks, units_stats, elements, long, larg)
 
     #display stats every round end
-    #display_stats (elements, color_team, ships, units_stats, peaks)
+    display_stats (elements, color_team, ships, units_stats, peaks)
     return units_stats
     
 def select_value_to_print (board, coordinates, units_stats, ships, peaks, color_team, elements):

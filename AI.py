@@ -345,7 +345,7 @@ def AI_transfer_and_destination(ships, peaks, team, units_stats, total_peak_ener
             for cruiser in alive_cruiser :
                 if ships[cruiser]['energy_point'] <= rate * units_stats['common']['cruiser']['max_energy'] :
                     low_fuel_cruiser.append(cruiser)
-            print (low_fuel_cruiser)
+            
             #go to draw energy 
             
             if (ships[tanker]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100) * 60 and total_peak_energy > 0 ): # reflechir aux conditions
@@ -1107,7 +1107,7 @@ def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peak
                 AI_stats[team]['virtual_energy_point'] -= cost
 
     if nb_move_upgrades == 1 and AI_stats[team]['virtual_energy_point'] >= cost_upgrade['cost_move_upgrade'] and units_stats[team]['cruiser']['move']!= max_upgrade['max_travel_upgrade'] :
-        print ('bonjour')
+
         instruction.append('upgrade:move')
         AI_stats[team]['virtual_energy_point'] -= cost_upgrade['cost_move_upgrade']
 

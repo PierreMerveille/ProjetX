@@ -43,9 +43,10 @@ def order_AI (team, ships, units_stats, peaks, ennemy_team, AI_stats, grouped_pe
     stance, total_peak_energy, our_total_peak_energy, favorable_peaks = stance_function(ships, team, ennemy_team, peaks, units_stats, AI_stats, alive_cruiser,alive_ennemy_tanker, alive_ennemy_cruiser,alive_tanker)
     AI_stats[team]['virtual_energy_point'] = units_stats[team]['hub']['energy_point']
     nb_tankers_to_create_var = nb_tankers_to_create(team, units_stats, favorable_peaks, peaks)
-    order_AI += do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peaks, peaks, ennemy_team, cost_upgrade, max_upgrade)
+    order_AI += do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peaks, peaks, ennemy_team, cost_upgrade, max_upgrade,alive_cruiser,stance)
     new_cruiser_group(alive_cruiser, ships, grouped_peaks, team)
-    
+    for ship in ships :
+        ships[ship]['virtual_HP'] = ships[ship]['HP']
     #Get the strategy depending on the stance
     if stance == 'control' :
         #Control stance
@@ -66,7 +67,7 @@ def order_AI (team, ships, units_stats, peaks, ennemy_team, AI_stats, grouped_pe
         #Offensive stance
         AI_stats[team]['placed_control_cruiser'] = []
         #Create ship
-        order_AI += create_defense_attack_ship(AI_stats,team,units_stats,alive_tanker)
+        order_AI += create_defense_attack_ship(AI_stats,team,units_stats,alive_tanker,alive_cruiser)
         #Manage the tanker
         instruction, no_movement = AI_transfer_and_destination(ships, peaks, team, units_stats, total_peak_energy, alive_tanker, alive_cruiser, AI_stats, stance,no_movement)
         order_AI += instruction
@@ -78,7 +79,7 @@ def order_AI (team, ships, units_stats, peaks, ennemy_team, AI_stats, grouped_pe
 
         AI_stats[team]['placed_control_cruiser'] = []
         #Create ship
-        order_AI += create_defense_attack_ship(AI_stats, team, units_stats, alive_tanker)
+        order_AI += create_defense_attack_ship(AI_stats, team, units_stats, alive_tanker,alive_cruiser)
         #Manage the tanker
         instruction, no_movement = AI_transfer_and_destination(ships, peaks, team, units_stats, total_peak_energy, alive_tanker, alive_cruiser, AI_stats, stance,no_movement)
         order_AI += instruction
@@ -344,7 +345,7 @@ def AI_transfer_and_destination(ships, peaks, team, units_stats, total_peak_ener
             for cruiser in alive_cruiser :
                 if ships[cruiser]['energy_point'] <= rate * units_stats['common']['cruiser']['max_energy'] :
                     low_fuel_cruiser.append(cruiser)
-            
+            print (low_fuel_cruiser)
             #go to draw energy 
             
             if (ships[tanker]['energy_point'] <= (units_stats[team]['tanker']['max_energy']/100) * 60 and total_peak_energy > 0 ): # reflechir aux conditions
@@ -383,16 +384,17 @@ def AI_transfer_and_destination(ships, peaks, team, units_stats, total_peak_ener
                     # draw in the hub 
                     ships[tanker]['coordinates_to_go'] = units_stats[team]['hub']['coordinates']
                
-                if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) <= 2 and AI_stats[team]['virtual_energy_point'] > 0 :
-                    transfer_instruction.append(str(tanker) + ':<'+ str(ships[tanker]['coordinates_to_go'][0]) + '-' + str(ships[tanker]['coordinates_to_go'][1]))
-                    count = 0
-                    while  AI_stats[team]['virtual_energy_point'] > 0 and count < (units_stats[team]['tanker']['max_energy'] - ships[tanker]['energy_point']) :
-                        AI_stats[team]['virtual_energy_point'] -= 1
-                        count+= 1
+                    if count_distance(ships[tanker]['coordinates_to_go'], ships[tanker]['coordinates']) <= 2 and AI_stats[team]['virtual_energy_point'] > 0 :
+                        transfer_instruction.append(str(tanker) + ':<'+ str(ships[tanker]['coordinates_to_go'][0]) + '-' + str(ships[tanker]['coordinates_to_go'][1]))
+                        count = 0
+                        while  AI_stats[team]['virtual_energy_point'] > 0 and count < (units_stats[team]['tanker']['max_energy'] - ships[tanker]['energy_point']) :
+                            AI_stats[team]['virtual_energy_point'] -= 1
+                            count+= 1
             # go to give energy 
             else : 
                 
                 #if one of the cruiser has low fuel
+                
                 if len(low_fuel_cruiser) != 0 :
                     destination = ''
                     for cruiser in low_fuel_cruiser :
@@ -695,6 +697,7 @@ def attack_cruiser_in_range(ships, alive_cruiser , alive_ennemy_cruiser, units_s
                 if range_verification(units_stats, distance,ships,team) and ships[cruiser]['virtual_HP'] > 0 :
                     target_ships.append(cruiser) 
             if target_ships != [] : 
+                
                 #order the tanker depending on their HP and energy
                 HP_list = order_ship_by_caracteristic(target_ships, 'HP', ships)
                 energy_list = order_ship_by_caracteristic(target_ships, 'energy_point', ships)
@@ -890,7 +893,7 @@ def nb_hauls(storage_without_upgrade, storage_with_upgrade, team, units_stats, p
 
     return average_nb_hauls
 
-def best_nb_upgrades(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, favorable_peaks, cost_upgrade, max_upgrade, alive_tanker, nb_tankers_to_create_var):
+def best_nb_upgrades(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, favorable_peaks, cost_upgrade, max_upgrade, alive_tanker, nb_tankers_to_create_var,stance,alive_cruiser):
     """ 
     Calculates best nb of upgrades
 
@@ -926,6 +929,7 @@ def best_nb_upgrades(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_
     nb_range_upgrades = 0
     nb_storage_upgrades = 0
     nb_regen_upgrades = 0
+    nb_move_upgrades = 0
     regen_without_upgrade = units_stats[team]['hub']['regeneration']
     lost_money_without_regen_upgrade_list = []
     money_lost_tanker_creation_list = []
@@ -974,14 +978,14 @@ def best_nb_upgrades(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_
             average_nb_hauls_list.append(average_nb_hauls)
     
         #see if upgrade is worth it for the money during tanker creation else don't do upgrade
-        #if money_lost_tanker_creation_list[0] - money_lost_tanker_creation_list[1] - cost_upgrade['cost_storage_upgrade'] > 0:
-        if average_nb_hauls_list[0] - min(average_nb_hauls_list) >= 1 :
+        if money_lost_tanker_creation_list[0] - money_lost_tanker_creation_list[1] - cost_upgrade['cost_storage_upgrade'] > 0:
+        #if average_nb_hauls_list[0] - min(average_nb_hauls_list) >= 1 :
 
             nb_storage_upgrades = average_nb_hauls_list.index(min(average_nb_hauls_list))
 
     ###############check storage_or_regen###################
     storage_with_upgrade = storage_without_upgrade + 100 * nb_storage_upgrades
-    money_from_storage = storage_without_upgrade * (nb_tankers_to_create_var - len(alive_tanker))
+    money_from_storage = storage_with_upgrade * (nb_tankers_to_create_var - len(alive_tanker))
     regen_with_upgrade = regen_without_upgrade + nb_regen_upgrades * 5
     money_from_regen = regen_with_upgrade * nb_rounds
    
@@ -1002,7 +1006,11 @@ def best_nb_upgrades(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_
 
             nb_range_upgrades += 1 
 
-    return nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, storage_or_regen
+        elif units_stats [team]['cruiser']['range'] == max_upgrade['max_range_upgrade'] and (stance == 'offensive' or stance =='control' ) :
+            nb_move_upgrades += 1 
+       
+            
+    return nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, storage_or_regen, nb_move_upgrades
 
 def nb_tankers_to_create(team, units_stats, favorable_peaks, peaks):
     """ 
@@ -1037,7 +1045,7 @@ def nb_tankers_to_create(team, units_stats, favorable_peaks, peaks):
     
     return nb_tankers_to_create_var
 
-def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peaks, peaks, ennemy_team, cost_upgrade, max_upgrade):          
+def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peaks, peaks, ennemy_team, cost_upgrade, max_upgrade,alive_cruiser,stance):          
     """ 
     Creates instructions to make desired upgrades
     
@@ -1067,7 +1075,7 @@ def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peak
     #Get the usefull variable
     nb_rounds = find_nb_rounds(team, ships, units_stats, AI_stats, alive_tanker)
     nb_tankers_to_create_var = nb_tankers_to_create(team, units_stats, favorable_peaks, peaks)
-    nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, storage_or_regen = best_nb_upgrades(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, favorable_peaks, cost_upgrade, max_upgrade, alive_tanker,nb_tankers_to_create_var)
+    nb_range_upgrades, nb_storage_upgrades, nb_regen_upgrades, storage_or_regen, nb_move_upgrades = best_nb_upgrades(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_rounds, favorable_peaks, cost_upgrade, max_upgrade, alive_tanker,nb_tankers_to_create_var,stance,alive_cruiser)
 
     instruction = []
 
@@ -1097,7 +1105,14 @@ def do_upgrades(team, units_stats, AI_stats, ships, alive_tanker, favorable_peak
             if AI_stats[team]['virtual_energy_point'] >= cost :
                 instruction.append('upgrade:' + str(storage_or_regen))
                 AI_stats[team]['virtual_energy_point'] -= cost
-        
+
+    if nb_move_upgrades == 1 and AI_stats[team]['virtual_energy_point'] >= cost_upgrade['cost_move_upgrade'] and units_stats[team]['cruiser']['move']!= max_upgrade['max_travel_upgrade'] :
+        print ('bonjour')
+        instruction.append('upgrade:move')
+        AI_stats[team]['virtual_energy_point'] -= cost_upgrade['cost_move_upgrade']
+
+
+
     return instruction 
 
 def place_cruiser_def(ships, board, team, ennemy_team, alive_cruiser, placed_defense_cruiser, units_stats, AI_stats):
@@ -1509,7 +1524,7 @@ def range_verification (units_stats, distance, ships, team):
     else :
         return False
  
-def create_defense_attack_ship (AI_stats, team, units_stats, alive_tanker):
+def create_defense_attack_ship (AI_stats, team, units_stats, alive_tanker,alive_cruiser):
     """Create the ship in the offensive or defensive stance
     Parameters
     ----------
@@ -1530,7 +1545,7 @@ def create_defense_attack_ship (AI_stats, team, units_stats, alive_tanker):
     instructions =[]
     while AI_stats[team]['virtual_energy_point'] >= units_stats['common']['cruiser']['creation_cost'] :
        
-        if len(alive_tanker) >=3 : 
+        if len(alive_tanker) >=3 or len(alive_cruiser) == 0 :
             #Create cruiser
             instruction, name = create_IA_ship('cruiser', team, 'nb_cruiser', AI_stats)
             instructions.append(instruction)

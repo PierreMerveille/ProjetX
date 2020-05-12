@@ -246,7 +246,7 @@ def set_games (team_1, team_1_type, team_2, team_2_type, map_title) :
     
     #Get the stat for the upgrade
     max_upgrade = {'max_regen_upgrade' :  50,  'max_range_upgrade' : 5, 'max_travel_upgrade' : 5, 'max_capacity_upgrade' : 900}
-    cost_upgrade = {'cost_regen_upgrade' : 750, 'cost_range_upgrade' : 400, 'cost_travel_upgrade' : 500, 'cost_storage_upgrade':600}
+    cost_upgrade = {'cost_regen_upgrade' : 750, 'cost_range_upgrade' : 400, 'cost_move_upgrade' : 500, 'cost_storage_upgrade':600}
 
     
     ships ={}
@@ -487,7 +487,7 @@ def create_units (create_list, ships, team, board, units_stats, peaks,teams) :
             
             #Get the energy point of the ship
             if instruction[1]== 'tanker' :
-                energy_point = 600 
+                energy_point = units_stats[team]['tanker']['max_energy']
             else : 
                 energy_point = units_stats['common'][instruction[1]]['max_energy']
 
@@ -556,7 +556,7 @@ def upgrade (upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade):
                     #Verify if he has the enegergy
                     if cost_upgrade['cost_regen_upgrade']  <= units_stats[team]['hub']['energy_point']:
                         units_stats[team]['hub']['regeneration'] += 5
-                        units_stats[team]['hub']['energy_point'] -= 700
+                        units_stats[team]['hub']['energy_point'] -= cost_upgrade['cost_regen_upgrade']
 
             #Make the upgrade asked
             elif upgrade == 'storage':
@@ -568,7 +568,7 @@ def upgrade (upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade):
                     #Verify if he has the enegergy
                     if storage_cost <= units_stats[team]['hub']['energy_point']:
                         units_stats[team]['tanker']['max_energy'] += 100
-                        units_stats[team]['hub']['energy_point'] -= 600           
+                        units_stats[team]['hub']['energy_point'] -= cost_upgrade['cost_storage_upgrade']         
             
             #Make the upgrade asked
             elif upgrade == 'move':
@@ -576,10 +576,11 @@ def upgrade (upgrade_list, team, units_stats, ships, max_upgrade, cost_upgrade):
                 #Verify if you have reached the maximum upgrade
                 if units_stats[team]['cruiser']['move'] > max_upgrade['max_travel_upgrade']:
                     
-                    #Verify if he has the enegergy
-                    if cost_upgrade['cost_travel_upgrade'] <= units_stats[team]['hub']['energy_point']:
+                    #Verify if he has the energy
+                    if cost_upgrade['cost_move_upgrade'] <= units_stats[team]['hub']['energy_point']:
                         units_stats[team]['cruiser']['move'] -= 1
-                        units_stats[team]['hub']['energy_point'] -= 500
+                        units_stats[team]['hub']['energy_point'] -= cost_upgrade['cost_move_upgrade']
+                        print ('salut')
 
             #Make the upgrade asked
             elif upgrade == 'range':
@@ -740,7 +741,7 @@ def move (move_list, ships, team, board, units_stats, peaks, attacking_list) :
 
                     else:
                         #Verify if the cruiser have enough energy_point
-                        if ships[instruction[0]]['energy_point'] > max(abs(new_coord[0] - old_coord[0]), abs(new_coord[1] - old_coord[1])) * units_stats[team]['cruiser']['move'] :
+                        if ships[instruction[0]]['energy_point'] >= max(abs(new_coord[0] - old_coord[0]), abs(new_coord[1] - old_coord[1])) * units_stats[team]['cruiser']['move'] :
                             
                             #Update the stat of the cruiser
                             change_value(instruction[0], ships, peaks, ( - (max(abs(new_coord[0] - old_coord[0]), abs(new_coord[1] - old_coord[1])) * units_stats[team]['cruiser']['move'])), 'energy_point', units_stats,team)

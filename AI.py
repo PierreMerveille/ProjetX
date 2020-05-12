@@ -974,13 +974,14 @@ def best_nb_upgrades(team, ships, ennemy_team, peaks, AI_stats, units_stats, nb_
             average_nb_hauls_list.append(average_nb_hauls)
     
         #see if upgrade is worth it for the money during tanker creation else don't do upgrade
-        if money_lost_tanker_creation_list[0] - money_lost_tanker_creation_list[1] - cost_upgrade['cost_storage_upgrade'] > 0:
-            
+        #if money_lost_tanker_creation_list[0] - money_lost_tanker_creation_list[1] - cost_upgrade['cost_storage_upgrade'] > 0:
+        if average_nb_hauls_list[0] - min(average_nb_hauls_list) >= 1 :
+
             nb_storage_upgrades = average_nb_hauls_list.index(min(average_nb_hauls_list))
 
     ###############check storage_or_regen###################
     storage_with_upgrade = storage_without_upgrade + 100 * nb_storage_upgrades
-    money_from_storage = storage_with_upgrade * (nb_tankers_to_create_var - len(alive_tanker))
+    money_from_storage = storage_without_upgrade * (nb_tankers_to_create_var - len(alive_tanker))
     regen_with_upgrade = regen_without_upgrade + nb_regen_upgrades * 5
     money_from_regen = regen_with_upgrade * nb_rounds
    

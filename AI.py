@@ -1551,7 +1551,7 @@ def create_defense_attack_ship (AI_stats, team, units_stats, alive_tanker,alive_
             instructions.append(instruction)
             AI_stats[team]['virtual_energy_point'] -= units_stats['common']['cruiser']['creation_cost']
         
-        else :
+        elif AI_stats[team]['virtual_energy_point'] >= units_stats['common']['tanker']['creation_cost'] :
             #Create tanker
             instruction, name = create_IA_ship('tanker', team, 'nb_tanker', AI_stats)  
             instructions.append(instruction)

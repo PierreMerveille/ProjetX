@@ -293,7 +293,7 @@ def end_game ( color_team, units_stats, end_counter, team, ennemy_team ):
     winner = 'NO'
 
     #check if 40 rounds have passed
-    if end_counter >= 4000:
+    if end_counter >= 400:
         end = True
 
         #Verify wich team has the most health point
